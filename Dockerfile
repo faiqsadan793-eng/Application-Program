@@ -60,7 +60,8 @@ COPY composer*.json composer*.lock ./
 
 # Install PHP dependencies
 RUN composer config -g process-timeout 600 \
-    && composer install --no-dev --no-scripts --no-autoloader --no-interaction --prefer-dist
+    && composer config -g max-parallel-http 4 \
+    && (composer install --no-dev --no-scripts --no-autoloader --no-interaction || composer install --no-dev --no-scripts --no-autoloader --no-interaction --prefer-source)
 
 # Copy custom PHP configuration
 COPY docker/php/custom.ini /usr/local/etc/php/conf.d/custom.ini
