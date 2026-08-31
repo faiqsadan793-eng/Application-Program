@@ -11,6 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Trust all proxies (Crucial for Cloudflare Tunnel / Reverse Proxy)
+        $middleware->trustProxies(at: '*');
+
         // Daftarkan alias middleware role di sini
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
