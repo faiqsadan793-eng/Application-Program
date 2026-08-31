@@ -3,7 +3,14 @@ set -e
 
 echo "==> Starting Laravel Container Setup..."
 
+# Ensure vendor folder exists (in case host directory mount shadowed it)
+if [ ! -f /var/www/html/vendor/autoload.php ]; then
+    echo "==> Vendor folder not found. Installing composer dependencies..."
+    composer install --no-dev --optimize-autoloader --no-interaction
+fi
+
 # Set proper permissions for storage & cache
+mkdir -p /var/www/html/storage/framework/cache /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views /var/www/html/storage/logs
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
