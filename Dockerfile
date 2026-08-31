@@ -53,15 +53,16 @@ RUN install-php-extensions \
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-ENV COMPOSER_ALLOW_SUPERUSER=1
+ENV COMPOSER_ALLOW_SUPERUSER=1 \
+    COMPOSER_PROCESS_TIMEOUT=600 \
+    COMPOSER_MAX_PARALLEL_HTTP=4
 
 # Copy dependency files first for better Docker layer caching
 COPY composer*.json composer*.lock ./
 
-# Install PHP dependencies
-RUN composer config -g process-timeout 600 \
-    && composer config -g max-parallel-http 4 \
-    && (composer install --no-dev --no-scripts --no-autoloader --no-interaction || composer install --no-dev --no-scripts --no-autoloader --no-interaction --prefer-source)
+# Install PHP dependencies with automatic git source fallback
+RUN composer install --no-dev --no-scripts --no-autoloader --no-interaction || \
+    composer install --no-dev --no-scripts --no-autoloader --no-interaction --prefer-source
 
 # Copy custom PHP configuration
 COPY docker/php/custom.ini /usr/local/etc/php/conf.d/custom.ini
