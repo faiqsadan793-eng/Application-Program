@@ -58,10 +58,9 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 # Copy dependency files first for better Docker layer caching
 COPY composer*.json composer*.lock ./
 
-# Install PHP dependencies (with HTTP fallback to prevent GitHub HTTP/2 400 glitches)
+# Install PHP dependencies
 RUN composer config -g process-timeout 600 \
-    && composer config -g -- http.curl-options.CURLOPT_HTTP_VERSION 2 \
-    && (composer install --no-dev --no-scripts --no-autoloader --no-interaction --prefer-dist || composer install --no-dev --no-scripts --no-autoloader --no-interaction)
+    && composer install --no-dev --no-scripts --no-autoloader --no-interaction --prefer-dist
 
 # Copy custom PHP configuration
 COPY docker/php/custom.ini /usr/local/etc/php/conf.d/custom.ini
