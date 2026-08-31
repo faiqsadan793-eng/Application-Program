@@ -53,6 +53,15 @@ RUN install-php-extensions \
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
+
+# Copy dependency files first for better Docker layer caching
+COPY composer*.json composer*.lock ./
+
+# Install PHP dependencies (with HTTP fallback to prevent GitHub HTTP/2 400 glitches)
+RUN composer config -g process-timeout 600 \
+    && composer config -g -- http.curl-options.CURLOPT_HTTP_VERSION 2 \
+    && (composer install --no-dev --no-scripts --no-autoloader --no-interaction --prefer-dist || composer install --no-dev --no-scripts --no-autoloader --no-interaction)
 
 # Copy custom PHP configuration
 COPY docker/php/custom.ini /usr/local/etc/php/conf.d/custom.ini
@@ -68,8 +77,8 @@ COPY . /var/www/html
 # Copy compiled frontend assets from Stage 1
 COPY --from=frontend /app/public/build /var/www/html/public/build
 
-# Install PHP dependencies without dev packages for production
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Generate optimized autoload classmap
+RUN composer dump-autoload --optimize --no-dev
 
 # Set directory permissions for Laravel storage and bootstrap cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
