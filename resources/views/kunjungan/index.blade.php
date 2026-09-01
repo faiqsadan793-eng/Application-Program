@@ -25,17 +25,9 @@
 
         <div class="flex-1 flex flex-col">
             <header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
-                <div class="w-full max-w-xl">
-                    {{-- Header search langsung submit form filter --}}
-                    <form method="GET" action="{{ route('kunjungan.index') }}" class="relative">
-                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-                        <input type="text" name="search" value="{{ request('search') }}"
-                            placeholder="Cari nama pasien atau No. RM..."
-                            class="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-12 pr-4 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
-                    </form>
-                </div>
+                @include('layouts.header-page-info', ['breadcrumb' => 'Klinik Lala Medicare / Kunjungan', 'title' => 'Riwayat Kunjungan Pasien'])
                 <div class="flex items-center gap-4">
-                    <div class="h-8 w-px bg-slate-200"></div>
+                    @include('layouts.header-date')
                     <div class="flex items-center gap-3">
                         <div class="hidden sm:block text-right">
                             <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>

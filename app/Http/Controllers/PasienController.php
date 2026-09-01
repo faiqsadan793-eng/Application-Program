@@ -43,7 +43,7 @@ class PasienController extends Controller
                 });
             })
             ->latest()
-            ->paginate(15)
+            ->paginate(7)
             ->withQueryString();
 
         $antreanHariIni = Kunjungan::with('pasien')

@@ -29,19 +29,9 @@
 
         <div class="flex-1 flex flex-col">
             <header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center justify-between no-print">
-                <div class="w-full max-w-xl">
-                    <form method="GET" action="{{ route('riwayat-transaksi.index') }}" class="relative">
-                        {{-- Preserve date filters when searching --}}
-                        @if(request('tanggal_dari'))<input type="hidden" name="tanggal_dari" value="{{ request('tanggal_dari') }}">@endif
-                        @if(request('tanggal_sampai'))<input type="hidden" name="tanggal_sampai" value="{{ request('tanggal_sampai') }}">@endif
-                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-                        <input type="text" name="search" value="{{ request('search') }}"
-                            placeholder="Cari nama pasien atau No. Transaksi..."
-                            class="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-12 pr-4 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
-                    </form>
-                </div>
+                @include('layouts.header-page-info', ['breadcrumb' => 'Klinik Lala Medicare / Transaksi', 'title' => 'Riwayat Transaksi'])
                 <div class="flex items-center gap-4">
-                    <div class="h-8 w-px bg-slate-200"></div>
+                    @include('layouts.header-date')
                     <div class="flex items-center gap-3">
                         <div class="hidden sm:block text-right">
                             <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>
@@ -183,6 +173,7 @@
                                                         'total_biaya' => $t->total_biaya,
                                                         'uang_dibayar' => $t->uang_dibayar,
                                                         'kembalian' => $t->kembalian,
+                                                        'metode_pembayaran' => \App\Models\Transaksi::labelMetodePembayaran($t->metode_pembayaran),
                                                     ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) }})'
                                                     class="inline-flex items-center gap-1.5 rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-600 hover:text-white hover:border-emerald-600">
                                                     <span class="material-symbols-outlined text-[16px]">receipt_long</span> Detail
@@ -277,6 +268,10 @@
                         <span id="detailTotalBiaya" class="font-bold text-emerald-800">Rp 0</span>
                     </div>
                     <div class="flex justify-between">
+                        <span class="text-slate-600">Metode Pembayaran</span>
+                        <span id="detailMetodePembayaran" class="font-semibold text-slate-800">-</span>
+                    </div>
+                    <div class="flex justify-between">
                         <span class="text-slate-600">Uang Diterima</span>
                         <span id="detailUangDibayar" class="font-semibold text-slate-800">Rp 0</span>
                     </div>
@@ -322,6 +317,7 @@
             document.getElementById('detailBiayaTindakan').innerText = formatRupiah(data.biaya_tindakan);
             document.getElementById('detailBiayaObat').innerText = formatRupiah(data.biaya_obat);
             document.getElementById('detailTotalBiaya').innerText = formatRupiah(data.total_biaya);
+            document.getElementById('detailMetodePembayaran').innerText = data.metode_pembayaran;
             document.getElementById('detailUangDibayar').innerText = formatRupiah(data.uang_dibayar);
             document.getElementById('detailKembalian').innerText = formatRupiah(data.kembalian);
 

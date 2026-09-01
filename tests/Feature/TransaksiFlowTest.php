@@ -22,6 +22,7 @@ class TransaksiFlowTest extends TestCase
             'biaya_tindakan' => 50000,
             'biaya_obat' => 12500,
             'uang_dibayar' => 100000,
+            'metode_pembayaran' => 'cash',
             // Nilai ini sengaja salah; server wajib mengabaikannya.
             'total_biaya' => 1,
             'kembalian' => 999999,
@@ -34,6 +35,7 @@ class TransaksiFlowTest extends TestCase
             'total_biaya' => 62500,
             'uang_dibayar' => 100000,
             'kembalian' => 37500,
+            'metode_pembayaran' => 'cash',
             'status_pembayaran' => Transaksi::STATUS_LUNAS,
         ]);
         $this->assertDatabaseHas('kunjungans', [
@@ -51,6 +53,7 @@ class TransaksiFlowTest extends TestCase
             'biaya_tindakan' => 50000,
             'biaya_obat' => 12500,
             'uang_dibayar' => 60000,
+            'metode_pembayaran' => 'cash',
         ])->assertSessionHas('error');
 
         $this->assertDatabaseHas('transaksis', [

@@ -24,15 +24,9 @@
 
         <div class="flex-1 flex flex-col">
             <header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
-                <div class="w-full max-w-xl">
-                    <form method="GET" action="{{ route('pasien.index') }}" class="relative">
-                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-                        <input type="text" name="search" placeholder="Cari nama pasien, NIK, atau No. RM..." class="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-12 pr-4 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
-                    </form>
-                </div>
-
+                @include('layouts.header-page-info', ['breadcrumb' => 'Klinik Lala Medicare / Pasien', 'title' => 'Input Pasien Baru'])
                 <div class="flex items-center gap-4">
-                    <div class="h-8 w-px bg-slate-200"></div>
+                    @include('layouts.header-date')
                     <div class="flex items-center gap-3">
                         <div class="hidden sm:block text-right">
                             <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>
@@ -54,8 +48,8 @@
                         </div>
 
                         <div class="flex items-center gap-2 bg-slate-50 p-1 rounded-full border border-slate-200">
-                            <a href="{{ route('pasien.index') }}" class="px-5 py-2 rounded-full text-slate-600 font-medium hover:bg-white/50">Cari Pasien Lama</a>
-                            <a href="{{ route('pasien.create') }}" class="px-5 py-2 rounded-full bg-white text-emerald-700 font-semibold shadow-sm">Input Pasien Baru</a>
+                            <a href="{{ route('pasien.index') }}" class="px-5 py-2 rounded-full text-slate-600 font-medium transition hover:bg-white">Cari Pasien Lama</a>
+                            <a href="{{ route('pasien.create') }}" class="px-5 py-2 rounded-full bg-emerald-600 text-white font-semibold shadow-sm transition hover:bg-emerald-700">Input Pasien Baru</a>
                         </div>
                     </div>
 

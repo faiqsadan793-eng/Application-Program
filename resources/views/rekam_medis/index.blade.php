@@ -24,12 +24,9 @@
 
         <div class="flex-1 flex flex-col">
             <header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
-                <div>
-                    <p class="text-sm text-slate-500">Panel Dokter</p>
-                    <p class="font-semibold text-slate-900">Daftar Antrean Pemeriksaan</p>
-                </div>
+                @include('layouts.header-page-info', ['breadcrumb' => 'Panel Dokter / Rekam Medis', 'title' => 'Daftar Antrean Pemeriksaan'])
                 <div class="flex items-center gap-4">
-                    <div class="h-8 w-px bg-slate-200"></div>
+                    @include('layouts.header-date')
                     <div class="flex items-center gap-3">
                         <div class="hidden sm:block text-right">
                             <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>

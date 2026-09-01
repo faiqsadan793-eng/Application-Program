@@ -38,7 +38,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
-                    <div class="h-8 w-px bg-slate-200"></div>
+                    @include('layouts.header-date')
                     <div class="flex items-center gap-3">
                         <div class="hidden sm:block text-right">
                             <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>
@@ -52,13 +52,18 @@
             </header>
 
             <main class="flex-1 overflow-y-auto p-6">
-                <div class="max-w-[860px] mx-auto space-y-5">
+                <div class="max-w-6xl mx-auto space-y-5">
 
-                    {{-- Badge status di atas --}}
+                    {{-- Judul, tombol kembali, dan status --}}
                     <div class="flex items-center justify-between">
-                        <h2 class="text-xl font-bold text-slate-900">
-                            Detail Kunjungan
-                        </h2>
+                        <div class="flex items-center gap-4">
+                            <a href="{{ route('kunjungan.index') }}"
+                                class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+                                <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+                                Kembali ke Riwayat
+                            </a>
+                            <h2 class="text-xl font-bold text-slate-900">Detail Kunjungan</h2>
+                        </div>
                         @if($kunjungan->status === 'selesai')
                             <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-4 py-1.5 text-sm font-semibold text-emerald-800">
                                 <span class="material-symbols-outlined text-[16px]">check_circle</span> Selesai
@@ -74,6 +79,7 @@
                         @endif
                     </div>
 
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
                     {{-- CARD 1: Info Kunjungan & Pasien --}}
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                         <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
@@ -171,6 +177,7 @@
                             </div>
                         @endif
                     </div>
+                    </div>
 
                     {{-- CARD 3: Transaksi / Pembayaran --}}
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
@@ -212,6 +219,14 @@
                                             @endif
                                         </div>
                                     </div>
+                                    @if($kunjungan->transaksi->status_pembayaran === 'lunas')
+                                        <div>
+                                            <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Metode Pembayaran</p>
+                                            <p class="mt-1 font-semibold text-slate-900">
+                                                {{ \App\Models\Transaksi::labelMetodePembayaran($kunjungan->transaksi->metode_pembayaran) }}
+                                            </p>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         @else
@@ -220,15 +235,6 @@
                                 <p class="text-slate-400 text-sm">Belum ada data pembayaran untuk kunjungan ini.</p>
                             </div>
                         @endif
-                    </div>
-
-                    {{-- Tombol kembali --}}
-                    <div class="flex justify-start pb-4">
-                        <a href="{{ route('kunjungan.index') }}"
-                            class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
-                            <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-                            Kembali ke Riwayat
-                        </a>
                     </div>
 
                 </div>

@@ -60,7 +60,7 @@ class KunjunganController extends Controller
 
         $kunjungans = $query->latest('tgl_kunjungan')
                             ->latest('id_kunjungan')
-                            ->paginate(20)
+                            ->paginate(7)
                             ->withQueryString(); // pertahankan filter di pagination
 
         return view('kunjungan.index', compact('kunjungans'));

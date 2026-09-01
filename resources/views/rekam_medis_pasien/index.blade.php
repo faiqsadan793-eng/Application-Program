@@ -22,8 +22,10 @@
         @include('layouts.sidebar')
 
         <div class="flex min-w-0 flex-1 flex-col">
-            <header class="h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-end shadow-sm">
+            <header class="h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between shadow-sm">
+                @include('layouts.header-page-info', ['breadcrumb' => 'Klinik Lala Medicare / Rekam Medis', 'title' => 'Rekam Medis Pasien'])
                 <div class="flex items-center gap-3">
+                    @include('layouts.header-date')
                     <div class="ml-1 flex items-center gap-3 border-l border-slate-200 pl-4">
                         <div class="hidden text-right sm:block">
                             <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>

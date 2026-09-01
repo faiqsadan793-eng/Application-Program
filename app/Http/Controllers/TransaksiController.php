@@ -24,6 +24,7 @@ class TransaksiController extends Controller
             'biaya_tindakan' => 'required|numeric|min:0',
             'biaya_obat'     => 'required|numeric|min:0',
             'uang_dibayar'   => 'required|numeric|min:0',
+            'metode_pembayaran' => 'required|in:cash,qr,debit',
         ]);
 
         try {
@@ -62,6 +63,7 @@ class TransaksiController extends Controller
                     'total_biaya'       => $totalBiaya,
                     'uang_dibayar'      => $uangDibayar,
                     'kembalian'         => round($uangDibayar - $totalBiaya, 2),
+                    'metode_pembayaran' => $validated['metode_pembayaran'],
                     'status_pembayaran' => Transaksi::STATUS_LUNAS,
                 ]);
 
@@ -98,11 +100,11 @@ class TransaksiController extends Controller
             $query->whereDate('updated_at', '<=', $request->tanggal_sampai);
         }
 
-        $riwayat = $query->latest('updated_at')->paginate(15);
-
-        // Hitung total pendapatan dari hasil filter
+        // Hitung ringkasan dari seluruh hasil filter sebelum query dibatasi pagination.
         $totalPendapatan = (clone $query)->sum('total_biaya');
         $jumlahTransaksi = (clone $query)->count();
+
+        $riwayat = $query->latest('updated_at')->paginate(7);
 
         return view('transaksi.riwayat', compact('riwayat', 'totalPendapatan', 'jumlahTransaksi'));
     }

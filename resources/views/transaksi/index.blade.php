@@ -24,14 +24,9 @@
 
         <div class="flex-1 flex flex-col">
             <header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
-                <div class="w-full max-w-xl">
-                    <div class="relative">
-                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
-                        <input type="text" placeholder="Cari transaksi..." class="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-12 pr-4 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
-                    </div>
-                </div>
+                @include('layouts.header-page-info', ['breadcrumb' => 'Klinik Lala Medicare / Transaksi', 'title' => 'Pembayaran Pasien'])
                 <div class="flex items-center gap-4">
-                    <div class="h-8 w-px bg-slate-200"></div>
+                    @include('layouts.header-date')
                     <div class="flex items-center gap-3">
                         <div class="hidden sm:block text-right">
                             <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>
@@ -134,7 +129,7 @@
 
     <!-- Modal Pembayaran Rinci -->
     <div id="paymentModal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
+        <div class="bg-white rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
             <div class="border-b border-slate-200 bg-slate-50 px-6 py-4 flex items-center justify-between">
                 <div class="flex items-center gap-2 text-slate-900">
                     <span class="material-symbols-outlined text-2xl text-emerald-600">payments</span>
@@ -149,6 +144,10 @@
                 @csrf
                 @method('PUT')
 
+                <div id="paymentValidationAlert" class="hidden rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700" role="alert"></div>
+
+                <div class="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-start">
+                    <div class="space-y-4">
                 <!-- Info Pasien -->
                 <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-150 text-sm">
                     <div>
@@ -176,22 +175,25 @@
                         <p id="modalResepObat" class="text-slate-800 mt-0.5 font-medium whitespace-pre-line">-</p>
                     </div>
                 </div>
+                    </div>
 
                 <!-- Form Rincian Transaksi -->
                 <div class="space-y-3">
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Jasa Dokter / Tindakan</label>
+                            <label class="mb-1 flex min-h-8 items-end text-xs font-semibold uppercase tracking-wider text-slate-600">Jasa Dokter / Tindakan</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">Rp</span>
-                                <input type="number" id="inputJasaDokter" name="biaya_tindakan" value="50000" min="0" oninput="calculateTotal()" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-50 text-sm font-semibold outline-none focus:ring-2 focus:ring-emerald-100" required />
+                                <input type="text" id="displayBiayaTindakan" value="50.000" inputmode="numeric" autocomplete="off" oninput="formatPaymentInput(this); calculateTotal()" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-50 text-sm font-semibold outline-none focus:ring-2 focus:ring-emerald-100" required />
+                                <input type="hidden" id="inputJasaDokter" name="biaya_tindakan" value="50000" />
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Biaya Obat</label>
+                            <label class="mb-1 flex min-h-8 items-end text-xs font-semibold uppercase tracking-wider text-slate-600">Biaya Obat</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">Rp</span>
-                                <input type="number" id="inputBiayaObat" name="biaya_obat" value="0" min="0" oninput="calculateTotal()" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-50 text-sm font-semibold outline-none focus:ring-2 focus:ring-emerald-100" required />
+                                <input type="text" id="displayBiayaObat" value="0" inputmode="numeric" autocomplete="off" oninput="formatPaymentInput(this); calculateTotal()" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-50 text-sm font-semibold outline-none focus:ring-2 focus:ring-emerald-100" required />
+                                <input type="hidden" id="inputBiayaObat" name="biaya_obat" value="0" />
                             </div>
                         </div>
                     </div>
@@ -201,27 +203,48 @@
                             <span class="text-sm font-bold text-slate-700">Total Biaya Tagihan</span>
                             <div class="relative w-44">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-bold">Rp</span>
-                                <input type="number" id="inputTotalBiaya" readonly min="0" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-100 font-bold text-emerald-800 text-sm outline-none" />
+                                <input type="text" id="inputTotalBiaya" readonly class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-100 font-bold text-emerald-800 text-sm outline-none" />
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-100 pt-3">
+                        <p class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Metode Pembayaran</p>
+                        <input type="hidden" id="inputMetodePembayaran" name="metode_pembayaran" value="cash" />
+                        <div class="grid grid-cols-3 gap-2" role="group" aria-label="Metode pembayaran">
+                            <button type="button" data-payment-method="cash" onclick="selectPaymentMethod('cash')" class="inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-3 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-emerald-200">
+                                <span class="material-symbols-outlined text-[19px]">payments</span>
+                                Cash
+                            </button>
+                            <button type="button" data-payment-method="qr" onclick="selectPaymentMethod('qr')" class="inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-3 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-emerald-200">
+                                <span class="material-symbols-outlined text-[19px]">qr_code_2</span>
+                                QRIS
+                            </button>
+                            <button type="button" data-payment-method="debit" onclick="selectPaymentMethod('debit')" class="inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-3 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-emerald-200">
+                                <span class="material-symbols-outlined text-[19px]">credit_card</span>
+                                Debit
+                            </button>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3 border-t border-slate-100 pt-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Uang Diterima (Tunai)</label>
+                            <label id="labelUangDibayar" class="mb-1 flex min-h-8 items-end text-xs font-bold uppercase tracking-wider text-slate-700">Uang Diterima (Cash)</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-bold">Rp</span>
-                                <input type="number" id="inputUangDibayar" name="uang_dibayar" value="0" min="0" oninput="calculateChange()" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-emerald-300 bg-emerald-50/50 text-sm font-bold text-emerald-900 outline-none focus:ring-2 focus:ring-emerald-200" required />
+                                <input type="text" id="displayUangDibayar" value="0" inputmode="numeric" autocomplete="off" oninput="formatPaymentInput(this); calculateChange()" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-emerald-300 bg-emerald-50/50 text-sm font-bold text-emerald-900 outline-none focus:ring-2 focus:ring-emerald-200" required />
+                                <input type="hidden" id="inputUangDibayar" name="uang_dibayar" value="0" />
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-1">Uang Kembalian</label>
+                            <label class="mb-1 flex min-h-8 items-end text-xs font-semibold uppercase tracking-wider text-slate-600">Uang Kembalian</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">Rp</span>
-                                <input type="number" id="inputKembalian" readonly min="0" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-100 font-semibold text-slate-700 text-sm outline-none" />
+                                <input type="text" id="inputKembalian" readonly class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-100 font-semibold text-slate-700 text-sm outline-none" />
                             </div>
                         </div>
                     </div>
+                </div>
                 </div>
 
                 <div class="pt-4 border-t border-slate-200 flex justify-end gap-3">
@@ -237,6 +260,24 @@
     </div>
 
     <script>
+        function paymentValue(value) {
+            return Number(String(value).replace(/\D/g, '')) || 0;
+        }
+
+        function formatRupiahNumber(value) {
+            return paymentValue(value).toLocaleString('id-ID');
+        }
+
+        function formatPaymentInput(input) {
+            input.value = formatRupiahNumber(input.value);
+        }
+
+        function setPaymentAlert(message = '') {
+            const alertBox = document.getElementById('paymentValidationAlert');
+            alertBox.textContent = message;
+            alertBox.classList.toggle('hidden', message === '');
+        }
+
         function openPaymentModal(data) {
             document.getElementById('modalNoAntrean').innerText = data.no_antrean;
             document.getElementById('modalPoli').innerText = data.poli;
@@ -244,9 +285,11 @@
             document.getElementById('modalDiagnosa').innerText = data.diagnosa;
             document.getElementById('modalResepObat').innerText = data.resep_obat;
 
-            document.getElementById('inputJasaDokter').value = data.jasa_dokter || 50000;
-            document.getElementById('inputBiayaObat').value = 0;
-            document.getElementById('inputUangDibayar').value = 0;
+            document.getElementById('displayBiayaTindakan').value = formatRupiahNumber(data.jasa_dokter || 50000);
+            document.getElementById('displayBiayaObat').value = '0';
+            document.getElementById('displayUangDibayar').value = '0';
+            selectPaymentMethod('cash');
+            setPaymentAlert();
 
             const form = document.getElementById('paymentForm');
             form.action = `/transaksi/${data.id_transaksi}`;
@@ -260,23 +303,71 @@
         function closePaymentModal() {
             const modal = document.getElementById('paymentModal');
             modal.classList.add('hidden');
+            setPaymentAlert();
         }
 
         function calculateTotal() {
-            const jasaDokter = parseFloat(document.getElementById('inputJasaDokter').value) || 0;
-            const biayaObat = parseFloat(document.getElementById('inputBiayaObat').value) || 0;
+            const jasaDokter = paymentValue(document.getElementById('displayBiayaTindakan').value);
+            const biayaObat = paymentValue(document.getElementById('displayBiayaObat').value);
             const total = jasaDokter + biayaObat;
-            document.getElementById('inputTotalBiaya').value = total;
+            document.getElementById('inputJasaDokter').value = jasaDokter;
+            document.getElementById('inputBiayaObat').value = biayaObat;
+            document.getElementById('inputTotalBiaya').value = formatRupiahNumber(total);
 
             calculateChange();
         }
 
         function calculateChange() {
-            const total = parseFloat(document.getElementById('inputTotalBiaya').value) || 0;
-            const uangDibayar = parseFloat(document.getElementById('inputUangDibayar').value) || 0;
+            const total = paymentValue(document.getElementById('inputTotalBiaya').value);
+            const uangDibayar = paymentValue(document.getElementById('displayUangDibayar').value);
             const kembalian = uangDibayar - total;
-            document.getElementById('inputKembalian').value = kembalian >= 0 ? kembalian : 0;
+            document.getElementById('inputUangDibayar').value = uangDibayar;
+            document.getElementById('inputKembalian').value = formatRupiahNumber(kembalian >= 0 ? kembalian : 0);
         }
+
+        function selectPaymentMethod(method) {
+            document.getElementById('inputMetodePembayaran').value = method;
+            handlePaymentMethodChange();
+        }
+
+        function handlePaymentMethodChange() {
+            const method = document.getElementById('inputMetodePembayaran').value;
+            const paymentInput = document.getElementById('displayUangDibayar');
+            const isCash = method === 'cash';
+
+            document.querySelectorAll('[data-payment-method]').forEach((button) => {
+                const isSelected = button.dataset.paymentMethod === method;
+                button.classList.toggle('border-emerald-600', isSelected);
+                button.classList.toggle('bg-emerald-600', isSelected);
+                button.classList.toggle('text-white', isSelected);
+                button.classList.toggle('shadow-sm', isSelected);
+                button.classList.toggle('border-slate-300', !isSelected);
+                button.classList.toggle('bg-white', !isSelected);
+                button.classList.toggle('text-slate-600', !isSelected);
+            });
+
+            document.getElementById('labelUangDibayar').textContent = isCash
+                ? 'Uang Diterima (Cash)'
+                : `Nominal Pembayaran (${method === 'qr' ? 'QRIS' : 'Debit'})`;
+            paymentInput.readOnly = false;
+            paymentInput.classList.remove('bg-slate-100');
+            paymentInput.classList.add('bg-emerald-50/50');
+
+            calculateTotal();
+        }
+
+        document.getElementById('paymentForm').addEventListener('submit', function (event) {
+            calculateTotal();
+
+            const total = paymentValue(document.getElementById('inputTotalBiaya').value);
+            const uangDibayar = paymentValue(document.getElementById('displayUangDibayar').value);
+
+            if (uangDibayar < total) {
+                event.preventDefault();
+                setPaymentAlert('Nominal pembayaran kurang dari total tagihan. Silakan periksa kembali nominal yang diterima.');
+                document.getElementById('displayUangDibayar').focus();
+            }
+        });
     </script>
 </body>
 </html>

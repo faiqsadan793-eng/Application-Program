@@ -19,6 +19,7 @@ class Transaksi extends Model
         'total_biaya',
         'uang_dibayar',
         'kembalian',
+        'metode_pembayaran',
         'status_pembayaran',
     ];
 
@@ -35,6 +36,19 @@ class Transaksi extends Model
 
     const STATUS_BELUM = 'belum';
     const STATUS_LUNAS = 'lunas';
+
+    const METODE_CASH = 'cash';
+    const METODE_QR = 'qr';
+    const METODE_DEBIT = 'debit';
+
+    public static function labelMetodePembayaran(?string $metode): string
+    {
+        return match ($metode) {
+            self::METODE_QR => 'QRIS',
+            self::METODE_DEBIT => 'Debit',
+            default => 'Cash',
+        };
+    }
 
     public function kunjungan()
     {
