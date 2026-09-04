@@ -75,8 +75,9 @@ RUN chmod +x /usr/local/bin/entrypoint.sh && \
 # Copy application source code
 COPY . /var/www/html
 
-# Copy compiled frontend assets from Stage 1
+# Copy compiled frontend assets from Stage 1 into public/build and backup dist directory
 COPY --from=frontend /app/public/build /var/www/html/public/build
+COPY --from=frontend /app/public/build /var/www/build-dist
 
 # Generate optimized autoload classmap
 RUN composer dump-autoload --optimize --no-dev

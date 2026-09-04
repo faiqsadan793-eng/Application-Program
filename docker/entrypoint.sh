@@ -9,6 +9,13 @@ if [ ! -f /var/www/html/vendor/autoload.php ]; then
     composer install --no-dev --optimize-autoloader --no-interaction
 fi
 
+# Always sync the latest compiled frontend assets from the image to public/build
+if [ -d /var/www/build-dist ]; then
+    echo "==> Syncing fresh compiled assets to public/build..."
+    mkdir -p /var/www/html/public/build
+    cp -rf /var/www/build-dist/* /var/www/html/public/build/
+fi
+
 # Set proper permissions for storage & cache
 mkdir -p /var/www/html/storage/framework/cache /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views /var/www/html/storage/logs
 chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
