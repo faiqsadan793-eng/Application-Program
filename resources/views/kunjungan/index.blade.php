@@ -100,6 +100,7 @@
                                         <option value="menunggu"  {{ request('status') === 'menunggu'  ? 'selected' : '' }}>Menunggu</option>
                                         <option value="siap_bayar"{{ request('status') === 'siap_bayar'? 'selected' : '' }}>Siap Bayar</option>
                                         <option value="selesai"   {{ request('status') === 'selesai'   ? 'selected' : '' }}>Selesai</option>
+                                        <option value="dibatalkan"{{ request('status') === 'dibatalkan'? 'selected' : '' }}>Dibatalkan</option>
                                     </select>
                                 </div>
 
@@ -167,6 +168,8 @@
                                             <td class="px-6 py-5">
                                                 @if($kunjungan->status === 'selesai')
                                                     <span class="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold text-emerald-800">Selesai</span>
+                                                @elseif($kunjungan->status === 'dibatalkan')
+                                                    <span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-[11px] font-semibold text-red-800">Dibatalkan</span>
                                                 @elseif($kunjungan->status === 'siap_bayar')
                                                     <span class="inline-flex rounded-full bg-orange-100 px-3 py-1 text-[11px] font-semibold text-orange-800">Siap Bayar</span>
                                                 @elseif(in_array($kunjungan->status, ['antre', 'menunggu_dokter']))

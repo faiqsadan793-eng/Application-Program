@@ -121,6 +121,8 @@
                                                 <span class="inline-flex rounded-full bg-sky-100 px-3 py-1 text-[11px] font-semibold text-sky-800">Pemeriksaan</span>
                                             @elseif($antrean->status == 'siap_bayar')
                                                 <span class="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold text-emerald-800">Siap Bayar</span>
+                                            @elseif($antrean->status == 'dibatalkan')
+                                                <span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-[11px] font-semibold text-red-800">Dibatalkan</span>
                                             @else
                                                 <span class="inline-flex rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold text-slate-800">Selesai</span>
                                             @endif
@@ -133,6 +135,10 @@
                                             @elseif($antrean->status == 'siap_bayar')
                                                 <span class="inline-flex items-center gap-1 rounded-2xl bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 border border-orange-200">
                                                     <span class="material-symbols-outlined text-[16px]">payments</span> Ke Kasir
+                                                </span>
+                                            @elseif($antrean->status == 'dibatalkan')
+                                                <span class="inline-flex items-center gap-1 rounded-2xl border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700">
+                                                    <span class="material-symbols-outlined text-[16px]">cancel</span> Dibatalkan
                                                 </span>
                                             @else
                                                 <span class="inline-flex items-center gap-1 rounded-2xl bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 border border-emerald-200">

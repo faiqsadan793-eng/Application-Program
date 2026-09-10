@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\DB;
 
 class TransaksiController extends Controller
 {
+    private const MAX_NOMINAL = 9_999_999_999;
+
     public function index()
     {
         $transaksis = Transaksi::with(['kunjungan.pasien', 'kunjungan.rekamMedis'])
@@ -20,11 +22,15 @@ class TransaksiController extends Controller
 
     public function update(Request $request, $id)
     {
+        // Dipakai untuk membuka kembali transaksi yang sama jika validasi gagal.
+        $request->merge(['payment_transaction_id' => (int) $id]);
+
         $validated = $request->validate([
-            'biaya_tindakan' => 'required|numeric|min:0',
-            'biaya_obat'     => 'required|numeric|min:0',
-            'uang_dibayar'   => 'required|numeric|min:0',
-            'metode_pembayaran' => 'required|in:cash,qr,debit',
+            'payment_transaction_id' => ['required', 'integer'],
+            'biaya_tindakan' => ['required', 'integer', 'min:0', 'max:'.self::MAX_NOMINAL],
+            'biaya_obat' => ['required', 'integer', 'min:0', 'max:'.self::MAX_NOMINAL],
+            'uang_dibayar' => ['required', 'integer', 'min:0', 'max:'.self::MAX_NOMINAL],
+            'metode_pembayaran' => ['required', 'in:cash,qr,debit'],
         ]);
 
         try {
@@ -53,6 +59,10 @@ class TransaksiController extends Controller
                 $totalBiaya = round($biayaTindakan + $biayaObat, 2);
                 $uangDibayar = round((float) $validated['uang_dibayar'], 2);
 
+                if ($totalBiaya > self::MAX_NOMINAL) {
+                    abort(422, 'Total biaya melebihi batas nominal yang dapat disimpan.');
+                }
+
                 if ($uangDibayar < $totalBiaya) {
                     abort(422, 'Uang dibayar tidak boleh kurang dari total biaya.');
                 }
@@ -70,10 +80,12 @@ class TransaksiController extends Controller
                 $transaksi->kunjungan->update(['status' => \App\Models\Kunjungan::STATUS_SELESAI]);
             });
         } catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $exception) {
-            return redirect()->back()->with('error', $exception->getMessage());
+            return redirect()->back()->withInput()->with('error', $exception->getMessage());
         }
 
-        return redirect()->back()->with('success', 'Pembayaran berhasil dicatat. Transaksi selesai!');
+        return redirect()->back()
+            ->with('success', 'Pembayaran berhasil dicatat. Transaksi selesai!')
+            ->with('completed_payment_id', (int) $id);
     }
 
     public function riwayat(Request $request)

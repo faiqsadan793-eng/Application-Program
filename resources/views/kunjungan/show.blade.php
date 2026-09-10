@@ -54,6 +54,17 @@
             <main class="flex-1 overflow-y-auto p-6">
                 <div class="max-w-6xl mx-auto space-y-5">
 
+                    @if(session('success'))
+                        <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800">
+                            {{ session('success') }}
+                        </div>
+                    @endif
+                    @if(session('error'))
+                        <div class="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
                     {{-- Judul, tombol kembali, dan status --}}
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-4">
@@ -67,6 +78,10 @@
                         @if($kunjungan->status === 'selesai')
                             <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-4 py-1.5 text-sm font-semibold text-emerald-800">
                                 <span class="material-symbols-outlined text-[16px]">check_circle</span> Selesai
+                            </span>
+                        @elseif($kunjungan->status === 'dibatalkan')
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-4 py-1.5 text-sm font-semibold text-red-800">
+                                <span class="material-symbols-outlined text-[16px]">cancel</span> Dibatalkan
                             </span>
                         @elseif($kunjungan->status === 'siap_bayar')
                             <span class="inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-4 py-1.5 text-sm font-semibold text-orange-800">
@@ -177,6 +192,36 @@
                             </div>
                         @endif
                     </div>
+
+                    @if(in_array($kunjungan->status, ['antre', 'menunggu_dokter']))
+                        <form method="POST" action="{{ route('kunjungan.batalkan', $kunjungan) }}" class="rounded-3xl border border-red-200 bg-red-50 p-5 lg:col-span-2">
+                            @csrf
+                            @method('PATCH')
+                            <label for="alasan_pembatalan" class="block text-sm font-semibold text-red-900">Batalkan kunjungan</label>
+                            <p class="mt-1 text-xs text-red-700">Data kunjungan tetap tersimpan dalam riwayat dan pasien dapat didaftarkan kembali.</p>
+                            <div class="mt-3 flex flex-col gap-3 sm:flex-row">
+                                <textarea id="alasan_pembatalan" name="alasan_pembatalan" rows="2" maxlength="500" required
+                                    class="min-h-20 flex-1 rounded-2xl border border-red-200 bg-white px-4 py-3 text-sm outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                                    placeholder="Contoh: pasien pulang, salah memilih poli, atau membatalkan pemeriksaan">{{ old('alasan_pembatalan') }}</textarea>
+                                <button type="submit" class="self-end rounded-2xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
+                                    onclick="return confirm('Batalkan kunjungan ini? Data tetap tersimpan dalam riwayat.')">
+                                    Batalkan Kunjungan
+                                </button>
+                            </div>
+                            @error('alasan_pembatalan')
+                                <p class="mt-2 text-xs font-medium text-red-700">{{ $message }}</p>
+                            @enderror
+                        </form>
+                    @elseif($kunjungan->status === 'dibatalkan')
+                        <div class="rounded-3xl border border-red-200 bg-red-50 p-5 lg:col-span-2">
+                            <h3 class="font-semibold text-red-900">Informasi Pembatalan</h3>
+                            <dl class="mt-3 grid gap-4 text-sm md:grid-cols-3">
+                                <div><dt class="text-xs font-semibold uppercase text-red-500">Alasan</dt><dd class="mt-1 text-red-900">{{ $kunjungan->alasan_pembatalan }}</dd></div>
+                                <div><dt class="text-xs font-semibold uppercase text-red-500">Waktu</dt><dd class="mt-1 text-red-900">{{ $kunjungan->dibatalkan_pada?->translatedFormat('d F Y, H:i') }} WIB</dd></div>
+                                <div><dt class="text-xs font-semibold uppercase text-red-500">Dibatalkan oleh</dt><dd class="mt-1 text-red-900">{{ $kunjungan->nama_pembatal ?? 'Pengguna yang sudah tidak aktif' }}</dd></div>
+                            </dl>
+                        </div>
+                    @endif
                     </div>
 
                     {{-- CARD 3: Transaksi / Pembayaran --}}

@@ -96,6 +96,7 @@
                                              </td>
                                              <td class="px-6 py-5 text-center">
                                                  <button type="button"
+                                                         data-transaction-id="{{ $t->id_transaksi }}"
                                                          onclick="openPaymentModal({{ json_encode([
                                                              'id_transaksi' => $t->id_transaksi,
                                                              'no_antrean' => 'A-' . str_pad($t->id_kunjungan, 3, '0', STR_PAD_LEFT),
@@ -104,6 +105,7 @@
                                                              'diagnosa' => $t->kunjungan->rekamMedis->diagnosa ?? '-',
                                                              'resep_obat' => $t->kunjungan->rekamMedis->resep_obat ?? '-',
                                                              'jasa_dokter' => 50000,
+                                                             'update_url' => route('transaksi.update', $t),
                                                          ]) }})"
                                                          class="inline-flex items-center gap-1.5 rounded-2xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700">
                                                      <span class="material-symbols-outlined text-[16px]">payments</span> Proses Bayar
@@ -143,6 +145,7 @@
             <form id="paymentForm" method="POST" action="" class="p-6 space-y-4">
                 @csrf
                 @method('PUT')
+                <input type="hidden" id="paymentTransactionId" name="payment_transaction_id" value="">
 
                 <div id="paymentValidationAlert" class="hidden rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700" role="alert"></div>
 
@@ -185,16 +188,18 @@
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">Rp</span>
                                 <input type="text" id="displayBiayaTindakan" value="50.000" inputmode="numeric" autocomplete="off" oninput="formatPaymentInput(this); calculateTotal()" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-50 text-sm font-semibold outline-none focus:ring-2 focus:ring-emerald-100" required />
-                                <input type="hidden" id="inputJasaDokter" name="biaya_tindakan" value="50000" />
-                            </div>
+                                 <input type="hidden" id="inputJasaDokter" name="biaya_tindakan" value="50000" />
+                             </div>
+                             @error('biaya_tindakan') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror
                         </div>
                         <div>
                             <label class="mb-1 flex min-h-8 items-end text-xs font-semibold uppercase tracking-wider text-slate-600">Biaya Obat</label>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">Rp</span>
                                 <input type="text" id="displayBiayaObat" value="0" inputmode="numeric" autocomplete="off" oninput="formatPaymentInput(this); calculateTotal()" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-50 text-sm font-semibold outline-none focus:ring-2 focus:ring-emerald-100" required />
-                                <input type="hidden" id="inputBiayaObat" name="biaya_obat" value="0" />
-                            </div>
+                                 <input type="hidden" id="inputBiayaObat" name="biaya_obat" value="0" />
+                             </div>
+                             @error('biaya_obat') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror
                         </div>
                     </div>
 
@@ -233,8 +238,9 @@
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-bold">Rp</span>
                                 <input type="text" id="displayUangDibayar" value="0" inputmode="numeric" autocomplete="off" oninput="formatPaymentInput(this); calculateChange()" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-emerald-300 bg-emerald-50/50 text-sm font-bold text-emerald-900 outline-none focus:ring-2 focus:ring-emerald-200" required />
-                                <input type="hidden" id="inputUangDibayar" name="uang_dibayar" value="0" />
-                            </div>
+                                 <input type="hidden" id="inputUangDibayar" name="uang_dibayar" value="0" />
+                             </div>
+                             @error('uang_dibayar') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror
                         </div>
                         <div>
                             <label class="mb-1 flex min-h-8 items-end text-xs font-semibold uppercase tracking-wider text-slate-600">Uang Kembalian</label>
@@ -251,7 +257,7 @@
                     <button type="button" onclick="closePaymentModal()" class="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
                         Batal
                     </button>
-                    <button type="submit" class="rounded-2xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-100 transition hover:bg-emerald-700">
+                    <button type="submit" id="paymentSubmitButton" class="rounded-2xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-100 transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60">
                         Proses & Selesai
                     </button>
                 </div>
@@ -260,6 +266,10 @@
     </div>
 
     <script>
+        const maxPaymentAmount = 9999999999;
+        let currentPaymentId = null;
+        let restoringPayment = false;
+
         function paymentValue(value) {
             return Number(String(value).replace(/\D/g, '')) || 0;
         }
@@ -278,7 +288,39 @@
             alertBox.classList.toggle('hidden', message === '');
         }
 
+        function paymentStorageKey(id) {
+            return `payment-draft-${id}`;
+        }
+
+        function savePaymentDraft() {
+            if (!currentPaymentId || restoringPayment) return;
+
+            const draft = {
+                biaya_tindakan: paymentValue(document.getElementById('displayBiayaTindakan').value),
+                biaya_obat: paymentValue(document.getElementById('displayBiayaObat').value),
+                uang_dibayar: paymentValue(document.getElementById('displayUangDibayar').value),
+                metode_pembayaran: document.getElementById('inputMetodePembayaran').value,
+            };
+
+            try {
+                sessionStorage.setItem(paymentStorageKey(currentPaymentId), JSON.stringify(draft));
+            } catch (error) {
+                // Penyimpanan browser bersifat tambahan; kegagalannya tidak boleh menghambat pembayaran.
+            }
+        }
+
+        function loadPaymentDraft(id) {
+            try {
+                const draft = JSON.parse(sessionStorage.getItem(paymentStorageKey(id)) || 'null');
+                return draft && typeof draft === 'object' ? draft : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
         function openPaymentModal(data) {
+            currentPaymentId = Number(data.id_transaksi);
+            restoringPayment = true;
             document.getElementById('modalNoAntrean').innerText = data.no_antrean;
             document.getElementById('modalPoli').innerText = data.poli;
             document.getElementById('modalNamaPasien').innerText = data.nama_pasien;
@@ -289,12 +331,28 @@
             document.getElementById('displayBiayaObat').value = '0';
             document.getElementById('displayUangDibayar').value = '0';
             selectPaymentMethod('cash');
-            setPaymentAlert();
 
             const form = document.getElementById('paymentForm');
-            form.action = `/transaksi/${data.id_transaksi}`;
+            form.action = data.update_url;
+            form.dataset.submitting = 'false';
+            document.getElementById('paymentTransactionId').value = currentPaymentId;
+            const submitButton = document.getElementById('paymentSubmitButton');
+            submitButton.disabled = false;
+            submitButton.textContent = 'Proses & Selesai';
 
+            const draft = loadPaymentDraft(currentPaymentId);
+            if (draft) {
+                document.getElementById('displayBiayaTindakan').value = formatRupiahNumber(draft.biaya_tindakan || 0);
+                document.getElementById('displayBiayaObat').value = formatRupiahNumber(draft.biaya_obat || 0);
+                document.getElementById('displayUangDibayar').value = formatRupiahNumber(draft.uang_dibayar || 0);
+                if (['cash', 'qr', 'debit'].includes(draft.metode_pembayaran)) {
+                    selectPaymentMethod(draft.metode_pembayaran);
+                }
+            }
+
+            restoringPayment = false;
             calculateTotal();
+            setPaymentAlert();
 
             const modal = document.getElementById('paymentModal');
             modal.classList.remove('hidden');
@@ -323,6 +381,7 @@
             const kembalian = uangDibayar - total;
             document.getElementById('inputUangDibayar').value = uangDibayar;
             document.getElementById('inputKembalian').value = formatRupiahNumber(kembalian >= 0 ? kembalian : 0);
+            savePaymentDraft();
         }
 
         function selectPaymentMethod(method) {
@@ -357,17 +416,61 @@
         }
 
         document.getElementById('paymentForm').addEventListener('submit', function (event) {
+            if (this.dataset.submitting === 'true') {
+                event.preventDefault();
+                return;
+            }
+
             calculateTotal();
 
+            const biayaTindakan = paymentValue(document.getElementById('displayBiayaTindakan').value);
+            const biayaObat = paymentValue(document.getElementById('displayBiayaObat').value);
             const total = paymentValue(document.getElementById('inputTotalBiaya').value);
             const uangDibayar = paymentValue(document.getElementById('displayUangDibayar').value);
+
+            if ([biayaTindakan, biayaObat, uangDibayar, total].some((value) => value > maxPaymentAmount)) {
+                event.preventDefault();
+                setPaymentAlert('Nominal maksimal yang dapat disimpan adalah Rp 9.999.999.999. Periksa kembali rincian pembayaran.');
+                return;
+            }
 
             if (uangDibayar < total) {
                 event.preventDefault();
                 setPaymentAlert('Nominal pembayaran kurang dari total tagihan. Silakan periksa kembali nominal yang diterima.');
                 document.getElementById('displayUangDibayar').focus();
+                return;
             }
+
+            savePaymentDraft();
+            this.dataset.submitting = 'true';
+            const submitButton = document.getElementById('paymentSubmitButton');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Memproses...';
         });
+
+        const completedPaymentId = @json(session('completed_payment_id'));
+        if (completedPaymentId) {
+            try {
+                sessionStorage.removeItem(paymentStorageKey(completedPaymentId));
+            } catch (error) {}
+        }
+
+        const failedPaymentId = @json(old('payment_transaction_id'));
+        if (failedPaymentId) {
+            const trigger = document.querySelector(`[data-transaction-id="${failedPaymentId}"]`);
+            if (trigger) {
+                trigger.click();
+                restoringPayment = true;
+                document.getElementById('displayBiayaTindakan').value = formatRupiahNumber(@json(old('biaya_tindakan', 0)));
+                document.getElementById('displayBiayaObat').value = formatRupiahNumber(@json(old('biaya_obat', 0)));
+                document.getElementById('displayUangDibayar').value = formatRupiahNumber(@json(old('uang_dibayar', 0)));
+                const oldMethod = @json(old('metode_pembayaran', 'cash'));
+                selectPaymentMethod(['cash', 'qr', 'debit'].includes(oldMethod) ? oldMethod : 'cash');
+                restoringPayment = false;
+                calculateTotal();
+                setPaymentAlert(@json($errors->all()).join(' '));
+            }
+        }
     </script>
 </body>
 </html>

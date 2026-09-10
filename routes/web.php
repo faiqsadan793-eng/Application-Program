@@ -43,6 +43,11 @@ Route::middleware(['auth', 'role:staff'])->group(function () {
 
 // Riwayat rekam medis dapat dibaca oleh staff dan dokter sesuai hak akses polinya.
 Route::middleware(['auth', 'role:staff,dokter'])->group(function () {
+    Route::patch('kunjungan/{kunjungan}/batalkan', [KunjunganController::class, 'batalkan'])
+        ->name('kunjungan.batalkan');
+    Route::patch('kunjungan/{kunjungan}/kembalikan-antrean', [KunjunganController::class, 'kembalikanKeAntrean'])
+        ->name('kunjungan.kembalikan-antrean');
+
     Route::get('rekam-medis-pasien', [RekamMedisPasienController::class, 'index'])
         ->name('rekam-medis-pasien.index');
     Route::get('rekam-medis-pasien/{pasien}', [RekamMedisPasienController::class, 'show'])

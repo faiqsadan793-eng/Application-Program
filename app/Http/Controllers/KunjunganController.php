@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Kunjungan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class KunjunganController extends Controller
 {
@@ -51,6 +53,7 @@ class KunjunganController extends Controller
                 'menunggu' => ['antre', 'menunggu_dokter'],
                 'siap_bayar' => ['siap_bayar'],
                 'selesai'  => ['selesai'],
+                'dibatalkan' => ['dibatalkan'],
             ];
             $statusFilter = $statusMap[$request->input('status')] ?? null;
             if ($statusFilter) {
@@ -118,5 +121,88 @@ class KunjunganController extends Controller
         }
 
         return redirect($redirectUrl)->with('success', 'Pasien berhasil masuk antrean.');
+    }
+
+    public function batalkan(Request $request, Kunjungan $kunjungan)
+    {
+        $this->pastikanBolehMengelola($kunjungan);
+
+        $validated = $request->validate([
+            'alasan_pembatalan' => ['required', 'string', 'max:500'],
+        ]);
+
+        try {
+            DB::transaction(function () use ($kunjungan, $validated): void {
+                $kunjungan = Kunjungan::query()->lockForUpdate()->findOrFail($kunjungan->id_kunjungan);
+                $this->pastikanBolehMengelola($kunjungan);
+
+                if (Auth::user()?->role === 'dokter' && $kunjungan->status !== Kunjungan::STATUS_MENUNGGU_DOKTER) {
+                    abort(422, 'Dokter hanya dapat membatalkan pasien yang sudah dipanggil.');
+                }
+
+                if (! in_array($kunjungan->status, [Kunjungan::STATUS_ANTRE, Kunjungan::STATUS_MENUNGGU_DOKTER], true)) {
+                    abort(422, 'Kunjungan ini tidak dapat dibatalkan karena sudah diproses lebih lanjut.');
+                }
+
+                $kunjungan->update([
+                    'status' => Kunjungan::STATUS_DIBATALKAN,
+                    'alasan_pembatalan' => trim($validated['alasan_pembatalan']),
+                    'dibatalkan_pada' => now(),
+                    'dibatalkan_oleh' => Auth::id(),
+                    'nama_pembatal' => Auth::user()?->name,
+                ]);
+            });
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $exception) {
+            if (in_array($exception->getStatusCode(), [403, 404], true)) {
+                throw $exception;
+            }
+
+            return redirect()->back()->with('error', $exception->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'Kunjungan berhasil dibatalkan dan tetap tersimpan dalam riwayat.');
+    }
+
+    public function kembalikanKeAntrean(Kunjungan $kunjungan)
+    {
+        try {
+            DB::transaction(function () use ($kunjungan): void {
+                $kunjungan = Kunjungan::query()->lockForUpdate()->findOrFail($kunjungan->id_kunjungan);
+                $this->pastikanBolehMengelola($kunjungan);
+
+                if ($kunjungan->status !== Kunjungan::STATUS_MENUNGGU_DOKTER) {
+                    abort(422, 'Hanya pasien yang sedang dipanggil atau diperiksa yang dapat dikembalikan ke antrean.');
+                }
+
+                if (! $kunjungan->tgl_kunjungan->isSameDay(now())) {
+                    abort(422, 'Kunjungan dari hari sebelumnya tidak dapat dikembalikan ke antrean hari ini. Batalkan kunjungan jika pasien tidak melanjutkan pemeriksaan.');
+                }
+
+                $kunjungan->update(['status' => Kunjungan::STATUS_ANTRE]);
+            });
+        } catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $exception) {
+            if (in_array($exception->getStatusCode(), [403, 404], true)) {
+                throw $exception;
+            }
+
+            return redirect()->back()->with('error', $exception->getMessage());
+        }
+
+        return redirect()->back()->with('success', 'Pasien berhasil dikembalikan ke antrean.');
+    }
+
+    private function pastikanBolehMengelola(Kunjungan $kunjungan): void
+    {
+        $user = Auth::user();
+
+        if ($user?->role === 'staff') {
+            return;
+        }
+
+        abort_unless(
+            $user?->role === 'dokter' && $user->dokter?->poli === $kunjungan->poli_tujuan,
+            403,
+            'Anda tidak memiliki akses untuk mengubah kunjungan ini.',
+        );
     }
 }

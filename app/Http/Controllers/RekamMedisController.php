@@ -19,11 +19,17 @@ class RekamMedisController extends Controller
             abort(403, 'Akun dokter belum memiliki profil dan poli yang valid.');
         }
 
-        // Hanya tampilkan antrian aktif HARI INI yang belum diperiksa untuk poli dokter tersebut
+        // Antrean baru hanya berasal dari hari ini. Pemeriksaan yang sudah dimulai
+        // tetap ditampilkan sampai selesai meskipun tanggal telah berganti.
         $antrean = Kunjungan::with('pasien')
-            ->whereDate('tgl_kunjungan', now()->toDateString())
             ->where('poli_tujuan', $dokter->poli)
-            ->whereIn('status', ['antre', 'menunggu_dokter'])
+            ->where(function ($query) {
+                $query->where('status', Kunjungan::STATUS_MENUNGGU_DOKTER)
+                    ->orWhere(function ($today) {
+                        $today->whereDate('tgl_kunjungan', now()->toDateString())
+                            ->where('status', Kunjungan::STATUS_ANTRE);
+                    });
+            })
             ->oldest() // FIFO: pasien yang datang lebih awal tampil di atas
             ->get();
 
@@ -80,10 +86,12 @@ class RekamMedisController extends Controller
                 throw $exception;
             }
 
-            return redirect()->back()->with('error', $exception->getMessage());
+            return redirect()->back()->withInput()->with('error', $exception->getMessage());
         }
 
-        return redirect()->back()->with('success', 'Pemeriksaan selesai. Pasien ' . ($kunjungan->pasien->nama ?? '') . ' diarahkan ke kasir.');
+        return redirect()->back()
+            ->with('success', 'Pemeriksaan selesai. Pasien ' . ($kunjungan->pasien->nama ?? '') . ' diarahkan ke kasir.')
+            ->with('completed_visit_id', $kunjungan->id_kunjungan);
     }
 
     public function mulaiPeriksa(int $id)
@@ -95,9 +103,13 @@ class RekamMedisController extends Controller
 
         try {
             $kunjungan = DB::transaction(function () use ($id, $dokter): Kunjungan {
-                // Kunci seluruh antrean poli agar dua request tidak dapat memulai pasien berbeda bersamaan.
-                $antreanPoli = Kunjungan::whereDate('tgl_kunjungan', now()->toDateString())
-                    ->where('poli_tujuan', $dokter->poli)
+                // Sertakan pemeriksaan lintas hari agar tetap hanya ada satu pasien
+                // yang sedang diperiksa pada poli ini.
+                $antreanPoli = Kunjungan::where('poli_tujuan', $dokter->poli)
+                    ->where(function ($query) {
+                        $query->whereDate('tgl_kunjungan', now()->toDateString())
+                            ->orWhere('status', Kunjungan::STATUS_MENUNGGU_DOKTER);
+                    })
                     ->lockForUpdate()
                     ->get();
 
@@ -143,9 +155,13 @@ class RekamMedisController extends Controller
         }
 
         $kunjungan = DB::transaction(function () use ($dokter): ?Kunjungan {
-            // Kunci antrean poli ini agar dua dokter/tabs tidak dapat memanggil pasien berbeda bersamaan.
-            $antreanPoli = Kunjungan::whereDate('tgl_kunjungan', now()->toDateString())
-                ->where('poli_tujuan', $dokter->poli)
+            // Pemeriksaan lintas hari ikut dikunci agar antrean baru tidak dipanggil
+            // sebelum pemeriksaan sebelumnya selesai.
+            $antreanPoli = Kunjungan::where('poli_tujuan', $dokter->poli)
+                ->where(function ($query) {
+                    $query->whereDate('tgl_kunjungan', now()->toDateString())
+                        ->orWhere('status', Kunjungan::STATUS_MENUNGGU_DOKTER);
+                })
                 ->lockForUpdate()
                 ->get();
 
@@ -187,8 +203,11 @@ class RekamMedisController extends Controller
     private function kunjunganUntukDokter(int $idKunjungan, string $poli, bool $lock = false): Kunjungan
     {
         $query = Kunjungan::whereKey($idKunjungan)
-            ->whereDate('tgl_kunjungan', now()->toDateString())
-            ->where('poli_tujuan', $poli);
+            ->where('poli_tujuan', $poli)
+            ->where(function ($query) {
+                $query->whereDate('tgl_kunjungan', now()->toDateString())
+                    ->orWhere('status', Kunjungan::STATUS_MENUNGGU_DOKTER);
+            });
 
         if ($lock) {
             $query->lockForUpdate();

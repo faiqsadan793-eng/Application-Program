@@ -51,7 +51,7 @@
             <div class="text-center space-y-1">
                 <div class="inline-flex items-center justify-center gap-2">
                     <span class="material-symbols-outlined text-[#006c4f] text-3xl" style="font-variation-settings: 'FILL' 1;">medical_services</span>
-                    <h1 class="text-2xl font-bold text-[#006c4f] tracking-tight">Klinik Lala MedicGiare</h1>
+                    <h1 class="text-2xl font-bold text-[#006c4f] tracking-tight">Klinik Lala Medicare</h1>
                 </div>
                 <p class="text-xs text-slate-500">Silakan masuk ke akun Anda</p>
             </div>

@@ -54,7 +54,9 @@ class TransaksiFlowTest extends TestCase
             'biaya_obat' => 12500,
             'uang_dibayar' => 60000,
             'metode_pembayaran' => 'cash',
-        ])->assertSessionHas('error');
+        ])->assertSessionHas('error')
+            ->assertSessionHasInput('uang_dibayar', 60000)
+            ->assertSessionHasInput('payment_transaction_id', $transaksi->id_transaksi);
 
         $this->assertDatabaseHas('transaksis', [
             'id_transaksi' => $transaksi->id_transaksi,
@@ -64,6 +66,41 @@ class TransaksiFlowTest extends TestCase
             'id_kunjungan' => $transaksi->id_kunjungan,
             'status' => Kunjungan::STATUS_SIAP_BAYAR,
         ]);
+    }
+
+    public function test_payment_rejects_amounts_beyond_database_capacity_and_keeps_input(): void
+    {
+        $staff = User::factory()->create(['role' => 'staff']);
+        $transaksi = $this->transaksiSiapBayar();
+
+        $this->actingAs($staff)->put(route('transaksi.update', $transaksi), [
+            'biaya_tindakan' => 10000000000,
+            'biaya_obat' => 0,
+            'uang_dibayar' => 10000000000,
+            'metode_pembayaran' => 'cash',
+        ])->assertSessionHasErrors(['biaya_tindakan', 'uang_dibayar'])
+            ->assertSessionHasInput('biaya_tindakan', 10000000000)
+            ->assertSessionHasInput('payment_transaction_id', $transaksi->id_transaksi);
+
+        $this->assertSame(Transaksi::STATUS_BELUM, $transaksi->fresh()->status_pembayaran);
+        $this->assertSame(Kunjungan::STATUS_SIAP_BAYAR, $transaksi->kunjungan->fresh()->status);
+    }
+
+    public function test_payment_rejects_combined_total_beyond_database_capacity(): void
+    {
+        $staff = User::factory()->create(['role' => 'staff']);
+        $transaksi = $this->transaksiSiapBayar();
+
+        $this->actingAs($staff)->put(route('transaksi.update', $transaksi), [
+            'biaya_tindakan' => 6000000000,
+            'biaya_obat' => 4000000000,
+            'uang_dibayar' => 9999999999,
+            'metode_pembayaran' => 'debit',
+        ])->assertSessionHas('error')
+            ->assertSessionHasInput('biaya_obat', 4000000000)
+            ->assertSessionHasInput('metode_pembayaran', 'debit');
+
+        $this->assertSame(Transaksi::STATUS_BELUM, $transaksi->fresh()->status_pembayaran);
     }
 
     private function transaksiSiapBayar(): Transaksi

@@ -120,7 +120,15 @@ Untuk menjaga data rekam medis dan transaksi pasien tetap aman, aktifkan backup 
    0 23 * * * cd /path/ke/eklinik-syahdan && ./backup-db.sh >> /var/log/eklinik-backup.log 2>&1
    ```
 
-Data backup database akan tersimpan otomatis di folder `backups/` dalam format `.sql.gz` dan otomatis menghapus backup yang lebih dari 14 hari agar kapasitas disk tetap terjaga.
+Data backup database akan tersimpan otomatis di folder `backups/` dalam format `.sql.gz`. Script membaca nama database dan kredensial dari konfigurasi container, memvalidasi hasil dump dan kompresi, lalu menghapus backup yang lebih dari 14 hari hanya setelah backup terbaru berhasil.
+
+Uji setiap backup penting dengan restore ke database pengujian terpisah:
+
+```bash
+./verify-backup.sh ./backups/backup_eklinik_YYYYMMDD_HHMMSS.sql.gz
+```
+
+Perintah tersebut membuat database sementara dengan awalan `eklinik_restore_test_`, mengimpor backup, memeriksa keberadaan tabel inti dan integritas seluruh tabel, kemudian menghapus database pengujian secara otomatis. Database aplikasi utama tidak dijadikan target restore.
 
 ---
 
@@ -145,4 +153,3 @@ Di terminal akan muncul URL publik acak seperti:
 ### ✨ Keunggulan & Penyesuaian yang Sudah Dilakukan:
 1. **Bebas Port Forwarding**: Anda bisa mengakses klinik dari luar rumah / jaringan internet tanpa perlu IP Public Static atau setting router.
 2. **Anti-Error "Mixed Content" & Livewire**: Sistem Laravel sudah dikonfigurasi (`TrustProxies` dan `forceScheme('https')`) sehingga semua aset Vite, Tailwind, dan Livewire otomatis berjalan di **HTTPS** tanpa error HTTP/HTTPS mismatch.
-

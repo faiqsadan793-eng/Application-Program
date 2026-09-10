@@ -17,6 +17,10 @@ class Kunjungan extends Model
         'tgl_kunjungan',
         'status',
         'poli_tujuan',
+        'alasan_pembatalan',
+        'dibatalkan_pada',
+        'dibatalkan_oleh',
+        'nama_pembatal',
     ];
 
     protected function casts(): array
@@ -24,6 +28,7 @@ class Kunjungan extends Model
         return [
             'tgl_kunjungan' => 'date',
             'active_tgl_kunjungan' => 'date',
+            'dibatalkan_pada' => 'datetime',
         ];
     }
 
@@ -32,6 +37,7 @@ class Kunjungan extends Model
     const STATUS_MENUNGGU_DOKTER = 'menunggu_dokter';
     const STATUS_SIAP_BAYAR      = 'siap_bayar';
     const STATUS_SELESAI         = 'selesai';
+    const STATUS_DIBATALKAN      = 'dibatalkan';
 
     // Daftar poli valid — single source of truth
     const POLI_LIST = [
