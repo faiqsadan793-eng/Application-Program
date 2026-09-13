@@ -107,6 +107,7 @@ class RekamMedisController extends Controller
                 // Sertakan pemeriksaan lintas hari agar tetap hanya ada satu pasien
                 // yang sedang diperiksa pada poli ini.
                 $antreanPoli = Kunjungan::where('poli_tujuan', $dokter->poli)
+                    ->whereIn('status', [Kunjungan::STATUS_ANTRE, Kunjungan::STATUS_MENUNGGU_DOKTER])
                     ->where(function ($query) {
                         $query->padaHariIni()
                             ->orWhere('status', Kunjungan::STATUS_MENUNGGU_DOKTER);
@@ -159,6 +160,7 @@ class RekamMedisController extends Controller
             // Pemeriksaan lintas hari ikut dikunci agar antrean baru tidak dipanggil
             // sebelum pemeriksaan sebelumnya selesai.
             $antreanPoli = Kunjungan::where('poli_tujuan', $dokter->poli)
+                ->whereIn('status', [Kunjungan::STATUS_ANTRE, Kunjungan::STATUS_MENUNGGU_DOKTER])
                 ->where(function ($query) {
                     $query->padaHariIni()
                         ->orWhere('status', Kunjungan::STATUS_MENUNGGU_DOKTER);

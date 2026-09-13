@@ -8,6 +8,9 @@ COPY_DIR="${BACKUP_COPY_DIR:-}"
 MARKER="# e-klinik-database-backup"
 
 command -v crontab >/dev/null 2>&1 || { echo "crontab tidak ditemukan." >&2; exit 1; }
+[[ -n "$COPY_DIR" ]] || { echo "BACKUP_COPY_DIR wajib diisi dengan folder pada perangkat kedua." >&2; exit 1; }
+[[ -d "$COPY_DIR" ]] || { echo "BACKUP_COPY_DIR tidak tersedia; pasang drive/NAS terlebih dahulu." >&2; exit 1; }
+[[ -w "$COPY_DIR" ]] || { echo "BACKUP_COPY_DIR tidak dapat ditulis." >&2; exit 1; }
 mkdir -p -- "$(dirname -- "$LOG_FILE")"
 
 quote_shell() { printf "'%s'" "${1//\'/\'\\\'\'}"; }
@@ -22,8 +25,4 @@ FILTERED="$(printf '%s\n' "$CURRENT" | grep -vF "$MARKER" || true)"
 
 echo "Backup otomatis terpasang: $SCHEDULE"
 echo "Log: $LOG_FILE"
-if [[ -z "$COPY_DIR" ]]; then
-    echo "PERINGATAN: BACKUP_COPY_DIR belum diisi; backup belum disalin ke perangkat kedua." >&2
-else
-    echo "Salinan kedua: $COPY_DIR"
-fi
+echo "Salinan kedua: $COPY_DIR"

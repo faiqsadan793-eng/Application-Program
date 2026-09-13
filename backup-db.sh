@@ -66,7 +66,8 @@ rm -f -- "$TEMP_SQL"
 # atomik agar drive tujuan tidak pernah berisi arsip setengah jadi.
 if [[ -n "$BACKUP_COPY_DIR" ]]; then
     [[ "$BACKUP_COPY_DIR" != "$BACKUP_DIR" ]] || fail "BACKUP_COPY_DIR harus berbeda dari BACKUP_DIR."
-    mkdir -p -- "$BACKUP_COPY_DIR" || fail "lokasi salinan backup tidak dapat dibuat."
+    [[ -d "$BACKUP_COPY_DIR" ]] || fail "lokasi salinan tidak tersedia; pastikan drive/NAS sudah terpasang."
+    [[ -w "$BACKUP_COPY_DIR" ]] || fail "lokasi salinan tidak dapat ditulis."
     COPY_TEMP="${BACKUP_COPY_DIR}/.$(basename -- "$FINAL_FILE").tmp"
     COPY_FINAL="${BACKUP_COPY_DIR}/$(basename -- "$FINAL_FILE")"
     cp -- "$FINAL_FILE" "$COPY_TEMP" || fail "salinan ke perangkat kedua gagal. Backup utama tetap tersedia."
