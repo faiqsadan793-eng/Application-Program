@@ -26,11 +26,12 @@ class RekamMedisController extends Controller
             ->where(function ($query) {
                 $query->where('status', Kunjungan::STATUS_MENUNGGU_DOKTER)
                     ->orWhere(function ($today) {
-                        $today->whereDate('tgl_kunjungan', now()->toDateString())
+                        $today->padaHariIni()
                             ->where('status', Kunjungan::STATUS_ANTRE);
                     });
             })
-            ->oldest() // FIFO: pasien yang datang lebih awal tampil di atas
+            ->orderBy('masuk_antrean_pada')
+            ->orderBy('id_kunjungan')
             ->get();
 
         return view('rekam_medis.index', compact('antrean'));
@@ -107,7 +108,7 @@ class RekamMedisController extends Controller
                 // yang sedang diperiksa pada poli ini.
                 $antreanPoli = Kunjungan::where('poli_tujuan', $dokter->poli)
                     ->where(function ($query) {
-                        $query->whereDate('tgl_kunjungan', now()->toDateString())
+                        $query->padaHariIni()
                             ->orWhere('status', Kunjungan::STATUS_MENUNGGU_DOKTER);
                     })
                     ->lockForUpdate()
@@ -159,7 +160,7 @@ class RekamMedisController extends Controller
             // sebelum pemeriksaan sebelumnya selesai.
             $antreanPoli = Kunjungan::where('poli_tujuan', $dokter->poli)
                 ->where(function ($query) {
-                    $query->whereDate('tgl_kunjungan', now()->toDateString())
+                    $query->padaHariIni()
                         ->orWhere('status', Kunjungan::STATUS_MENUNGGU_DOKTER);
                 })
                 ->lockForUpdate()
@@ -173,7 +174,11 @@ class RekamMedisController extends Controller
 
             $kunjungan = $antreanPoli
                 ->where('status', Kunjungan::STATUS_ANTRE)
-                ->sortBy('created_at')
+                ->sortBy(fn (Kunjungan $item) => sprintf(
+                    '%s-%020d',
+                    $item->masuk_antrean_pada?->format('YmdHis.u') ?? $item->created_at->format('YmdHis.u'),
+                    $item->id_kunjungan,
+                ))
                 ->first();
 
             if ($kunjungan) {
@@ -205,7 +210,7 @@ class RekamMedisController extends Controller
         $query = Kunjungan::whereKey($idKunjungan)
             ->where('poli_tujuan', $poli)
             ->where(function ($query) {
-                $query->whereDate('tgl_kunjungan', now()->toDateString())
+                $query->padaHariIni()
                     ->orWhere('status', Kunjungan::STATUS_MENUNGGU_DOKTER);
             });
 

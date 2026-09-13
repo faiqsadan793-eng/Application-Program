@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class TransaksiController extends Controller
 {
@@ -15,7 +16,7 @@ class TransaksiController extends Controller
         $transaksis = Transaksi::with(['kunjungan.pasien', 'kunjungan.rekamMedis'])
             ->where('status_pembayaran', 'belum')
             ->oldest() // FIFO: yang lebih lama tampil di atas
-            ->get();
+            ->paginate(25);
 
         return view('transaksi.index', compact('transaksis'));
     }
@@ -90,6 +91,12 @@ class TransaksiController extends Controller
 
     public function riwayat(Request $request)
     {
+        $request->validate([
+            'search' => ['nullable', 'string', 'max:100'],
+            'tanggal_dari' => ['nullable', 'date_format:Y-m-d'],
+            'tanggal_sampai' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:tanggal_dari'],
+        ]);
+
         $query = Transaksi::with(['kunjungan.pasien', 'kunjungan.rekamMedis'])
             ->where('status_pembayaran', 'lunas');
 
@@ -106,10 +113,10 @@ class TransaksiController extends Controller
 
         // Filter tanggal
         if ($request->filled('tanggal_dari')) {
-            $query->whereDate('updated_at', '>=', $request->tanggal_dari);
+            $query->where('updated_at', '>=', Carbon::parse($request->tanggal_dari, 'Asia/Jakarta')->startOfDay());
         }
         if ($request->filled('tanggal_sampai')) {
-            $query->whereDate('updated_at', '<=', $request->tanggal_sampai);
+            $query->where('updated_at', '<', Carbon::parse($request->tanggal_sampai, 'Asia/Jakarta')->addDay()->startOfDay());
         }
 
         // Hitung ringkasan dari seluruh hasil filter sebelum query dibatasi pagination.

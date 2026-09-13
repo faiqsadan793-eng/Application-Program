@@ -149,7 +149,7 @@
                                     @forelse($riwayat as $t)
                                         <tr class="hover:bg-slate-50 transition-colors">
                                             <td class="px-6 py-5 font-bold text-slate-800">TRX-{{ str_pad($t->id_transaksi, 5, '0', STR_PAD_LEFT) }}</td>
-                                            <td class="px-6 py-5 text-slate-500">{{ $t->updated_at->format('d M Y, H:i') }}</td>
+                                            <td class="px-6 py-5 text-slate-500">{{ $t->updated_at->timezone('Asia/Jakarta')->locale('id')->translatedFormat('d M Y, H:i') }} WIB</td>
                                             <td class="px-6 py-5">
                                                 <p class="font-semibold text-slate-900">{{ $t->kunjungan->pasien->nama ?? '-' }}</p>
                                                 <p class="text-xs text-slate-500">{{ $t->kunjungan->poli_tujuan ?? '-' }}</p>
@@ -163,7 +163,7 @@
                                                 <button type="button"
                                                     onclick='openDetailModal({{ json_encode([
                                                         'no_transaksi' => 'TRX-' . str_pad($t->id_transaksi, 5, '0', STR_PAD_LEFT),
-                                                        'tanggal' => $t->updated_at->format('d M Y, H:i') . ' WIB',
+                                                        'tanggal' => $t->updated_at->timezone('Asia/Jakarta')->locale('id')->translatedFormat('d M Y, H:i') . ' WIB',
                                                         'nama_pasien' => $t->kunjungan->pasien->nama ?? '-',
                                                         'poli' => $t->kunjungan->poli_tujuan ?? '-',
                                                         'diagnosa' => $t->kunjungan->rekamMedis->diagnosa ?? '-',

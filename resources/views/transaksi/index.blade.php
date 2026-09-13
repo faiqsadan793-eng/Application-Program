@@ -123,6 +123,11 @@
                                 </tbody>
                             </table>
                         </div>
+                        @if($transaksis->hasPages())
+                            <div class="border-t border-slate-200 px-6 py-4">
+                                {{ $transaksis->links() }}
+                            </div>
+                        @endif
                     </div>
                 </div>
             </main>

@@ -157,7 +157,7 @@
                                                     </td>
                                                     <td class="px-6 py-4 text-slate-600">{{ $p->nik ?? '-' }}</td>
                                                     <td class="px-6 py-4 text-slate-600">{{ $p->no_hp ?? '-' }}</td>
-                                                    <td class="px-6 py-4 text-slate-500">{{ $p->created_at?->format('d M Y') ?? '-' }}</td>
+                                                    <td class="px-6 py-4 text-slate-500">{{ $p->created_at?->timezone('Asia/Jakarta')->locale('id')->translatedFormat('d M Y') ?? '-' }}</td>
                                                     <td class="px-6 py-4 text-right">
                                                         @if($p->has_active_kunjungan_today)
                                                             <span class="inline-flex items-center gap-1 rounded-lg bg-emerald-100 px-3 py-2 text-xs font-semibold text-emerald-700">
@@ -224,7 +224,7 @@
                                                 </td>
                                                 <td class="px-6 py-4 font-medium text-slate-900">{{ $antrean->pasien->nama ?? '-' }}</td>
                                                 <td class="px-6 py-4 text-slate-600">{{ $antrean->poli_tujuan }}</td>
-                                                <td class="px-6 py-4 text-slate-500">{{ $antrean->created_at->format('H:i') }} WIB</td>
+                                                <td class="px-6 py-4 text-slate-500">{{ ($antrean->masuk_antrean_pada ?? $antrean->created_at)->timezone('Asia/Jakarta')->format('H:i') }} WIB</td>
                                                 <td class="px-6 py-4 text-right">
                                                     @if($antrean->status == 'antre')
                                                         <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-[11px] font-semibold">Antre</span>

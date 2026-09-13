@@ -103,7 +103,7 @@ Buka browser dari perangkat mana saja yang terhubung ke WiFi/LAN yang sama:
 
 ---
 
-## 💾 7. Auto Backup Database Otomatis (Cron Job)
+## 💾 7. Backup Otomatis dan Salinan Perangkat Kedua
 
 Untuk menjaga data rekam medis dan transaksi pasien tetap aman, aktifkan backup harian otomatis:
 
@@ -111,16 +111,28 @@ Untuk menjaga data rekam medis dan transaksi pasien tetap aman, aktifkan backup 
    ```bash
    chmod +x backup-db.sh
    ```
-2. Pasang cron job harian (misal setiap jam 23:00 malam):
+2. Sambungkan drive atau NAS tujuan. Folder tujuan harus berada di perangkat fisik
+   yang berbeda dari disk database.
+
+3. Pasang jadwal harian secara otomatis:
    ```bash
-   crontab -e
-   ```
-   Tambahkan baris berikut di baris paling bawah:
-   ```cron
-   0 23 * * * cd /path/ke/eklinik-syahdan && ./backup-db.sh >> /var/log/eklinik-backup.log 2>&1
+   chmod +x install-backup-cron.sh
+   BACKUP_COPY_DIR=/mnt/backup-eklinik ./install-backup-cron.sh
    ```
 
-Data backup database akan tersimpan otomatis di folder `backups/` dalam format `.sql.gz`. Script membaca nama database dan kredensial dari konfigurasi container, memvalidasi hasil dump dan kompresi, lalu menghapus backup yang lebih dari 14 hari hanya setelah backup terbaru berhasil.
+   Jadwal bawaan berjalan setiap pukul 23:00. Jadwal dapat diubah dengan
+   `BACKUP_CRON_SCHEDULE`, misalnya `BACKUP_CRON_SCHEDULE="0 1 * * *"`.
+
+Data backup tersimpan di `backups/` dan disalin secara atomik ke `BACKUP_COPY_DIR`.
+Script memakai kunci proses agar dua backup tidak berjalan bersamaan, memvalidasi
+dump dan kedua arsip, serta baru membersihkan file lama setelah backup terbaru berhasil.
+
+Periksa log setiap pagi di `storage/logs/database-backup.log`. Jalankan satu backup
+manual setelah pemasangan untuk memastikan drive tujuan dapat ditulis:
+
+```bash
+BACKUP_COPY_DIR=/mnt/backup-eklinik ./backup-db.sh
+```
 
 Uji setiap backup penting dengan restore ke database pengujian terpisah:
 

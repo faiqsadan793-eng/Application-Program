@@ -18,6 +18,7 @@ class WibTimezoneTest extends TestCase
     {
         // UTC masih 9 September, tetapi WIB sudah 10 September pukul 00.30.
         $this->travelTo(Carbon::parse('2026-09-09 17:30:00', 'UTC'));
+        $this->assertSame('2026-09-10', Kunjungan::tanggalHariIni());
 
         $staff = User::factory()->create(['role' => 'staff']);
         $doctor = User::factory()->create(['role' => 'dokter']);
@@ -81,6 +82,7 @@ class WibTimezoneTest extends TestCase
     public function test_daily_queue_changes_at_wib_midnight_instead_of_utc_midnight(): void
     {
         $this->travelTo(Carbon::parse('2026-09-09 16:59:59', 'UTC'));
+        $this->assertSame('2026-09-09', Kunjungan::tanggalHariIni());
         $staff = User::factory()->create(['role' => 'staff']);
         $this->actingAs($staff)->post(route('pasien.store'), [
             'nama' => 'Pasien Sebelum Tengah Malam',

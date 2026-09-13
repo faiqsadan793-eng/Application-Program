@@ -26,7 +26,7 @@ class PasienController extends Controller
         // seluruh data sekaligus agar halaman tetap ringan saat data bertambah.
         $pasiens = Pasien::query()
             ->withExists(['kunjungans as has_active_kunjungan_today' => function ($query) {
-                $query->whereDate('tgl_kunjungan', now()->toDateString())
+                $query->padaHariIni()
                     ->whereIn('status', Kunjungan::STATUS_AKTIF);
             }])
             ->when($hasSearch, function ($query) use ($search) {
@@ -47,8 +47,9 @@ class PasienController extends Controller
             ->withQueryString();
 
         $antreanHariIni = Kunjungan::with('pasien')
-            ->whereDate('tgl_kunjungan', now()->toDateString())
-            ->oldest()
+            ->padaHariIni()
+            ->orderBy('masuk_antrean_pada')
+            ->orderBy('id_kunjungan')
             ->get();
 
         return view('pasien.index', compact('pasiens', 'antreanHariIni', 'hasSearch'));
@@ -88,7 +89,7 @@ class PasienController extends Controller
 
             Kunjungan::create([
                 'id_pasien'     => $pasien->id_pasien,
-                'tgl_kunjungan' => now()->toDateString(),
+                'tgl_kunjungan' => Kunjungan::tanggalHariIni(),
                 'poli_tujuan'   => $validated['poli_tujuan'],
                 'status'        => Kunjungan::STATUS_ANTRE,
             ]);

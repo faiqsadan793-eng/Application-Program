@@ -21,11 +21,13 @@ class KunjunganCancellationFlowTest extends TestCase
         $kunjungan = $this->kunjungan($pasien, Kunjungan::STATUS_ANTRE);
 
         $this->actingAs($staff)->patch(route('kunjungan.batalkan', $kunjungan), [
+            'kategori_pembatalan' => 'salah_poli',
             'alasan_pembatalan' => 'Pasien salah memilih poli',
         ])->assertSessionHasNoErrors()->assertSessionHas('success');
 
         $kunjungan->refresh();
         $this->assertSame(Kunjungan::STATUS_DIBATALKAN, $kunjungan->status);
+        $this->assertSame('salah_poli', $kunjungan->kategori_pembatalan);
         $this->assertSame('Pasien salah memilih poli', $kunjungan->alasan_pembatalan);
         $this->assertSame($staff->id, $kunjungan->dibatalkan_oleh);
         $this->assertSame($staff->name, $kunjungan->nama_pembatal);
@@ -57,6 +59,7 @@ class KunjunganCancellationFlowTest extends TestCase
 
         $this->post(route('rekam-medis.mulai', $kunjungan))->assertSessionHas('success');
         $this->patch(route('kunjungan.batalkan', $kunjungan), [
+            'kategori_pembatalan' => 'tidak_hadir',
             'alasan_pembatalan' => 'Pasien tidak hadir saat dipanggil',
         ])->assertSessionHas('success');
 
@@ -72,6 +75,7 @@ class KunjunganCancellationFlowTest extends TestCase
         $poliLain = $this->kunjungan($pasien, Kunjungan::STATUS_MENUNGGU_DOKTER, 'Poli Gigi');
 
         $this->actingAs($dokterUser)->patch(route('kunjungan.batalkan', $poliLain), [
+            'kategori_pembatalan' => 'lainnya',
             'alasan_pembatalan' => 'Tidak berhak',
         ])->assertForbidden();
         $this->patch(route('kunjungan.kembalikan-antrean', $poliLain))->assertForbidden();
@@ -83,6 +87,7 @@ class KunjunganCancellationFlowTest extends TestCase
             Kunjungan::STATUS_SELESAI,
         );
         $this->actingAs($staff)->patch(route('kunjungan.batalkan', $kunjunganSelesai), [
+            'kategori_pembatalan' => 'lainnya',
             'alasan_pembatalan' => 'Tidak boleh',
         ])->assertSessionHas('error');
         $this->assertSame(Kunjungan::STATUS_SELESAI, $kunjunganSelesai->fresh()->status);
@@ -97,6 +102,7 @@ class KunjunganCancellationFlowTest extends TestCase
         );
 
         $this->actingAs($dokterUser)->patch(route('kunjungan.batalkan', $kunjungan), [
+            'kategori_pembatalan' => 'lainnya',
             'alasan_pembatalan' => 'Belum dipanggil',
         ])->assertSessionHas('error');
 
@@ -125,11 +131,37 @@ class KunjunganCancellationFlowTest extends TestCase
         $kunjungan = $this->kunjungan(Pasien::create($this->pasienData()), Kunjungan::STATUS_ANTRE);
 
         $this->actingAs($staff)->from(route('kunjungan.show', $kunjungan))
-            ->patch(route('kunjungan.batalkan', $kunjungan), ['alasan_pembatalan' => ''])
+            ->patch(route('kunjungan.batalkan', $kunjungan), [
+                'kategori_pembatalan' => 'lainnya',
+                'alasan_pembatalan' => '',
+            ])
             ->assertRedirect(route('kunjungan.show', $kunjungan))
             ->assertSessionHasErrors('alasan_pembatalan');
 
         $this->assertSame(Kunjungan::STATUS_ANTRE, $kunjungan->fresh()->status);
+    }
+
+    public function test_returned_patient_moves_to_the_back_of_same_poli_queue(): void
+    {
+        $this->travelTo(Carbon::parse('2026-09-13 08:00:00', 'Asia/Jakarta'));
+        [$dokterUser] = $this->dokter('Poli Umum');
+        $first = $this->kunjungan(Pasien::create($this->pasienData()), Kunjungan::STATUS_MENUNGGU_DOKTER);
+
+        $this->travelTo(Carbon::parse('2026-09-13 08:05:00', 'Asia/Jakarta'));
+        $second = $this->kunjungan(Pasien::create(array_replace($this->pasienData(), [
+            'nama' => 'Pasien Kedua',
+            'no_hp' => '081234567892',
+        ])), Kunjungan::STATUS_ANTRE);
+
+        $this->travelTo(Carbon::parse('2026-09-13 08:10:00', 'Asia/Jakarta'));
+        $this->actingAs($dokterUser)->patch(route('kunjungan.kembalikan-antrean', $first))
+            ->assertSessionHas('success');
+
+        $first->refresh();
+        $this->assertTrue($first->masuk_antrean_pada->greaterThan($second->masuk_antrean_pada));
+        $this->post(route('rekam-medis.panggil-selanjutnya'))->assertSessionHas('success');
+        $this->assertSame(Kunjungan::STATUS_MENUNGGU_DOKTER, $second->fresh()->status);
+        $this->assertSame(Kunjungan::STATUS_ANTRE, $first->fresh()->status);
     }
 
     /** @return array{0: User, 1: Dokter} */

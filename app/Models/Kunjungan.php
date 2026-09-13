@@ -15,8 +15,10 @@ class Kunjungan extends Model
     protected $fillable = [
         'id_pasien',
         'tgl_kunjungan',
+        'masuk_antrean_pada',
         'status',
         'poli_tujuan',
+        'kategori_pembatalan',
         'alasan_pembatalan',
         'dibatalkan_pada',
         'dibatalkan_oleh',
@@ -28,6 +30,7 @@ class Kunjungan extends Model
         return [
             'tgl_kunjungan' => 'date',
             'active_tgl_kunjungan' => 'date',
+            'masuk_antrean_pada' => 'datetime',
             'dibatalkan_pada' => 'datetime',
         ];
     }
@@ -38,6 +41,15 @@ class Kunjungan extends Model
     const STATUS_SIAP_BAYAR      = 'siap_bayar';
     const STATUS_SELESAI         = 'selesai';
     const STATUS_DIBATALKAN      = 'dibatalkan';
+
+    const KATEGORI_PEMBATALAN = [
+        'tidak_hadir' => 'Pasien tidak hadir',
+        'dibatalkan_pasien' => 'Dibatalkan oleh pasien',
+        'salah_poli' => 'Salah memilih poli',
+        'pulang_sebelum_diperiksa' => 'Pulang sebelum diperiksa',
+        'rujukan' => 'Dirujuk ke fasilitas lain',
+        'lainnya' => 'Lainnya',
+    ];
 
     // Daftar poli valid — single source of truth
     const POLI_LIST = [
@@ -57,6 +69,7 @@ class Kunjungan extends Model
     {
         static::creating(function (self $kunjungan): void {
             $kunjungan->syncTanggalKunjunganAktif();
+            $kunjungan->masuk_antrean_pada ??= now();
         });
 
         static::updating(function (self $kunjungan): void {
@@ -69,6 +82,25 @@ class Kunjungan extends Model
     public static function statusAktif(string $status): bool
     {
         return in_array($status, self::STATUS_AKTIF, true);
+    }
+
+    public static function tanggalHariIni(): string
+    {
+        return now()->setTimezone('Asia/Jakarta')->toDateString();
+    }
+
+    public function scopePadaHariIni($query)
+    {
+        $mulai = now()->setTimezone('Asia/Jakarta')->startOfDay();
+
+        return $query
+            ->where('tgl_kunjungan', '>=', $mulai->toDateString())
+            ->where('tgl_kunjungan', '<', $mulai->copy()->addDay()->toDateString());
+    }
+
+    public function kategoriPembatalanLabel(): string
+    {
+        return self::KATEGORI_PEMBATALAN[$this->kategori_pembatalan] ?? 'Belum dikategorikan';
     }
 
     private function syncTanggalKunjunganAktif(): void

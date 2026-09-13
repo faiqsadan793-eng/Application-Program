@@ -131,7 +131,7 @@
                                             <p class="font-semibold text-slate-900">{{ $antrean->pasien->nama ?? '-' }}</p>
                                             <p class="text-xs text-slate-500">ID: RM-{{ str_pad($antrean->id_pasien, 4, '0', STR_PAD_LEFT) }}</p>
                                         </td>
-                                        <td class="px-6 py-5 text-slate-500">{{ $antrean->created_at->format('H:i') }} WIB</td>
+                                        <td class="px-6 py-5 text-slate-500">{{ ($antrean->masuk_antrean_pada ?? $antrean->created_at)->timezone('Asia/Jakarta')->format('H:i') }} WIB</td>
                                         <td class="px-6 py-5 text-slate-600 font-medium">{{ $antrean->poli_tujuan }}</td>
                                         <td class="px-6 py-5">
                                             @if($antrean->status == 'antre')

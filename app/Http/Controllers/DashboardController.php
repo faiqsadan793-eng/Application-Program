@@ -19,43 +19,47 @@ class DashboardController extends Controller
             $poli = $dokter ? $dokter->poli : null;
 
             // Total Pasien Poli Hari Ini
-            $totalPasien = Kunjungan::whereDate('tgl_kunjungan', now()->today())
+            $totalPasien = Kunjungan::padaHariIni()
                 ->where('poli_tujuan', $poli)
                 ->count();
 
             // Menunggu Diperiksa
-            $antreanAktif = Kunjungan::whereDate('tgl_kunjungan', now()->today())
+            $antreanAktif = Kunjungan::padaHariIni()
                 ->where('poli_tujuan', $poli)
                 ->whereIn('status', ['antre', 'menunggu_dokter'])
                 ->count();
 
             // Selesai Diperiksa (siap_bayar atau selesai)
-            $selesaiDiperiksa = Kunjungan::whereDate('tgl_kunjungan', now()->today())
+            $selesaiDiperiksa = Kunjungan::padaHariIni()
                 ->where('poli_tujuan', $poli)
                 ->whereIn('status', ['siap_bayar', 'selesai'])
                 ->count();
 
             // Daftar Antrean Pasien Poli Hari Ini
             $antreanHariIni = Kunjungan::with('pasien')
-                ->whereDate('tgl_kunjungan', now()->today())
+                ->padaHariIni()
                 ->where('poli_tujuan', $poli)
-                ->oldest() // FIFO
+                ->orderBy('masuk_antrean_pada')
+                ->orderBy('id_kunjungan')
+                ->limit(100)
                 ->get();
 
             return view('dashboard_dokter', compact('totalPasien', 'antreanAktif', 'selesaiDiperiksa', 'antreanHariIni', 'dokter'));
         }
 
         $totalPasien = Pasien::count();
-        $antreanAktif = Kunjungan::whereDate('tgl_kunjungan', now()->today())
+        $antreanAktif = Kunjungan::padaHariIni()
             ->whereIn('status', ['antre', 'menunggu_dokter'])
             ->count();
-        $menungguKasir = Kunjungan::whereDate('tgl_kunjungan', now()->today())
+        $menungguKasir = Kunjungan::padaHariIni()
             ->where('status', 'siap_bayar')
             ->count();
 
         $antreanHariIni = Kunjungan::with('pasien')
-            ->whereDate('tgl_kunjungan', now()->today())
-            ->latest()
+            ->padaHariIni()
+            ->orderBy('masuk_antrean_pada')
+            ->orderBy('id_kunjungan')
+            ->limit(100)
             ->get();
 
         return view('dashboard', compact('totalPasien', 'antreanAktif', 'menungguKasir', 'antreanHariIni'));

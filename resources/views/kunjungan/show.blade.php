@@ -133,7 +133,7 @@
                                         <p class="mt-1 font-semibold text-slate-900">
                                             {{ $kunjungan->tgl_kunjungan->translatedFormat('d F Y') }}
                                         </p>
-                                        <p class="text-xs text-slate-400">Jam daftar: {{ $kunjungan->created_at->format('H:i') }} WIB</p>
+                                        <p class="text-xs text-slate-400">Jam masuk antrean: {{ ($kunjungan->masuk_antrean_pada ?? $kunjungan->created_at)->timezone('Asia/Jakarta')->format('H:i') }} WIB</p>
                                     </div>
                                     <div>
                                         <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Poli Tujuan</p>
@@ -197,27 +197,36 @@
                         <form method="POST" action="{{ route('kunjungan.batalkan', $kunjungan) }}" class="rounded-3xl border border-red-200 bg-red-50 p-5 lg:col-span-2">
                             @csrf
                             @method('PATCH')
-                            <label for="alasan_pembatalan" class="block text-sm font-semibold text-red-900">Batalkan kunjungan</label>
+                            <label for="kategori_pembatalan" class="block text-sm font-semibold text-red-900">Batalkan kunjungan</label>
                             <p class="mt-1 text-xs text-red-700">Data kunjungan tetap tersimpan dalam riwayat dan pasien dapat didaftarkan kembali.</p>
-                            <div class="mt-3 flex flex-col gap-3 sm:flex-row">
-                                <textarea id="alasan_pembatalan" name="alasan_pembatalan" rows="2" maxlength="500" required
-                                    class="min-h-20 flex-1 rounded-2xl border border-red-200 bg-white px-4 py-3 text-sm outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
-                                    placeholder="Contoh: pasien pulang, salah memilih poli, atau membatalkan pemeriksaan">{{ old('alasan_pembatalan') }}</textarea>
+                            <div class="mt-3 grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto]">
+                                <div>
+                                    <select id="kategori_pembatalan" name="kategori_pembatalan" required
+                                        class="w-full rounded-2xl border border-red-200 bg-white px-4 py-3 text-sm outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100">
+                                        <option value="">Pilih kategori</option>
+                                        @foreach(\App\Models\Kunjungan::KATEGORI_PEMBATALAN as $nilai => $label)
+                                            <option value="{{ $nilai }}" @selected(old('kategori_pembatalan') === $nilai)>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('kategori_pembatalan') <p class="mt-2 text-xs font-medium text-red-700">{{ $message }}</p> @enderror
+                                </div>
+                                <textarea id="alasan_pembatalan" name="alasan_pembatalan" rows="2" maxlength="500"
+                                    class="min-h-20 w-full rounded-2xl border border-red-200 bg-white px-4 py-3 text-sm outline-none focus:border-red-400 focus:ring-2 focus:ring-red-100"
+                                    placeholder="Keterangan tambahan (wajib bila memilih Lainnya)">{{ old('alasan_pembatalan') }}</textarea>
                                 <button type="submit" class="self-end rounded-2xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
                                     onclick="return confirm('Batalkan kunjungan ini? Data tetap tersimpan dalam riwayat.')">
                                     Batalkan Kunjungan
                                 </button>
                             </div>
-                            @error('alasan_pembatalan')
-                                <p class="mt-2 text-xs font-medium text-red-700">{{ $message }}</p>
-                            @enderror
+                            @error('alasan_pembatalan') <p class="mt-2 text-xs font-medium text-red-700">{{ $message }}</p> @enderror
                         </form>
                     @elseif($kunjungan->status === 'dibatalkan')
                         <div class="rounded-3xl border border-red-200 bg-red-50 p-5 lg:col-span-2">
                             <h3 class="font-semibold text-red-900">Informasi Pembatalan</h3>
-                            <dl class="mt-3 grid gap-4 text-sm md:grid-cols-3">
-                                <div><dt class="text-xs font-semibold uppercase text-red-500">Alasan</dt><dd class="mt-1 text-red-900">{{ $kunjungan->alasan_pembatalan }}</dd></div>
-                                <div><dt class="text-xs font-semibold uppercase text-red-500">Waktu</dt><dd class="mt-1 text-red-900">{{ $kunjungan->dibatalkan_pada?->translatedFormat('d F Y, H:i') }} WIB</dd></div>
+                            <dl class="mt-3 grid gap-4 text-sm md:grid-cols-4">
+                                <div><dt class="text-xs font-semibold uppercase text-red-500">Kategori</dt><dd class="mt-1 text-red-900">{{ $kunjungan->kategoriPembatalanLabel() }}</dd></div>
+                                <div><dt class="text-xs font-semibold uppercase text-red-500">Keterangan</dt><dd class="mt-1 text-red-900">{{ $kunjungan->alasan_pembatalan ?: '-' }}</dd></div>
+                                <div><dt class="text-xs font-semibold uppercase text-red-500">Waktu</dt><dd class="mt-1 text-red-900">{{ $kunjungan->dibatalkan_pada?->timezone('Asia/Jakarta')->locale('id')->translatedFormat('d F Y, H:i') }} WIB</dd></div>
                                 <div><dt class="text-xs font-semibold uppercase text-red-500">Dibatalkan oleh</dt><dd class="mt-1 text-red-900">{{ $kunjungan->nama_pembatal ?? 'Pengguna yang sudah tidak aktif' }}</dd></div>
                             </dl>
                         </div>

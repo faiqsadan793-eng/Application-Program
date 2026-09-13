@@ -72,7 +72,7 @@
                                     <span class="font-semibold text-emerald-700">A-{{ str_pad($k->id_kunjungan, 3, '0', STR_PAD_LEFT) }}</span>
                                     <div>
                                         <p class="font-semibold text-slate-900">{{ $k->pasien->nama ?? '-' }}</p>
-                                        <p class="text-xs text-slate-500">{{ $k->poli_tujuan }} • Daftar {{ $k->created_at->format('H:i') }} WIB</p>
+                                        <p class="text-xs text-slate-500">{{ $k->poli_tujuan }} • Antrean {{ ($k->masuk_antrean_pada ?? $k->created_at)->timezone('Asia/Jakarta')->format('H:i') }} WIB</p>
                                     </div>
                                 </div>
                                 @if($k->status == 'antre')
@@ -106,6 +106,7 @@
                                     <form method="POST" action="{{ route('kunjungan.batalkan', $k) }}">
                                         @csrf
                                         @method('PATCH')
+                                        <input type="hidden" name="kategori_pembatalan" value="tidak_hadir">
                                         <input type="hidden" name="alasan_pembatalan" value="Pasien tidak hadir saat dipanggil">
                                         <button type="submit" class="inline-flex items-center gap-1.5 rounded-2xl border border-red-200 bg-red-50 px-4 py-2 text-xs font-semibold text-red-700 transition hover:bg-red-100"
                                             onclick="return confirm('Tandai pasien tidak hadir dan batalkan kunjungan ini?')">

@@ -33,12 +33,12 @@ class KunjunganController extends Controller
         // --- Filter: Rentang Waktu ---
         $rentang = $request->input('rentang', '7');
         if ($rentang === '7') {
-            $query->where('tgl_kunjungan', '>=', now()->subDays(7)->toDateString());
+            $query->where('tgl_kunjungan', '>=', now()->setTimezone('Asia/Jakarta')->subDays(7)->toDateString());
         } elseif ($rentang === '30') {
-            $query->where('tgl_kunjungan', '>=', now()->subDays(30)->toDateString());
+            $query->where('tgl_kunjungan', '>=', now()->setTimezone('Asia/Jakarta')->subDays(30)->toDateString());
         } elseif ($rentang === 'bulan') {
-            $query->whereMonth('tgl_kunjungan', now()->month)
-                  ->whereYear('tgl_kunjungan', now()->year);
+            $query->whereMonth('tgl_kunjungan', now()->setTimezone('Asia/Jakarta')->month)
+                  ->whereYear('tgl_kunjungan', now()->setTimezone('Asia/Jakarta')->year);
         }
         // 'semua' = tidak ada filter waktu
 
@@ -89,7 +89,7 @@ class KunjunganController extends Controller
 
         // Cek di level aplikasi — cegah sebelum sampai ke DB
         $sudahAntri = Kunjungan::where('id_pasien', $validated['id_pasien'])
-            ->whereDate('tgl_kunjungan', now()->toDateString())
+            ->padaHariIni()
             ->whereIn('status', Kunjungan::STATUS_AKTIF)
             ->exists();
 
@@ -103,7 +103,7 @@ class KunjunganController extends Controller
             Kunjungan::create([
                 'id_pasien'     => $validated['id_pasien'],
                 'poli_tujuan'   => $validated['poli_tujuan'],
-                'tgl_kunjungan' => now()->toDateString(),
+                'tgl_kunjungan' => Kunjungan::tanggalHariIni(),
                 'status'        => 'antre',
             ]);
         } catch (\Illuminate\Database\QueryException $e) {
@@ -128,7 +128,8 @@ class KunjunganController extends Controller
         $this->pastikanBolehMengelola($kunjungan);
 
         $validated = $request->validate([
-            'alasan_pembatalan' => ['required', 'string', 'max:500'],
+            'kategori_pembatalan' => ['required', 'string', 'in:'.implode(',', array_keys(Kunjungan::KATEGORI_PEMBATALAN))],
+            'alasan_pembatalan' => ['nullable', 'string', 'max:500', 'required_if:kategori_pembatalan,lainnya'],
         ]);
 
         try {
@@ -146,7 +147,8 @@ class KunjunganController extends Controller
 
                 $kunjungan->update([
                     'status' => Kunjungan::STATUS_DIBATALKAN,
-                    'alasan_pembatalan' => trim($validated['alasan_pembatalan']),
+                    'kategori_pembatalan' => $validated['kategori_pembatalan'],
+                    'alasan_pembatalan' => trim($validated['alasan_pembatalan'] ?? '') ?: null,
                     'dibatalkan_pada' => now(),
                     'dibatalkan_oleh' => Auth::id(),
                     'nama_pembatal' => Auth::user()?->name,
@@ -174,11 +176,15 @@ class KunjunganController extends Controller
                     abort(422, 'Hanya pasien yang sedang dipanggil atau diperiksa yang dapat dikembalikan ke antrean.');
                 }
 
-                if (! $kunjungan->tgl_kunjungan->isSameDay(now())) {
+                if ($kunjungan->tgl_kunjungan->toDateString() !== Kunjungan::tanggalHariIni()) {
                     abort(422, 'Kunjungan dari hari sebelumnya tidak dapat dikembalikan ke antrean hari ini. Batalkan kunjungan jika pasien tidak melanjutkan pemeriksaan.');
                 }
 
-                $kunjungan->update(['status' => Kunjungan::STATUS_ANTRE]);
+                // Pasien masuk paling belakang tanpa membuat kunjungan baru atau menghapus riwayat.
+                $kunjungan->update([
+                    'status' => Kunjungan::STATUS_ANTRE,
+                    'masuk_antrean_pada' => now(),
+                ]);
             });
         } catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $exception) {
             if (in_array($exception->getStatusCode(), [403, 404], true)) {
@@ -188,7 +194,7 @@ class KunjunganController extends Controller
             return redirect()->back()->with('error', $exception->getMessage());
         }
 
-        return redirect()->back()->with('success', 'Pasien berhasil dikembalikan ke antrean.');
+        return redirect()->back()->with('success', 'Pasien berhasil dikembalikan ke urutan paling belakang antrean.');
     }
 
     private function pastikanBolehMengelola(Kunjungan $kunjungan): void

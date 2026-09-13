@@ -160,7 +160,7 @@
                                             </td>
                                             <td class="px-6 py-5 text-slate-500">
                                                 {{ $kunjungan->tgl_kunjungan->format('d M Y') }}
-                                                <span class="block text-xs">{{ $kunjungan->created_at->format('H:i') }} WIB</span>
+                                                <span class="block text-xs">{{ ($kunjungan->masuk_antrean_pada ?? $kunjungan->created_at)->timezone('Asia/Jakarta')->format('H:i') }} WIB</span>
                                             </td>
                                             <td class="px-6 py-5 font-medium text-slate-700">
                                                 {{ $kunjungan->poli_tujuan ?? '-' }}

@@ -7,6 +7,24 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Pengujian aplikasi
+
+Jalankan pengujian backend dan alur bisnis:
+
+```bash
+php artisan test
+```
+
+Jalankan pengujian browser nyata untuk pemulihan draft dan pencegahan submit ganda:
+
+```bash
+npm run test:browser
+```
+
+Pengujian browser memakai Chrome lokal, database SQLite sementara, akun sementara,
+dan server pada port khusus. Seluruh data pengujian dihapus setelah proses selesai;
+database aplikasi tidak disentuh.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
