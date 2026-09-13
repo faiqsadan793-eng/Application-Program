@@ -143,7 +143,24 @@ try {
         throw new Error('Pelindung pengiriman ganda pembayaran tidak bekerja.');
     }
 
-    console.log('Browser test lulus: draft dan pengiriman ganda rekam medis serta pembayaran.');
+    await staffPage.goto(`${baseUrl}/rekam-medis-pasien`);
+    await staffPage.getByRole('link', {name: 'Lihat Detail RM'}).first().click();
+    if (!await staffPage.getByText('Klinik Lala Medicare / Rekam Medis / Detail Pasien', {exact: true}).isVisible()) {
+        throw new Error('Breadcrumb detail rekam medis tidak tampil.');
+    }
+    const downloadPromise = staffPage.waitForEvent('download');
+    await staffPage.getByRole('link', {name: 'Ekspor Seluruh Riwayat PDF'}).click();
+    const download = await downloadPromise;
+    if (await download.failure() || !download.suggestedFilename().endsWith('.pdf')) {
+        throw new Error('Unduhan PDF rekam medis gagal.');
+    }
+    await staffPage.setViewportSize({width: 1280, height: 900});
+    await staffPage.screenshot({path: 'storage/framework/testing/medical-record-desktop.png', fullPage: true});
+    await staffPage.setViewportSize({width: 768, height: 1024});
+    if (await staffPage.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)) {
+        throw new Error('Layout detail rekam medis meluber pada layar tablet.');
+    }
+    console.log('Browser test lulus: draft, pengiriman ganda, breadcrumb, layout tablet, dan unduhan PDF rekam medis.');
 } finally {
     await browser.close();
     if (server) {

@@ -52,6 +52,8 @@ Route::middleware(['auth', 'role:staff,dokter'])->group(function () {
         ->name('rekam-medis-pasien.index');
     Route::get('rekam-medis-pasien/{pasien}', [RekamMedisPasienController::class, 'show'])
         ->name('rekam-medis-pasien.show');
+    Route::get('rekam-medis-pasien/{pasien}/pdf', [RekamMedisPasienController::class, 'export'])
+        ->middleware('throttle:6,1')->name('rekam-medis-pasien.pdf');
 });
 
 // ROUTE KHUSUS DOKTER

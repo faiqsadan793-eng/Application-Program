@@ -9,6 +9,28 @@
 
 ## Pengujian aplikasi
 
+### Rekam medis dan PDF
+
+Daftar dan detail rekam medis tersedia untuk staf dan dokter. Ekspor PDF per pasien
+mengikuti hak akses yang sama: staf seluruh poli, dokter hanya polinya. Detail
+menampilkan 10 pemeriksaan per halaman. PDF memuat maksimal 50 pemeriksaan per
+bagian; riwayat lebih panjang dapat diunduh seluruhnya lewat pilihan bagian pada
+detail pasien. Urutan setiap bagian mengikuti pemeriksaan terbaru. Unduh semua
+bagian dalam satu sesi sebelum ada penambahan riwayat agar urutannya konsisten.
+
+Saat deploy perubahan ini, pasang dependensi dari lockfile dan bangun aset:
+
+```bash
+composer install --no-dev --optimize-autoloader
+npm ci
+npm run build
+php artisan optimize:clear
+php artisan optimize
+```
+
+Tidak ada migration baru untuk fitur PDF. Pembuatan PDF memakai Dompdf tanpa
+akses aset jarak jauh; file dikirim langsung sebagai unduhan dengan cache dinonaktifkan.
+
 Jalankan pengujian backend dan alur bisnis:
 
 ```bash
