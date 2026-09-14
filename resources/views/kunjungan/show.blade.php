@@ -168,22 +168,26 @@
                             <div class="p-6 space-y-5">
                                 <div>
                                     <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Keluhan Pasien</p>
-                                    <div class="rounded-2xl bg-slate-50 border border-slate-100 px-4 py-3 text-sm text-slate-700 leading-relaxed">
-                                        {{ $kunjungan->rekamMedis->keluhan }}
-                                    </div>
+                                    <div class="rounded-2xl bg-slate-50 border border-slate-100 px-4 py-3 text-sm text-slate-700 leading-relaxed">{{ $kunjungan->rekamMedis->keluhan }}</div>
                                 </div>
                                 <div>
                                     <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Diagnosa</p>
-                                    <div class="rounded-2xl bg-sky-50 border border-sky-100 px-4 py-3 text-sm text-slate-700 leading-relaxed">
-                                        {{ $kunjungan->rekamMedis->diagnosa }}
-                                    </div>
+                                    <div class="rounded-2xl bg-sky-50 border border-sky-100 px-4 py-3 text-sm text-slate-700 leading-relaxed">{{ $kunjungan->rekamMedis->diagnosa }}</div>
                                 </div>
                                 <div>
                                     <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Resep Obat</p>
-                                    <div class="rounded-2xl bg-emerald-50 border border-emerald-100 px-4 py-3 text-sm text-slate-700 leading-relaxed">
-                                        {{ $kunjungan->rekamMedis->resep_obat }}
-                                    </div>
+                                    <div class="rounded-2xl bg-emerald-50 border border-emerald-100 px-4 py-3 text-sm text-slate-700 leading-relaxed">{{ $kunjungan->rekamMedis->resep_obat }}</div>
                                 </div>
+                                @if($kunjungan->poli_tujuan === 'Poli Spesialis Kandungan')
+                                    <div>
+                                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Hasil Pemeriksaan</p>
+                                        <div class="rounded-2xl bg-violet-50 border border-violet-100 px-4 py-3 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{{ $kunjungan->rekamMedis->hasil_pemeriksaan ?: '-' }}</div>
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Catatan Tambahan</p>
+                                        <div class="rounded-2xl bg-amber-50 border border-amber-100 px-4 py-3 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">{{ $kunjungan->rekamMedis->catatan_tambahan ?: '-' }}</div>
+                                    </div>
+                                @endif
                             </div>
                         @else
                             <div class="p-10 text-center">
@@ -231,10 +235,8 @@
                             </dl>
                         </div>
                     @endif
-                    </div>
-
                     {{-- CARD 3: Transaksi / Pembayaran --}}
-                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden lg:col-span-2">
                         <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center gap-3">
                             <span class="material-symbols-outlined text-orange-500">payments</span>
                             <h3 class="font-semibold text-slate-800">Informasi Pembayaran</h3>
@@ -242,7 +244,7 @@
 
                         @if($kunjungan->transaksi)
                             <div class="p-6">
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                                <div class="grid grid-cols-1 gap-5 md:grid-cols-4">
                                     <div>
                                         <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">No. Transaksi</p>
                                         <p class="mt-1 font-semibold text-slate-900">
@@ -290,8 +292,7 @@
                             </div>
                         @endif
                     </div>
-
-                </div>
+                    </div>
             </main>
         </div>
     </div>

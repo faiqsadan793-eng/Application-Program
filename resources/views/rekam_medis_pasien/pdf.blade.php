@@ -18,7 +18,15 @@ NIK: {{ $pasien->nik ?? '-' }} · Telepon: {{ $pasien->no_hp ?? '-' }}</div>
 @foreach($kunjungans as $kunjungan)
     @php $rm = $kunjungan->rekamMedis; @endphp
     <h3>{{ $loop->iteration }}. {{ $kunjungan->tgl_kunjungan->translatedFormat('d F Y') }} · {{ $kunjungan->poli_tujuan }}<br>Dokter: {{ $rm->nama_dokter ?? $rm->dokter?->user?->name ?? '-' }}</h3>
-    @foreach(['Keluhan' => $rm->keluhan, 'Diagnosis' => $rm->diagnosa, 'Resep obat' => $rm->resep_obat] as $label => $value)
+    @php $fields = ['Keluhan' => $rm->keluhan]; @endphp
+    @if($kunjungan->poli_tujuan === 'Poli Spesialis Kandungan')
+        @php $fields['Hasil pemeriksaan'] = $rm->hasil_pemeriksaan; @endphp
+    @endif
+    @php $fields['Diagnosis'] = $rm->diagnosa; $fields['Resep obat'] = $rm->resep_obat; @endphp
+    @if($kunjungan->poli_tujuan === 'Poli Spesialis Kandungan')
+        @php $fields['Catatan tambahan'] = $rm->catatan_tambahan; @endphp
+    @endif
+    @foreach($fields as $label => $value)
         <p class="label">{{ $label }}</p><p class="note">{{ $value ?: '-' }}</p>
     @endforeach
 @endforeach

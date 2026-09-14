@@ -51,13 +51,6 @@ class Kunjungan extends Model
         'lainnya' => 'Lainnya',
     ];
 
-    // Daftar poli valid — single source of truth
-    const POLI_LIST = [
-        'Poli Umum',
-        'Poli Gigi',
-        'Poli Anak',
-    ];
-
     /** Status yang masih menghalangi pasien membuat kunjungan baru di hari yang sama. */
     const STATUS_AKTIF = [
         self::STATUS_ANTRE,

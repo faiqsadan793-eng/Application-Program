@@ -131,6 +131,13 @@
                                                 placeholder="Tuliskan keluhan yang disampaikan pasien..." required>{{ $pulihkanInput ? old('keluhan') : '' }}</textarea>
                                             @if($pulihkanInput) @error('keluhan') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror @endif
                                         </div>
+                                        @if($k->poli_tujuan === 'Poli Spesialis Kandungan')
+                                            <div>
+                                                <label class="block text-sm font-medium text-slate-600 mb-2">Hasil Pemeriksaan *</label>
+                                                <textarea name="hasil_pemeriksaan" rows="3" maxlength="4000" data-draft-field="hasil_pemeriksaan" class="w-full rounded-xl border {{ $pulihkanInput && $errors->has('hasil_pemeriksaan') ? 'border-red-400' : 'border-slate-200' }} bg-slate-50 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-sky-100" placeholder="Tuliskan kondisi pasien dan hasil pemeriksaan terbaru..." required>{{ $pulihkanInput ? old('hasil_pemeriksaan') : '' }}</textarea>
+                                                @if($pulihkanInput) @error('hasil_pemeriksaan') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror @endif
+                                            </div>
+                                        @endif
                                         <div>
                                             <label class="block text-sm font-medium text-slate-600 mb-2">Diagnosa *</label>
                                             <textarea name="diagnosa" rows="2" maxlength="2000" data-draft-field="diagnosa"
@@ -145,6 +152,13 @@
                                                 placeholder="Tuliskan resep obat yang diberikan..." required>{{ $pulihkanInput ? old('resep_obat') : '' }}</textarea>
                                             @if($pulihkanInput) @error('resep_obat') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror @endif
                                         </div>
+                                        @if($k->poli_tujuan === 'Poli Spesialis Kandungan')
+                                            <div>
+                                                <label class="block text-sm font-medium text-slate-600 mb-2">Catatan Tambahan <span class="text-xs font-normal text-slate-400">(opsional)</span></label>
+                                                <textarea name="catatan_tambahan" rows="3" maxlength="4000" data-draft-field="catatan_tambahan" class="w-full rounded-xl border {{ $pulihkanInput && $errors->has('catatan_tambahan') ? 'border-red-400' : 'border-slate-200' }} bg-slate-50 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-sky-100" placeholder="Usia kehamilan, hasil USG, anjuran, atau jadwal kontrol...">{{ $pulihkanInput ? old('catatan_tambahan') : '' }}</textarea>
+                                                @if($pulihkanInput) @error('catatan_tambahan') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror @endif
+                                            </div>
+                                        @endif
                                     </div>
                                     <div class="mt-4 flex justify-end">
                                         <button type="submit" data-submit-button class="inline-flex items-center gap-2 rounded-2xl bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60">

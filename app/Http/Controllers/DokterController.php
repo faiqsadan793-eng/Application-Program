@@ -13,12 +13,6 @@ use Illuminate\View\View;
 
 class DokterController extends Controller
 {
-    private const POLI_LIST = [
-        'Poli Umum',
-        'Poli Gigi',
-        'Poli Anak',
-    ];
-
     /**
      * Menampilkan dokter beserta akun loginnya untuk staff.
      */
@@ -30,7 +24,7 @@ class DokterController extends Controller
 
         return view('master-dokter.index', [
             'dokters' => $dokters,
-            'poliList' => self::POLI_LIST,
+            'poliList' => array_keys(config('clinic.poli')),
         ]);
     }
 
@@ -132,7 +126,7 @@ class DokterController extends Controller
                 'max:100',
                 Rule::unique('dokters', 'nip_sip')->ignore($dokter?->id_dokter, 'id_dokter'),
             ],
-            'poli' => ['required', 'string', Rule::in(self::POLI_LIST)],
+            'poli' => ['required', 'string', Rule::in(array_keys(config('clinic.poli')))],
         ];
     }
 }

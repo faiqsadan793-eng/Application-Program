@@ -7,14 +7,6 @@ use App\Models\Kunjungan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-// Daftar poli terpusat agar konsisten di seluruh aplikasi
-// Format: 'value_form' => 'nama_poli_di_DB'
-const POLI_LIST = [
-    'Poli Umum'  => 'Poli Umum',
-    'Poli Gigi'  => 'Poli Gigi',
-    'Poli Anak'  => 'Poli Anak',
-];
-
 class PasienController extends Controller
 {
     public function index(Request $request)
@@ -57,7 +49,7 @@ class PasienController extends Controller
 
     public function create()
     {
-        return view('input.pasien', ['poliList' => POLI_LIST]);
+        return view('input.pasien', ['poliList' => config('clinic.poli')]);
     }
 
     public function store(Request $request)
@@ -70,7 +62,7 @@ class PasienController extends Controller
             'nik'           => 'nullable|string|size:16',
             'pekerjaan'     => 'nullable|string|max:255',
             'alamat'        => 'nullable|string|max:500',
-            'poli_tujuan'   => 'required|string|in:' . implode(',', array_keys(POLI_LIST)),
+            'poli_tujuan'   => 'required|string|in:' . implode(',', array_keys(config('clinic.poli'))),
         ]);
 
         $pasien = DB::transaction(function () use ($validated): Pasien {

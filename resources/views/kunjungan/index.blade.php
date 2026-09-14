@@ -85,9 +85,9 @@
                                     <select name="poli"
                                         class="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 px-4 text-sm outline-none transition focus:border-emerald-500 appearance-none">
                                         <option value="semua"     {{ request('poli','semua') === 'semua'     ? 'selected' : '' }}>Semua Poli</option>
-                                        <option value="Poli Umum" {{ request('poli') === 'Poli Umum' ? 'selected' : '' }}>Poli Umum</option>
-                                        <option value="Poli Gigi" {{ request('poli') === 'Poli Gigi' ? 'selected' : '' }}>Poli Gigi</option>
-                                        <option value="Poli Anak" {{ request('poli') === 'Poli Anak' ? 'selected' : '' }}>Poli Anak</option>
+                                        @foreach(config('clinic.poli') as $poli)
+                                            <option value="{{ $poli }}" {{ request('poli') === $poli ? 'selected' : '' }}>{{ $poli }}</option>
+                                        @endforeach
                                     </select>
                                 </div>
 

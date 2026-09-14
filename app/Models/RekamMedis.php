@@ -17,8 +17,10 @@ class RekamMedis extends Model
         'id_dokter',
         'nama_dokter',
         'keluhan',
+        'hasil_pemeriksaan',
         'diagnosa',
         'resep_obat',
+        'catatan_tambahan',
     ];
 
     public function kunjungan()

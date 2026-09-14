@@ -171,9 +171,9 @@
                                                                 <input type="hidden" name="search_query" value="{{ request('search') }}">
                                                                 <select name="poli_tujuan" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" required>
                                                                     <option disabled selected value="">Pilih Poli</option>
-                                                                    <option value="Poli Umum">Poli Umum</option>
-                                                                    <option value="Poli Gigi">Poli Gigi</option>
-                                                                    <option value="Poli Anak">Poli Anak</option>
+                                                                    @foreach(config('clinic.poli') as $poli)
+                                                                        <option value="{{ $poli }}">{{ $poli }}</option>
+                                                                    @endforeach
                                                                 </select>
                                                                 <button type="submit" class="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 whitespace-nowrap">
                                                                     <span class="material-symbols-outlined text-[16px]">add</span>

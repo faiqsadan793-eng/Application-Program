@@ -39,17 +39,23 @@ class RekamMedisController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'id_kunjungan' => 'required|exists:kunjungans,id_kunjungan',
-            'keluhan'      => 'required|string|max:2000',
-            'diagnosa'     => 'required|string|max:2000',
-            'resep_obat'   => 'required|string|max:2000',
-        ]);
-
         $dokter = $this->dokterAktif();
         if (! $dokter) {
             return redirect()->back()->with('error', 'Profil dokter belum tersedia. Hubungi staff klinik.');
         }
+
+        $rules = [
+            'id_kunjungan' => 'required|exists:kunjungans,id_kunjungan',
+            'keluhan'      => 'required|string|max:2000',
+            'hasil_pemeriksaan' => 'nullable|string|max:4000',
+            'diagnosa'     => 'required|string|max:2000',
+            'resep_obat'   => 'required|string|max:2000',
+            'catatan_tambahan' => 'nullable|string|max:4000',
+        ];
+        if ($dokter->poli === 'Poli Spesialis Kandungan') {
+            $rules['hasil_pemeriksaan'] = 'required|string|max:4000';
+        }
+        $validated = $request->validate($rules);
 
         try {
             $kunjungan = DB::transaction(function () use ($validated, $dokter): Kunjungan {
@@ -69,8 +75,10 @@ class RekamMedisController extends Controller
                     // Snapshot menjaga identitas pemeriksa pada histori bila akun dokter berubah/dihapus.
                     'nama_dokter'  => Auth::user()->name,
                     'keluhan'      => $validated['keluhan'],
+                    'hasil_pemeriksaan' => $validated['hasil_pemeriksaan'] ?? null,
                     'diagnosa'     => $validated['diagnosa'],
                     'resep_obat'   => $validated['resep_obat'],
+                    'catatan_tambahan' => $validated['catatan_tambahan'] ?? null,
                 ]);
 
                 $kunjungan->update(['status' => Kunjungan::STATUS_SIAP_BAYAR]);

@@ -61,7 +61,13 @@
                             <dl class="grid gap-6 p-6 md:grid-cols-2">
                                 <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Keluhan</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->keluhan ?: '-' }}</dd></div>
                                 <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Diagnosis</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->diagnosa ?: '-' }}</dd></div>
+                                @if($kunjungan->poli_tujuan === 'Poli Spesialis Kandungan')
+                                    <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Hasil Pemeriksaan</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->hasil_pemeriksaan ?: '-' }}</dd></div>
+                                @endif
                                 <div class="rounded-lg bg-emerald-50 p-4 md:col-span-2"><dt class="text-xs font-semibold uppercase tracking-wide text-emerald-800">Resep Obat</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->resep_obat ?: '-' }}</dd></div>
+                                @if($kunjungan->poli_tujuan === 'Poli Spesialis Kandungan')
+                                    <div class="rounded-lg bg-sky-50 p-4 md:col-span-2"><dt class="text-xs font-semibold uppercase tracking-wide text-sky-800">Catatan Tambahan</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->catatan_tambahan ?: '-' }}</dd></div>
+                                @endif
                             </dl>
                         </article>
                     @endforeach

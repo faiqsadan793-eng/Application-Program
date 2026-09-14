@@ -84,7 +84,7 @@ class KunjunganController extends Controller
     {
         $validated = $request->validate([
             'id_pasien'   => 'required|exists:pasiens,id_pasien',
-            'poli_tujuan' => 'required|string|in:Poli Umum,Poli Gigi,Poli Anak',
+            'poli_tujuan' => 'required|string|in:' . implode(',', array_keys(config('clinic.poli'))),
         ]);
 
         // Cek di level aplikasi — cegah sebelum sampai ke DB

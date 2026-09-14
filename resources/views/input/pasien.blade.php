@@ -118,9 +118,9 @@
                                     <label class="block text-sm font-medium text-slate-600">Pilih Poli Tujuan *</label>
                                     <select name="poli_tujuan" class="mt-2 w-full rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-emerald-100" required>
                                         <option disabled value="">-- Pilih Poli --</option>
-                                        <option value="Poli Umum" {{ old('poli_tujuan') == 'Poli Umum' ? 'selected' : '' }}>Poli Umum</option>
-                                        <option value="Poli Gigi" {{ old('poli_tujuan') == 'Poli Gigi' ? 'selected' : '' }}>Poli Gigi</option>
-                                        <option value="Poli Anak" {{ old('poli_tujuan') == 'Poli Anak' ? 'selected' : '' }}>Poli Anak</option>
+                                        @foreach($poliList as $poli)
+                                            <option value="{{ $poli }}" @selected(old('poli_tujuan') === $poli)>{{ $poli }}</option>
+                                        @endforeach
                                     </select>
                                     @error('poli_tujuan')
                                         <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
