@@ -114,19 +114,16 @@ class RekamMedisController extends Controller
             $kunjungan = DB::transaction(function () use ($id, $dokter): Kunjungan {
                 // Sertakan pemeriksaan lintas hari agar tetap hanya ada satu pasien
                 // yang sedang diperiksa pada poli ini.
-                $antreanPoli = Kunjungan::where('poli_tujuan', $dokter->poli)
+                $kunjungan = Kunjungan::where('poli_tujuan', $dokter->poli)
+                    ->whereKey($id)
                     ->whereIn('status', [Kunjungan::STATUS_ANTRE, Kunjungan::STATUS_MENUNGGU_DOKTER])
                     ->where(function ($query) {
                         $query->padaHariIni()
                             ->orWhere('status', Kunjungan::STATUS_MENUNGGU_DOKTER);
                     })
                     ->lockForUpdate()
-                    ->get();
-
-                $kunjungan = $antreanPoli->firstWhere('id_kunjungan', $id);
+                    ->first();
                 abort_unless($kunjungan, 404);
-
-                $kunjunganAktif = $antreanPoli->firstWhere('status', Kunjungan::STATUS_MENUNGGU_DOKTER);
 
                 if ($kunjungan->status === Kunjungan::STATUS_MENUNGGU_DOKTER) {
                     return $kunjungan;
@@ -135,6 +132,11 @@ class RekamMedisController extends Controller
                 if ($kunjungan->status !== Kunjungan::STATUS_ANTRE) {
                     abort(422, 'Kunjungan ini sudah tidak dapat dimulai karena statusnya bukan antrean.');
                 }
+
+                $kunjunganAktif = Kunjungan::where('poli_tujuan', $dokter->poli)
+                    ->where('status', Kunjungan::STATUS_MENUNGGU_DOKTER)
+                    ->lockForUpdate()
+                    ->first();
 
                 if ($kunjunganAktif) {
                     abort(422, 'Masih ada pasien yang sedang diperiksa di poli ini. Selesaikan pemeriksaan tersebut terlebih dahulu.');
@@ -167,28 +169,22 @@ class RekamMedisController extends Controller
         $kunjungan = DB::transaction(function () use ($dokter): ?Kunjungan {
             // Pemeriksaan lintas hari ikut dikunci agar antrean baru tidak dipanggil
             // sebelum pemeriksaan sebelumnya selesai.
-            $antreanPoli = Kunjungan::where('poli_tujuan', $dokter->poli)
-                ->whereIn('status', [Kunjungan::STATUS_ANTRE, Kunjungan::STATUS_MENUNGGU_DOKTER])
-                ->where(function ($query) {
-                    $query->padaHariIni()
-                        ->orWhere('status', Kunjungan::STATUS_MENUNGGU_DOKTER);
-                })
+            // Kunci hanya kunjungan yang sedang diperiksa, bukan seluruh antrean.
+            $sedangDiperiksa = Kunjungan::where('poli_tujuan', $dokter->poli)
+                ->where('status', Kunjungan::STATUS_MENUNGGU_DOKTER)
                 ->lockForUpdate()
-                ->get();
-
-            $sedangDiperiksa = $antreanPoli->firstWhere('status', Kunjungan::STATUS_MENUNGGU_DOKTER);
+                ->first();
 
             if ($sedangDiperiksa) {
                 return null;
             }
 
-            $kunjungan = $antreanPoli
+            $kunjungan = Kunjungan::where('poli_tujuan', $dokter->poli)
                 ->where('status', Kunjungan::STATUS_ANTRE)
-                ->sortBy(fn (Kunjungan $item) => sprintf(
-                    '%s-%020d',
-                    $item->masuk_antrean_pada?->format('YmdHis.u') ?? $item->created_at->format('YmdHis.u'),
-                    $item->id_kunjungan,
-                ))
+                ->padaHariIni()
+                ->orderByRaw('COALESCE(masuk_antrean_pada, created_at)')
+                ->orderBy('id_kunjungan')
+                ->lockForUpdate()
                 ->first();
 
             if ($kunjungan) {

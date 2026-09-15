@@ -31,7 +31,9 @@ class KunjunganController extends Controller
         }
 
         // --- Filter: Rentang Waktu ---
-        $rentang = $request->input('rentang', '7');
+        // Tampilkan seluruh riwayat secara default; pagination tetap membatasi
+        // jumlah data yang dikirim ke halaman.
+        $rentang = $request->input('rentang', 'semua');
         if ($rentang === '7') {
             $query->where('tgl_kunjungan', '>=', now()->setTimezone('Asia/Jakarta')->subDays(7)->toDateString());
         } elseif ($rentang === '30') {

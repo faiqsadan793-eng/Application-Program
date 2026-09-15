@@ -71,10 +71,10 @@
                                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">calendar_month</span>
                                         <select name="rentang"
                                             class="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-12 pr-4 text-sm outline-none transition focus:border-emerald-500 appearance-none">
-                                            <option value="7"     {{ request('rentang','7') === '7'     ? 'selected' : '' }}>7 Hari Terakhir</option>
-                                            <option value="30"    {{ request('rentang','7') === '30'    ? 'selected' : '' }}>30 Hari Terakhir</option>
-                                            <option value="bulan" {{ request('rentang','7') === 'bulan' ? 'selected' : '' }}>Bulan Ini</option>
-                                            <option value="semua" {{ request('rentang','7') === 'semua' ? 'selected' : '' }}>Semua Waktu</option>
+                                            <option value="7"     {{ request('rentang','semua') === '7'     ? 'selected' : '' }}>7 Hari Terakhir</option>
+                                            <option value="30"    {{ request('rentang','semua') === '30'    ? 'selected' : '' }}>30 Hari Terakhir</option>
+                                            <option value="bulan" {{ request('rentang','semua') === 'bulan' ? 'selected' : '' }}>Bulan Ini</option>
+                                            <option value="semua" {{ request('rentang','semua') === 'semua' ? 'selected' : '' }}>Semua Waktu</option>
                                         </select>
                                     </div>
                                 </div>
