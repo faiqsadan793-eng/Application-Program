@@ -47,6 +47,10 @@ class RekamMedisController extends Controller
         $rules = [
             'id_kunjungan' => 'required|exists:kunjungans,id_kunjungan',
             'keluhan'      => 'required|string|max:2000',
+            'suhu_tubuh'   => 'nullable|numeric|min:20|max:45',
+            'tinggi_badan' => 'nullable|numeric|min:30|max:250',
+            'berat_badan'  => 'nullable|numeric|min:1|max:500',
+            'tekanan_darah'=> ['nullable', 'regex:/^\d{2,3}\/\d{2,3}$/'],
             'hasil_pemeriksaan' => 'nullable|string|max:4000',
             'diagnosa'     => 'required|string|max:2000',
             'resep_obat'   => 'required|string|max:2000',
@@ -75,6 +79,10 @@ class RekamMedisController extends Controller
                     // Snapshot menjaga identitas pemeriksa pada histori bila akun dokter berubah/dihapus.
                     'nama_dokter'  => Auth::user()->name,
                     'keluhan'      => $validated['keluhan'],
+                    'suhu_tubuh'   => $validated['suhu_tubuh'] ?? null,
+                    'tinggi_badan' => $validated['tinggi_badan'] ?? null,
+                    'berat_badan'  => $validated['berat_badan'] ?? null,
+                    'tekanan_darah'=> $validated['tekanan_darah'] ?? null,
                     'hasil_pemeriksaan' => $validated['hasil_pemeriksaan'] ?? null,
                     'diagnosa'     => $validated['diagnosa'],
                     'resep_obat'   => $validated['resep_obat'],

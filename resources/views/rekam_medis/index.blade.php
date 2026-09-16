@@ -131,6 +131,15 @@
                                                 placeholder="Tuliskan keluhan yang disampaikan pasien..." required>{{ $pulihkanInput ? old('keluhan') : '' }}</textarea>
                                             @if($pulihkanInput) @error('keluhan') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror @endif
                                         </div>
+                                        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                                            <p class="mb-3 text-sm font-semibold text-slate-700">Tanda Vital <span class="text-xs font-normal text-slate-400">(opsional, disarankan diisi)</span></p>
+                                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                                                <div><label class="block text-xs font-medium text-slate-500">Suhu (°C)</label><input type="number" step="0.1" min="20" max="45" name="suhu_tubuh" value="{{ $pulihkanInput ? old('suhu_tubuh') : '' }}" class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" placeholder="36.5">@if($pulihkanInput) @error('suhu_tubuh')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror @endif</div>
+                                                <div><label class="block text-xs font-medium text-slate-500">Tinggi (cm)</label><input type="number" step="0.01" min="30" max="250" name="tinggi_badan" value="{{ $pulihkanInput ? old('tinggi_badan') : '' }}" class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" placeholder="165">@if($pulihkanInput) @error('tinggi_badan')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror @endif</div>
+                                                <div><label class="block text-xs font-medium text-slate-500">Berat (kg)</label><input type="number" step="0.01" min="1" max="500" name="berat_badan" value="{{ $pulihkanInput ? old('berat_badan') : '' }}" class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" placeholder="60">@if($pulihkanInput) @error('berat_badan')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror @endif</div>
+                                                <div><label class="block text-xs font-medium text-slate-500">Tekanan darah (mmHg)</label><input type="text" maxlength="7" name="tekanan_darah" value="{{ $pulihkanInput ? old('tekanan_darah') : '' }}" class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" placeholder="120/80">@if($pulihkanInput) @error('tekanan_darah')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror @endif</div>
+                                            </div>
+                                        </div>
                                         @if($k->poli_tujuan === 'Poli Spesialis Kandungan')
                                             <div>
                                                 <label class="block text-sm font-medium text-slate-600 mb-2">Hasil Pemeriksaan *</label>

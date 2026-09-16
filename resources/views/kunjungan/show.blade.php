@@ -171,6 +171,14 @@
                                     <div class="rounded-2xl bg-slate-50 border border-slate-100 px-4 py-3 text-sm text-slate-700 leading-relaxed">{{ $kunjungan->rekamMedis->keluhan }}</div>
                                 </div>
                                 <div>
+                                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Tanda Vital</p>
+                                    <div class="rounded-2xl bg-orange-50 border border-orange-100 px-4 py-3 text-sm text-slate-700 leading-relaxed">
+                                        Suhu: {{ $kunjungan->rekamMedis->suhu_tubuh !== null ? number_format((float) $kunjungan->rekamMedis->suhu_tubuh, 1, ',', '.') . ' °C' : '-' }}<br>
+                                        Tinggi: {{ $kunjungan->rekamMedis->tinggi_badan !== null ? $kunjungan->rekamMedis->tinggi_badan . ' cm' : '-' }} · Berat: {{ $kunjungan->rekamMedis->berat_badan !== null ? $kunjungan->rekamMedis->berat_badan . ' kg' : '-' }}<br>
+                                        Tekanan darah: {{ $kunjungan->rekamMedis->tekanan_darah ?: '-' }} mmHg
+                                    </div>
+                                </div>
+                                <div>
                                     <p class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Diagnosa</p>
                                     <div class="rounded-2xl bg-sky-50 border border-sky-100 px-4 py-3 text-sm text-slate-700 leading-relaxed">{{ $kunjungan->rekamMedis->diagnosa }}</div>
                                 </div>

@@ -60,6 +60,7 @@
                             </div>
                             <dl class="grid gap-6 p-6 md:grid-cols-2">
                                 <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Keluhan</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->keluhan ?: '-' }}</dd></div>
+                                <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Tanda Vital</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">Suhu: {{ $rm->suhu_tubuh !== null ? number_format((float) $rm->suhu_tubuh, 1, ',', '.') . ' °C' : '-' }}<br>Tinggi: {{ $rm->tinggi_badan !== null ? $rm->tinggi_badan . ' cm' : '-' }} · Berat: {{ $rm->berat_badan !== null ? $rm->berat_badan . ' kg' : '-' }}<br>Tekanan darah: {{ $rm->tekanan_darah ?: '-' }} mmHg</dd></div>
                                 <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Diagnosis</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->diagnosa ?: '-' }}</dd></div>
                                 @if($kunjungan->poli_tujuan === 'Poli Spesialis Kandungan')
                                     <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Hasil Pemeriksaan</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->hasil_pemeriksaan ?: '-' }}</dd></div>
