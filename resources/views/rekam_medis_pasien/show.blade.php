@@ -23,7 +23,7 @@
         </header>
         <main class="p-4 md:p-8">
             <div class="mx-auto max-w-6xl">
-                <a href="{{ route('rekam-medis-pasien.index') }}" class="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 hover:underline"><span class="material-symbols-outlined text-lg">arrow_back</span>Daftar Rekam Medis</a>
+                <a href="{{ route('rekam-medis-pasien.index') }}" class="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-white px-4 py-2.5 text-sm font-semibold text-emerald-700 shadow-sm transition hover:border-emerald-300 hover:bg-emerald-50"><span class="material-symbols-outlined text-lg">arrow_back</span>Daftar Rekam Medis</a>
                 <div class="my-6 flex flex-wrap items-start justify-between gap-4">
                     <div><h1 class="text-2xl font-bold tracking-tight text-emerald-800">Rekam Medis Pasien</h1><p class="mt-2 text-sm text-slate-500">Identitas dan riwayat pemeriksaan pasien.</p></div>
                     <a href="{{ route('rekam-medis-pasien.pdf', $pasien) }}" class="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-800"><span class="material-symbols-outlined text-lg">download</span>Ekspor Seluruh Riwayat PDF</a>
@@ -59,11 +59,11 @@
                                 <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Selesai diperiksa</span>
                             </div>
                             <dl class="grid gap-6 p-6 md:grid-cols-2">
-                                <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Keluhan</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->keluhan ?: '-' }}</dd></div>
-                                <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Tanda Vital</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">Suhu: {{ $rm->suhu_tubuh !== null ? number_format((float) $rm->suhu_tubuh, 1, ',', '.') . ' °C' : '-' }}<br>Tinggi: {{ $rm->tinggi_badan !== null ? $rm->tinggi_badan . ' cm' : '-' }} · Berat: {{ $rm->berat_badan !== null ? $rm->berat_badan . ' kg' : '-' }}<br>Tekanan darah: {{ $rm->tekanan_darah ?: '-' }} mmHg</dd></div>
-                                <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Diagnosis</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->diagnosa ?: '-' }}</dd></div>
+                                <div class="rounded-lg border border-orange-100 bg-orange-50 p-4"><dt class="text-xs font-semibold uppercase tracking-wide text-orange-800">Tanda Vital</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">Suhu: {{ $rm->suhu_tubuh !== null ? number_format((float) $rm->suhu_tubuh, 1, ',', '.') . ' °C' : '-' }}<br>Tinggi: {{ $rm->tinggi_badan !== null ? $rm->tinggi_badan . ' cm' : '-' }} · Berat: {{ $rm->berat_badan !== null ? $rm->berat_badan . ' kg' : '-' }}<br>Tekanan darah: {{ $rm->tekanan_darah ?: '-' }} mmHg</dd></div>
+                                <div class="rounded-lg border border-slate-100 bg-slate-50 p-4"><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Keluhan</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->keluhan ?: '-' }}</dd></div>
+                                <div class="rounded-lg border border-sky-100 bg-sky-50 p-4"><dt class="text-xs font-semibold uppercase tracking-wide text-sky-800">Diagnosis</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->diagnosa ?: '-' }}</dd></div>
                                 @if($kunjungan->poli_tujuan === 'Poli Spesialis Kandungan')
-                                    <div><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Hasil Pemeriksaan</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->hasil_pemeriksaan ?: '-' }}</dd></div>
+                                     <div class="rounded-lg border border-violet-100 bg-violet-50 p-4"><dt class="text-xs font-semibold uppercase tracking-wide text-violet-800">Hasil Pemeriksaan</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->hasil_pemeriksaan ?: '-' }}</dd></div>
                                 @endif
                                 <div class="rounded-lg bg-emerald-50 p-4 md:col-span-2"><dt class="text-xs font-semibold uppercase tracking-wide text-emerald-800">Resep Obat</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->resep_obat ?: '-' }}</dd></div>
                                 @if($kunjungan->poli_tujuan === 'Poli Spesialis Kandungan')

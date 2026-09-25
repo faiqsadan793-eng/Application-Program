@@ -195,58 +195,6 @@
                             @endif
                         </div>
 
-                        {{-- Antrean Hari Ini --}}
-                        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
-                                <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Antrean Terbaru Hari Ini</h3>
-                                <a href="{{ route('dashboard') }}"
-                                    class="text-emerald-700 font-semibold text-sm flex items-center gap-1 hover:underline">
-                                    Lihat Semua
-                                    <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
-                                </a>
-                            </div>
-                            <div class="overflow-x-auto">
-                                <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
-                                    <thead class="bg-slate-50 text-slate-500">
-                                        <tr>
-                                            <th class="px-6 py-3 font-semibold uppercase tracking-wide">No. Antrean</th>
-                                            <th class="px-6 py-3 font-semibold uppercase tracking-wide">Nama Pasien</th>
-                                            <th class="px-6 py-3 font-semibold uppercase tracking-wide">Poli</th>
-                                            <th class="px-6 py-3 font-semibold uppercase tracking-wide">Jam Daftar</th>
-                                            <th class="px-6 py-3 font-semibold uppercase tracking-wide text-right">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-slate-200 bg-white">
-                                        @forelse($antreanHariIni as $antrean)
-                                            <tr class="hover:bg-slate-50">
-                                                <td class="px-6 py-4 font-semibold text-emerald-700">
-                                                    A-{{ str_pad($antrean->id_kunjungan, 3, '0', STR_PAD_LEFT) }}
-                                                </td>
-                                                <td class="px-6 py-4 font-medium text-slate-900">{{ $antrean->pasien->nama ?? '-' }}</td>
-                                                <td class="px-6 py-4 text-slate-600">{{ $antrean->poli_tujuan }}</td>
-                                                <td class="px-6 py-4 text-slate-500">{{ ($antrean->masuk_antrean_pada ?? $antrean->created_at)->timezone('Asia/Jakarta')->format('H:i') }} WIB</td>
-                                                <td class="px-6 py-4 text-right">
-                                                    @if($antrean->status == 'antre')
-                                                        <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-[11px] font-semibold">Antre</span>
-                                                    @elseif($antrean->status == 'menunggu_dokter')
-                                                        <span class="px-3 py-1 rounded-full bg-sky-100 text-sky-800 text-[11px] font-semibold">Pemeriksaan</span>
-                                                    @elseif($antrean->status == 'siap_bayar')
-                                                        <span class="px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-[11px] font-semibold">Siap Bayar</span>
-                                                    @else
-                                                        <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-800 text-[11px] font-semibold">Selesai</span>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @empty
-                                            <tr>
-                                                <td colspan="5" class="px-6 py-8 text-center text-slate-500">Belum ada antrean untuk hari ini.</td>
-                                            </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
                     </div>{{-- end space-y-6 --}}
                 </div>
             </main>

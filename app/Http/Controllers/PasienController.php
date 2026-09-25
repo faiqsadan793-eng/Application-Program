@@ -38,13 +38,7 @@ class PasienController extends Controller
             ->paginate(7)
             ->withQueryString();
 
-        $antreanHariIni = Kunjungan::with('pasien')
-            ->padaHariIni()
-            ->orderBy('masuk_antrean_pada')
-            ->orderBy('id_kunjungan')
-            ->get();
-
-        return view('pasien.index', compact('pasiens', 'antreanHariIni', 'hasSearch'));
+        return view('pasien.index', compact('pasiens', 'hasSearch'));
     }
 
     public function create()
