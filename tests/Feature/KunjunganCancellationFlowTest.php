@@ -152,6 +152,10 @@ class KunjunganCancellationFlowTest extends TestCase
             'nama' => 'Pasien Kedua',
             'no_hp' => '081234567892',
         ])), Kunjungan::STATUS_ANTRE);
+        $second->update(['kode_antrean' => 'A', 'nomor_antrean' => 1]);
+        $this->assertSame(1, $second->fresh()->nomor_antrean);
+        $this->assertSame(1, Kunjungan::where('tgl_kunjungan', $second->tgl_kunjungan)
+            ->where('poli_tujuan', 'Poli Umum')->max('nomor_antrean'));
 
         $this->travelTo(Carbon::parse('2026-09-13 08:10:00', 'Asia/Jakarta'));
         $this->actingAs($dokterUser)->patch(route('kunjungan.kembalikan-antrean', $first))
@@ -159,6 +163,8 @@ class KunjunganCancellationFlowTest extends TestCase
 
         $first->refresh();
         $this->assertTrue($first->masuk_antrean_pada->greaterThan($second->masuk_antrean_pada));
+        $this->assertSame('A', $first->kode_antrean);
+        $this->assertSame(2, $first->nomor_antrean);
         $this->post(route('rekam-medis.panggil-selanjutnya'))->assertSessionHas('success');
         $this->assertSame(Kunjungan::STATUS_MENUNGGU_DOKTER, $second->fresh()->status);
         $this->assertSame(Kunjungan::STATUS_ANTRE, $first->fresh()->status);

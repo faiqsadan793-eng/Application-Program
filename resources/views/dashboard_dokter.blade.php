@@ -126,7 +126,7 @@
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 @forelse($antreanHariIni as $antrean)
                                     <tr class="hover:bg-slate-50">
-                                        <td class="px-6 py-5 font-semibold text-slate-900">A-{{ str_pad($antrean->id_kunjungan, 3, '0', STR_PAD_LEFT) }}</td>
+                                        <td class="px-6 py-5 font-semibold text-slate-900">{{ $antrean->labelAntrean() }}</td>
                                         <td class="px-6 py-5">
                                             <p class="font-semibold text-slate-900">{{ $antrean->pasien->nama ?? '-' }}</p>
                                             <p class="text-xs text-slate-500">ID: RM-{{ str_pad($antrean->id_pasien, 4, '0', STR_PAD_LEFT) }}</p>

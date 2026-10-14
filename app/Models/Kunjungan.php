@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Kunjungan extends Model
 {
@@ -18,6 +19,8 @@ class Kunjungan extends Model
         'masuk_antrean_pada',
         'status',
         'poli_tujuan',
+        'kode_antrean',
+        'nomor_antrean',
         'kategori_pembatalan',
         'alasan_pembatalan',
         'dibatalkan_pada',
@@ -80,6 +83,57 @@ class Kunjungan extends Model
     public static function tanggalHariIni(): string
     {
         return now()->setTimezone('Asia/Jakarta')->toDateString();
+    }
+
+    public static function kodeAntreanUntuk(string $poli): string
+    {
+        return (string) (config('clinic.kode_antrean')[$poli] ?? '');
+    }
+
+    public function labelAntrean(): string
+    {
+        if ($this->kode_antrean === null || $this->nomor_antrean === null) {
+            return 'Nomor belum tersedia';
+        }
+
+        return $this->kode_antrean . '-' . str_pad((string) $this->nomor_antrean, 3, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Ambil nomor berikutnya di dalam transaksi pemanggil.
+     * lockForUpdate mencegah dua pendaftaran pada tanggal dan poli yang sama
+     * membaca nomor terakhir secara bersamaan.
+     */
+    public static function nomorAntreanBerikutnya(string $tanggal, string $poli): int
+    {
+        $batasiTanggal = static function ($query) use ($tanggal) {
+            return DB::connection()->getDriverName() === 'sqlite'
+                ? $query->whereDate('tgl_kunjungan', $tanggal)
+                : $query->where('tgl_kunjungan', $tanggal);
+        };
+
+        // Kunci seluruh antrean pada tanggal dan poli ini selama transaksi
+        // pemanggil berlangsung agar pembacaan nomor tidak bersamaan.
+        $batasiTanggal(DB::table('kunjungans'))
+            ->select('id_kunjungan')
+            ->where('poli_tujuan', $poli)
+            ->lockForUpdate()
+            ->get();
+
+        $nomor = ((int) $batasiTanggal(DB::table('kunjungans'))
+            ->where('poli_tujuan', $poli)
+            ->max('nomor_antrean')) + 1;
+
+        // Pemeriksaan ulang menjaga keamanan bila terdapat data lama yang
+        // memiliki celah nomor atau driver database mengurutkan NULL berbeda.
+        while ($batasiTanggal(DB::table('kunjungans'))
+            ->where('poli_tujuan', $poli)
+            ->where('nomor_antrean', $nomor)
+            ->exists()) {
+            $nomor++;
+        }
+
+        return $nomor;
     }
 
     public function scopePadaHariIni($query)

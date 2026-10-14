@@ -69,7 +69,7 @@
                         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-4 overflow-hidden">
                             <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
                                 <div class="flex items-center gap-4">
-                                    <span class="font-semibold text-emerald-700">A-{{ str_pad($k->id_kunjungan, 3, '0', STR_PAD_LEFT) }}</span>
+                                    <span class="font-semibold text-emerald-700">{{ $k->labelAntrean() }}</span>
                                     <div>
                                         <p class="font-semibold text-slate-900">{{ $k->pasien->nama ?? '-' }}</p>
                                         <p class="text-xs text-slate-500">{{ $k->poli_tujuan }} â€¢ Antrean {{ ($k->masuk_antrean_pada ?? $k->created_at)->timezone('Asia/Jakarta')->format('H:i') }} WIB</p>

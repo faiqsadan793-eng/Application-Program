@@ -73,10 +73,15 @@ class PasienController extends Controller
             $pasien->no_rm = Pasien::nomorRekamMedisUntuk($pasien->id_pasien);
             $pasien->save();
 
+            $tanggalKunjungan = Kunjungan::tanggalHariIni();
+            $poli = $validated['poli_tujuan'];
+
             Kunjungan::create([
                 'id_pasien'     => $pasien->id_pasien,
-                'tgl_kunjungan' => Kunjungan::tanggalHariIni(),
-                'poli_tujuan'   => $validated['poli_tujuan'],
+                'tgl_kunjungan' => $tanggalKunjungan,
+                'poli_tujuan'   => $poli,
+                'kode_antrean'  => Kunjungan::kodeAntreanUntuk($poli),
+                'nomor_antrean' => Kunjungan::nomorAntreanBerikutnya($tanggalKunjungan, $poli),
                 'status'        => Kunjungan::STATUS_ANTRE,
             ]);
 

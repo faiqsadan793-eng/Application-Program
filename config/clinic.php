@@ -17,4 +17,13 @@ return [
         'Poli Anak' => 'Poli Anak',
         'Poli Spesialis Kandungan' => 'Poli Spesialis Kandungan',
     ],
+
+    // Kode antrean ditetapkan terpusat agar seluruh proses pendaftaran
+    // menggunakan aturan yang sama.
+    'kode_antrean' => [
+        'Poli Umum' => 'A',
+        'Poli Gigi' => 'G',
+        'Poli Anak' => 'C',
+        'Poli Spesialis Kandungan' => 'K',
+    ],
 ];

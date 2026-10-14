@@ -102,12 +102,19 @@ class KunjunganController extends Controller
         }
 
         try {
-            Kunjungan::create([
-                'id_pasien'     => $validated['id_pasien'],
-                'poli_tujuan'   => $validated['poli_tujuan'],
-                'tgl_kunjungan' => Kunjungan::tanggalHariIni(),
-                'status'        => 'antre',
-            ]);
+            DB::transaction(function () use ($validated): void {
+                $tanggalKunjungan = Kunjungan::tanggalHariIni();
+                $poli = $validated['poli_tujuan'];
+
+                Kunjungan::create([
+                    'id_pasien'     => $validated['id_pasien'],
+                    'poli_tujuan'   => $poli,
+                    'tgl_kunjungan' => $tanggalKunjungan,
+                    'kode_antrean'  => Kunjungan::kodeAntreanUntuk($poli),
+                    'nomor_antrean' => Kunjungan::nomorAntreanBerikutnya($tanggalKunjungan, $poli),
+                    'status'        => Kunjungan::STATUS_ANTRE,
+                ]);
+            });
         } catch (\Illuminate\Database\QueryException $e) {
             if ($e->getCode() === '23000') {
                 return redirect()->back()
@@ -182,10 +189,15 @@ class KunjunganController extends Controller
                     abort(422, 'Kunjungan dari hari sebelumnya tidak dapat dikembalikan ke antrean hari ini. Batalkan kunjungan jika pasien tidak melanjutkan pemeriksaan.');
                 }
 
-                // Pasien masuk paling belakang tanpa membuat kunjungan baru atau menghapus riwayat.
+                // Nomor baru menempatkan pasien di posisi paling belakang tanpa
+                // membuat kunjungan baru atau menghapus riwayat.
+                $tanggalKunjungan = $kunjungan->tgl_kunjungan->toDateString();
+                $poli = $kunjungan->poli_tujuan;
                 $kunjungan->update([
                     'status' => Kunjungan::STATUS_ANTRE,
                     'masuk_antrean_pada' => now(),
+                    'kode_antrean' => Kunjungan::kodeAntreanUntuk($poli),
+                    'nomor_antrean' => Kunjungan::nomorAntreanBerikutnya($tanggalKunjungan, $poli),
                 ]);
             });
         } catch (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $exception) {

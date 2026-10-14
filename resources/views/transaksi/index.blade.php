@@ -83,7 +83,7 @@
                                 <tbody class="divide-y divide-slate-200 bg-white">
                                     @forelse($transaksis as $t)
                                         <tr class="hover:bg-slate-50">
-                                            <td class="px-6 py-5 font-semibold text-orange-700">A-{{ str_pad($t->id_kunjungan, 3, '0', STR_PAD_LEFT) }}</td>
+                                            <td class="px-6 py-5 font-semibold text-orange-700">{{ $t->kunjungan?->labelAntrean() ?? 'Nomor belum tersedia' }}</td>
                                             <td class="px-6 py-5">
                                                 <p class="font-semibold text-slate-900">{{ $t->kunjungan->pasien->nama ?? '-' }}</p>
                                                 <p class="text-xs text-slate-500">{{ $t->kunjungan->poli_tujuan ?? '-' }}</p>
@@ -99,7 +99,7 @@
                                                          data-transaction-id="{{ $t->id_transaksi }}"
                                                          onclick="openPaymentModal({{ json_encode([
                                                              'id_transaksi' => $t->id_transaksi,
-                                                             'no_antrean' => 'A-' . str_pad($t->id_kunjungan, 3, '0', STR_PAD_LEFT),
+                                                             'no_antrean' => $t->kunjungan?->labelAntrean() ?? 'Nomor belum tersedia',
                                                              'nama_pasien' => $t->kunjungan->pasien->nama ?? '-',
                                                              'poli' => $t->kunjungan->poli_tujuan ?? '-',
                                                              'diagnosa' => $t->kunjungan->rekamMedis->diagnosa ?? '-',

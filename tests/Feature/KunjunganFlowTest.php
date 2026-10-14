@@ -56,6 +56,36 @@ class KunjunganFlowTest extends TestCase
             ->exists());
     }
 
+    public function test_daily_queue_numbers_restart_per_poli_and_date(): void
+    {
+        $staff = User::factory()->create(['role' => 'staff']);
+        $this->travelTo(now()->setTime(8, 0));
+
+        $register = function (string $name, string $phone, string $poli) use ($staff): Kunjungan {
+            $this->actingAs($staff)->post(route('pasien.store'), [
+                'nama' => $name,
+                'tanggal_lahir' => '1995-02-12',
+                'jenis_kelamin' => 'Perempuan',
+                'no_hp' => $phone,
+                'poli_tujuan' => $poli,
+            ])->assertRedirect(route('pasien.index'));
+
+            return Kunjungan::latest('id_kunjungan')->firstOrFail();
+        };
+
+        $umumPertama = $register('Pasien Umum 1', '081234567801', 'Poli Umum');
+        $umumKedua = $register('Pasien Umum 2', '081234567802', 'Poli Umum');
+        $gigiPertama = $register('Pasien Gigi 1', '081234567803', 'Poli Gigi');
+
+        $this->travelTo(now()->addDay()->setTime(8, 0));
+        $umumHariBerikutnya = $register('Pasien Umum Hari Berikutnya', '081234567804', 'Poli Umum');
+
+        $this->assertSame(['A', 1], [$umumPertama->kode_antrean, $umumPertama->nomor_antrean]);
+        $this->assertSame(['A', 2], [$umumKedua->kode_antrean, $umumKedua->nomor_antrean]);
+        $this->assertSame(['G', 1], [$gigiPertama->kode_antrean, $gigiPertama->nomor_antrean]);
+        $this->assertSame(['A', 1], [$umumHariBerikutnya->kode_antrean, $umumHariBerikutnya->nomor_antrean]);
+    }
+
     private function pasien(): Pasien
     {
         return Pasien::create([
