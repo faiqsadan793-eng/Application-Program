@@ -22,8 +22,8 @@
     <div class="flex min-h-screen">
         @include('layouts.sidebar')
 
-        <div class="flex-1 flex flex-col">
-            <header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
+        <div class="flex min-w-0 flex-1 flex-col">
+            <header class="min-h-20 bg-white border-b border-slate-200 px-3 py-3 sm:px-6 flex items-center justify-between gap-3">
                 @include('layouts.header-page-info', ['breadcrumb' => 'Klinik Lala Medicare / Transaksi', 'title' => 'Pembayaran Pasien'])
                 <div class="flex items-center gap-4">
                     @include('layouts.header-date')
@@ -39,7 +39,7 @@
                 </div>
             </header>
 
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-3 sm:p-6">
                 <div class="max-w-[1200px] mx-auto">
                     @if(session('success'))
                         <div class="mb-6 rounded-2xl bg-emerald-50 border border-emerald-200 p-4 text-sm font-semibold text-emerald-800 flex items-center gap-2">
@@ -55,12 +55,12 @@
                     @endif
 
                     <div class="mb-6">
-                        <h2 class="text-2xl font-bold">Kasir & Pembayaran</h2>
+                        <h2 class="text-xl sm:text-2xl font-bold">Kasir & Pembayaran</h2>
                         <p class="text-sm text-slate-500 mt-1">Daftar pasien yang menunggu proses pembayaran di kasir.</p>
                     </div>
 
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="border-b border-slate-200 bg-slate-50 px-6 py-5 flex items-center justify-between">
+                        <div class="border-b border-slate-200 bg-slate-50 px-3 sm:px-6 py-5 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div class="flex items-center gap-3">
                                 <span class="material-symbols-outlined text-2xl text-orange-500">payments</span>
                                 <h3 class="text-lg font-semibold">Menunggu Pembayaran</h3>
@@ -70,7 +70,7 @@
                             </span>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                            <table class="min-w-[680px] divide-y divide-slate-200 text-left text-sm">
                                 <thead class="bg-slate-50 text-slate-500">
                                     <tr>
                                         <th class="px-6 py-4 font-semibold uppercase tracking-wide">No. Antrean</th>
@@ -124,7 +124,7 @@
                             </table>
                         </div>
                         @if($transaksis->hasPages())
-                            <div class="border-t border-slate-200 px-6 py-4">
+                            <div class="border-t border-slate-200 px-3 sm:px-6 py-4">
                                 {{ $transaksis->links() }}
                             </div>
                         @endif
@@ -135,9 +135,9 @@
     </div>
 
     <!-- Modal Pembayaran Rinci -->
-    <div id="paymentModal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-3xl w-full overflow-hidden shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
-            <div class="border-b border-slate-200 bg-slate-50 px-6 py-4 flex items-center justify-between">
+    <div id="paymentModal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-start sm:items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[calc(100dvh-1.5rem)] sm:max-h-[90vh] overflow-hidden shadow-2xl border border-slate-200 flex flex-col animate-in fade-in zoom-in-95 duration-200">
+            <div class="border-b border-slate-200 bg-slate-50 px-3 sm:px-6 py-4 flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2 text-slate-900">
                     <span class="material-symbols-outlined text-2xl text-emerald-600">payments</span>
                     <h3 class="font-bold text-lg">Proses Pembayaran</h3>
@@ -147,7 +147,7 @@
                 </button>
             </div>
 
-            <form id="paymentForm" method="POST" action="" class="p-6 space-y-4">
+            <form id="paymentForm" method="POST" action="" class="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
                 @csrf
                 @method('PUT')
                 <input type="hidden" id="paymentTransactionId" name="payment_transaction_id" value="">
@@ -157,7 +157,7 @@
                 <div class="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:items-start">
                     <div class="space-y-4">
                 <!-- Info Pasien -->
-                <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-150 text-sm">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-150 text-sm">
                     <div>
                         <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">No. Antrean</p>
                         <p id="modalNoAntrean" class="font-bold text-slate-800 text-base mt-0.5">-</p>
@@ -166,7 +166,7 @@
                         <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Poli Tujuan</p>
                         <p id="modalPoli" class="font-semibold text-slate-800 text-base mt-0.5">-</p>
                     </div>
-                    <div class="col-span-2">
+                    <div class="col-span-1 sm:col-span-2">
                         <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Nama Pasien</p>
                         <p id="modalNamaPasien" class="font-bold text-slate-900 mt-0.5">-</p>
                     </div>
@@ -187,7 +187,7 @@
 
                 <!-- Form Rincian Transaksi -->
                 <div class="space-y-3">
-                    <div class="grid grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label class="mb-1 flex min-h-8 items-end text-xs font-semibold uppercase tracking-wider text-slate-600">Jasa Dokter / Tindakan</label>
                             <div class="relative">
@@ -211,7 +211,7 @@
                     <div class="border-t border-slate-100 pt-3">
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-bold text-slate-700">Total Biaya Tagihan</span>
-                            <div class="relative w-44">
+                            <div class="relative w-36 sm:w-44 shrink-0">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm font-bold">Rp</span>
                                 <input type="text" id="inputTotalBiaya" readonly class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-100 font-bold text-emerald-800 text-sm outline-none" />
                             </div>
@@ -222,22 +222,22 @@
                         <p class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Metode Pembayaran</p>
                         <input type="hidden" id="inputMetodePembayaran" name="metode_pembayaran" value="cash" />
                         <div class="grid grid-cols-3 gap-2" role="group" aria-label="Metode pembayaran">
-                            <button type="button" data-payment-method="cash" onclick="selectPaymentMethod('cash')" class="inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-3 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-emerald-200">
-                                <span class="material-symbols-outlined text-[19px]">payments</span>
+                            <button type="button" data-payment-method="cash" onclick="selectPaymentMethod('cash')" class="inline-flex items-center justify-center gap-1 rounded-xl border px-2 sm:px-3 py-2.5 sm:py-3 text-xs sm:text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-emerald-200">
+                                <span class="material-symbols-outlined text-[16px] sm:text-[19px]">payments</span>
                                 Cash
                             </button>
-                            <button type="button" data-payment-method="qr" onclick="selectPaymentMethod('qr')" class="inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-3 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-emerald-200">
-                                <span class="material-symbols-outlined text-[19px]">qr_code_2</span>
+                            <button type="button" data-payment-method="qr" onclick="selectPaymentMethod('qr')" class="inline-flex items-center justify-center gap-1 rounded-xl border px-2 sm:px-3 py-2.5 sm:py-3 text-xs sm:text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-emerald-200">
+                                <span class="material-symbols-outlined text-[16px] sm:text-[19px]">qr_code_2</span>
                                 QRIS
                             </button>
-                            <button type="button" data-payment-method="debit" onclick="selectPaymentMethod('debit')" class="inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-3 text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-emerald-200">
-                                <span class="material-symbols-outlined text-[19px]">credit_card</span>
+                            <button type="button" data-payment-method="debit" onclick="selectPaymentMethod('debit')" class="inline-flex items-center justify-center gap-1 rounded-xl border px-2 sm:px-3 py-2.5 sm:py-3 text-xs sm:text-sm font-bold transition focus:outline-none focus:ring-2 focus:ring-emerald-200">
+                                <span class="material-symbols-outlined text-[16px] sm:text-[19px]">credit_card</span>
                                 Debit
                             </button>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3 border-t border-slate-100 pt-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-slate-100 pt-3">
                         <div>
                             <label id="labelUangDibayar" class="mb-1 flex min-h-8 items-end text-xs font-bold uppercase tracking-wider text-slate-700">Uang Diterima (Cash)</label>
                             <div class="relative">
@@ -258,15 +258,16 @@
                 </div>
                 </div>
 
-                <div class="pt-4 border-t border-slate-200 flex justify-end gap-3">
-                    <button type="button" onclick="closePaymentModal()" class="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
-                        Batal
-                    </button>
-                    <button type="submit" id="paymentSubmitButton" class="rounded-2xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-100 transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60">
-                        Proses & Selesai
-                    </button>
-                </div>
             </form>
+
+            <div class="shrink-0 border-t border-slate-200 bg-white px-4 sm:px-6 py-4 flex flex-col-reverse sm:flex-row justify-end gap-3">
+                <button type="button" onclick="closePaymentModal()" class="w-full sm:w-auto rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+                    Batal
+                </button>
+                <button type="submit" form="paymentForm" id="paymentSubmitButton" class="w-full sm:w-auto rounded-2xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-100 transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60">
+                    Proses & Selesai
+                </button>
+            </div>
         </div>
     </div>
 

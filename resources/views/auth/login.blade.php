@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Login - Klinik Lala Medicare</title>
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS melalui Vite -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Google Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
@@ -19,14 +19,19 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
+        .login-field-icon {
+            font-size: 14px;
+            line-height: 1;
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+        }
     </style>
 </head>
 <body class="h-full overflow-x-hidden antialiased">
 
-<div class="flex min-h-screen w-full">
+<div class="flex min-h-screen w-full flex-col lg:flex-row">
     
     <!-- Left Side: Image Banner (50% Width Desktop) -->
-    <div class="hidden lg:flex lg:w-1/2 relative bg-slate-800">
+    <div class="relative flex h-40 w-full bg-slate-800 lg:h-auto lg:w-1/2">
         <img class="absolute inset-0 w-full h-full object-cover opacity-90" 
              src="https://images.unsplash.com/photo-1629909613654-28e377c37b09?q=80&w=1200&auto=format&fit=crop" 
              alt="Klinik Banner"/>
@@ -35,16 +40,16 @@
         <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/80 via-emerald-900/20 to-transparent"></div>
         
         <!-- Bottom Text -->
-        <div class="absolute bottom-0 left-0 p-12 z-10 text-white space-y-2">
-            <h2 class="text-3xl font-bold tracking-tight">Penjelasan Klinik</h2>
-            <p class="text-sm opacity-90 max-w-md leading-relaxed">
+        <div class="absolute bottom-0 left-0 z-10 space-y-1 p-4 text-white lg:space-y-2 lg:p-12">
+            <h2 class="text-xl font-bold tracking-tight lg:text-3xl">Penjelasan Klinik</h2>
+            <p class="max-w-md text-xs leading-relaxed opacity-90 lg:text-sm">
                Layanan kesehatan profesional dengan pendekatan modern yang berpusat pada pasien, dirancang untuk generasi baru.
             </p>
         </div>
     </div>
 
     <!-- Right Side: Login Form (50% Width Desktop) -->
-    <div class="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-[#f7f9ff]">
+    <div class="flex w-full flex-1 items-center justify-center bg-[#f7f9ff] p-6 sm:p-12 lg:w-1/2">
         <div class="w-full max-w-md bg-white p-8 sm:p-10 rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 space-y-6">
             
             <!-- Header Brand -->
@@ -71,7 +76,7 @@
                 <div class="space-y-1">
                     <label class="block text-xs font-semibold text-slate-600" for="email">Username</label>
                     <div class="relative flex items-center">
-                        <span class="material-symbols-outlined absolute left-3 text-slate-400 text-lg pointer-events-none">person</span>
+                        <span class="material-symbols-outlined login-field-icon absolute left-3 text-slate-400 pointer-events-none">person</span>
                         <input type="email" 
                                id="email" 
                                name="email" 
@@ -90,7 +95,7 @@
                 <div class="space-y-1">
                     <label class="block text-xs font-semibold text-slate-600" for="password">Password</label>
                     <div class="relative flex items-center">
-                        <span class="material-symbols-outlined absolute left-3 text-slate-400 text-lg pointer-events-none">lock</span>
+                        <span class="material-symbols-outlined login-field-icon absolute left-3 text-slate-400 pointer-events-none">lock</span>
                         <input type="password" 
                                id="password" 
                                name="password" 
@@ -100,7 +105,7 @@
                         <button type="button" 
                                 onclick="togglePasswordVisibility()" 
                                 class="absolute right-3 text-slate-400 hover:text-emerald-600 focus:outline-none">
-                            <span class="material-symbols-outlined text-lg" id="eyeIcon">visibility</span>
+                            <span class="material-symbols-outlined login-field-icon" id="eyeIcon">visibility</span>
                         </button>
                     </div>
                     @error('password')

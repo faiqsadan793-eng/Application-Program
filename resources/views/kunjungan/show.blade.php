@@ -25,7 +25,7 @@
 
         <div class="flex-1 flex flex-col">
             <header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-3 pl-14 md:pl-0">
                     <a href="{{ route('kunjungan.index') }}"
                         class="flex items-center justify-center rounded-full border border-slate-200 bg-slate-50 p-2 text-slate-600 transition hover:bg-slate-100">
                         <span class="material-symbols-outlined text-[20px]">arrow_back</span>

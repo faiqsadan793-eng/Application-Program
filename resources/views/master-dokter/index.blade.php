@@ -24,7 +24,7 @@
         @include('layouts.sidebar')
 
         <div class="flex min-w-0 flex-1 flex-col">
-            <header class="flex h-20 items-center justify-between border-b border-slate-200 bg-white px-6">
+            <header class="flex min-h-20 items-center justify-between gap-3 border-b border-slate-200 bg-white px-3 py-3 sm:px-6">
                 @include('layouts.header-page-info', ['breadcrumb' => 'Klinik Lala Medicare / Master Data', 'title' => 'Manajemen Data Dokter'])
                 <div class="flex items-center gap-3">
                     @include('layouts.header-date')
@@ -38,10 +38,10 @@
                 </div>
             </header>
 
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-3 sm:p-6">
                 <section class="mb-7">
                     <p class="text-sm font-semibold text-emerald-700">Master Data</p>
-                    <h1 class="mt-1 text-3xl font-bold tracking-tight text-slate-900">Manajemen Data Dokter</h1>
+                    <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Manajemen Data Dokter</h1>
                     <p class="mt-2 text-sm text-slate-500">Kelola informasi dokter, poli praktik, dan akun login dokter.</p>
                 </section>
 
@@ -59,8 +59,8 @@
                     </div>
                 @endif
 
-                <div class="grid gap-6 xl:grid-cols-[minmax(290px,360px)_minmax(0,1fr)]">
-                    <section class="h-fit rounded-3xl border border-slate-200 bg-white p-6 shadow-sm xl:sticky xl:top-6">
+                <div class="grid gap-4 sm:gap-6 xl:grid-cols-[minmax(290px,360px)_minmax(0,1fr)]">
+                    <section class="h-fit rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6 xl:sticky xl:top-6">
                         <div class="mb-6 flex items-center gap-3">
                             <div class="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
                                 <span class="material-symbols-outlined">person_add</span>
@@ -125,7 +125,7 @@
                             <span class="inline-flex w-fit rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">{{ $dokters->count() }} Dokter</span>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                            <table class="min-w-[680px] divide-y divide-slate-200 text-left text-sm">
                                 <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
                                     <tr>
                                         <th class="px-6 py-4">No</th>
@@ -138,11 +138,11 @@
                                 <tbody class="divide-y divide-slate-200 bg-white">
                                     @forelse($dokters as $index => $dokter)
                                         <tr class="transition hover:bg-slate-50">
-                                            <td class="px-6 py-4 text-slate-500">{{ $index + 1 }}</td>
-                                            <td class="px-6 py-4 font-semibold text-slate-900">{{ $dokter->user->name }}</td>
-                                            <td class="px-6 py-4 text-slate-600">{{ $dokter->nip_sip }}</td>
-                                            <td class="px-6 py-4"><span class="inline-flex rounded-full bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700">{{ $dokter->poli }}</span></td>
-                                            <td class="px-6 py-4">
+                                            <td class="whitespace-nowrap px-3 py-4 text-slate-500 sm:px-6">{{ $index + 1 }}</td>
+                                            <td class="whitespace-nowrap px-3 py-4 font-semibold text-slate-900 sm:px-6">{{ $dokter->user->name }}</td>
+                                            <td class="whitespace-nowrap px-3 py-4 text-slate-600 sm:px-6">{{ $dokter->nip_sip }}</td>
+                                            <td class="whitespace-nowrap px-3 py-4 sm:px-6"><span class="inline-flex rounded-full bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-700">{{ $dokter->poli }}</span></td>
+                                            <td class="whitespace-nowrap px-3 py-4 sm:px-6">
                                                 <div class="flex justify-end gap-2">
                                                     <button type="button" onclick="openEditModal(this)" data-action="{{ route('dokter.update', $dokter) }}" data-name="{{ $dokter->user->name }}" data-email="{{ $dokter->user->email }}" data-nip-sip="{{ $dokter->nip_sip }}" data-poli="{{ $dokter->poli }}" class="rounded-lg border border-sky-200 bg-sky-50 px-3 py-1.5 text-xs font-semibold text-sky-700 transition hover:bg-sky-100">Edit</button>
                                                     <button type="button" onclick="openDeleteModal(this)" data-action="{{ route('dokter.destroy', $dokter) }}" data-name="{{ $dokter->user->name }}" class="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-100">Hapus</button>

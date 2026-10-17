@@ -1,5 +1,11 @@
 @php $user = Auth::user(); @endphp
-<aside class="hidden shrink-0 flex-col border-r border-slate-100 bg-white md:flex md:w-64">
+<button id="sidebarToggle" type="button" class="fixed left-4 top-4 z-[55] inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-md transition hover:bg-slate-50 md:hidden" aria-label="Buka menu navigasi" aria-controls="appSidebar" aria-expanded="false">
+    <span id="sidebarMenuIcon" class="material-symbols-outlined">menu</span>
+</button>
+
+<div id="sidebarOverlay" class="fixed inset-0 z-40 hidden bg-slate-900/40 backdrop-blur-[1px] md:hidden" aria-hidden="true"></div>
+
+<aside id="appSidebar" class="fixed inset-y-0 left-0 z-50 flex w-64 -translate-x-full flex-col border-r border-slate-100 bg-white transition-transform duration-200 md:static md:z-auto md:w-64 md:translate-x-0">
     <div class="border-b border-slate-100 px-5 py-4">
         <div class="flex items-center gap-2.5">
             <div class="flex h-8 w-8 items-center justify-center text-emerald-600">
@@ -95,6 +101,31 @@
 </div>
 
 <script>
+    const sidebar = document.getElementById('appSidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function setSidebar(open) {
+        sidebar.classList.toggle('-translate-x-full', !open);
+        sidebar.classList.toggle('translate-x-0', open);
+        sidebarOverlay.classList.toggle('hidden', !open);
+        sidebarToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        sidebarToggle.setAttribute('aria-label', open ? 'Tutup menu navigasi' : 'Buka menu navigasi');
+        document.getElementById('sidebarMenuIcon').textContent = open ? 'arrow_back' : 'menu';
+        sidebarToggle.setAttribute('aria-label', open ? 'Tutup menu navigasi' : 'Buka menu navigasi');
+        document.getElementById('sidebarMenuIcon').textContent = open ? 'arrow_back' : 'menu';
+        sidebarToggle.setAttribute('aria-label', open ? 'Tutup menu navigasi' : 'Buka menu navigasi');
+        document.getElementById('sidebarMenuIcon').textContent = open ? 'arrow_back' : 'menu';
+    }
+
+    sidebarToggle?.addEventListener('click', function () {
+        setSidebar(sidebar.classList.contains('-translate-x-full'));
+    });
+
+    sidebarOverlay?.addEventListener('click', function () {
+        setSidebar(false);
+    });
+
     function openLogoutModal() {
         document.getElementById('logoutModal').classList.remove('hidden');
         document.getElementById('logoutModal').classList.add('flex');

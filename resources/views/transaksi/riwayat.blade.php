@@ -27,8 +27,8 @@
     <div class="flex min-h-screen">
         @include('layouts.sidebar')
 
-        <div class="flex-1 flex flex-col">
-            <header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center justify-between no-print">
+        <div class="flex min-w-0 flex-1 flex-col">
+            <header class="min-h-20 bg-white border-b border-slate-200 px-3 py-3 sm:px-6 flex items-center justify-between gap-3 no-print">
                 @include('layouts.header-page-info', ['breadcrumb' => 'Klinik Lala Medicare / Transaksi', 'title' => 'Riwayat Transaksi'])
                 <div class="flex items-center gap-4">
                     @include('layouts.header-date')
@@ -44,11 +44,11 @@
                 </div>
             </header>
 
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-3 sm:p-6">
                 <div class="max-w-[1200px] mx-auto">
 
                     <div class="mb-6">
-                        <h2 class="text-2xl font-bold">Riwayat Transaksi</h2>
+                        <h2 class="text-xl sm:text-2xl font-bold">Riwayat Transaksi</h2>
                         <p class="text-sm text-slate-500 mt-1">Histori transaksi pembayaran pasien dan rekapitulasi kasir.</p>
                     </div>
 
@@ -81,9 +81,9 @@
                     {{-- Filter Bar --}}
                     <form method="GET" action="{{ route('riwayat-transaksi.index') }}" id="filter-form" class="no-print">
                         <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 mb-6">
-                            <div class="flex flex-wrap gap-4 items-end">
+                            <div class="flex flex-col gap-4 items-stretch sm:flex-row sm:flex-wrap sm:items-end">
                                 {{-- Search --}}
-                                <div class="flex-1 min-w-[200px]">
+                                <div class="w-full sm:flex-1 sm:min-w-[200px]">
                                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Cari</label>
                                     <div class="relative">
                                         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
@@ -94,25 +94,25 @@
                                 </div>
 
                                 {{-- Date from --}}
-                                <div class="min-w-[160px]">
+                                <div class="w-full sm:min-w-[160px]">
                                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Dari Tanggal</label>
                                     <input type="date" name="tanggal_dari" value="{{ request('tanggal_dari') }}"
                                         class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
                                 </div>
 
                                 {{-- Date to --}}
-                                <div class="min-w-[160px]">
+                                <div class="w-full sm:min-w-[160px]">
                                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Sampai Tanggal</label>
                                     <input type="date" name="tanggal_sampai" value="{{ request('tanggal_sampai') }}"
                                         class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
                                 </div>
 
                                 {{-- Buttons --}}
-                                <div class="flex gap-2">
-                                    <button type="submit" class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
+                                <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+                                    <button type="submit" class="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
                                         <span class="material-symbols-outlined text-[18px]">filter_alt</span> Filter
                                     </button>
-                                    <a href="{{ route('riwayat-transaksi.index') }}" class="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+                                    <a href="{{ route('riwayat-transaksi.index') }}" class="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
                                         <span class="material-symbols-outlined text-[18px]">refresh</span> Reset
                                     </a>
                                 </div>
@@ -122,7 +122,7 @@
 
                     {{-- Transaction Table --}}
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="border-b border-slate-200 bg-slate-50 px-6 py-5 flex items-center justify-between">
+                        <div class="border-b border-slate-200 bg-slate-50 px-3 sm:px-6 py-5 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
                             <div class="flex items-center gap-3">
                                 <span class="material-symbols-outlined text-2xl text-emerald-600">account_balance_wallet</span>
                                 <h3 class="text-lg font-semibold">Transaksi Selesai</h3>
@@ -133,7 +133,7 @@
                         </div>
 
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                            <table class="min-w-[900px] divide-y divide-slate-200 text-left text-sm">
                                 <thead class="bg-slate-50 text-slate-500">
                                     <tr>
                                         <th class="px-6 py-4 font-semibold uppercase tracking-wide">No. Transaksi</th>
@@ -195,7 +195,7 @@
 
                         {{-- Pagination --}}
                         @if($riwayat->hasPages())
-                            <div class="border-t border-slate-200 bg-slate-50 px-6 py-4">
+                            <div class="border-t border-slate-200 bg-slate-50 px-3 sm:px-6 py-4">
                                 {{ $riwayat->withQueryString()->links() }}
                             </div>
                         @endif
@@ -209,7 +209,7 @@
     {{-- Detail Modal --}}
     <div id="detailModal" class="fixed inset-0 z-50 hidden bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 no-print">
         <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200">
-            <div class="border-b border-slate-200 bg-slate-50 px-6 py-4 flex items-center justify-between">
+            <div class="border-b border-slate-200 bg-slate-50 px-3 sm:px-6 py-4 flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2 text-slate-900">
                     <span class="material-symbols-outlined text-2xl text-emerald-600">receipt_long</span>
                     <h3 class="font-bold text-lg">Detail Transaksi</h3>
@@ -219,9 +219,9 @@
                 </button>
             </div>
 
-            <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto custom-scrollbar" id="printableArea">
+            <div class="p-4 sm:p-6 space-y-4 max-h-[75vh] overflow-y-auto custom-scrollbar" id="printableArea">
                 {{-- Info Transaksi --}}
-                <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-sm">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-sm">
                     <div>
                         <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">No. Transaksi</p>
                         <p id="detailNoTransaksi" class="font-bold text-slate-800 text-base mt-0.5">-</p>
@@ -289,11 +289,11 @@
                 </div>
             </div>
 
-            <div class="border-t border-slate-200 bg-slate-50 px-6 py-4 flex justify-end gap-3">
-                <button type="button" onclick="closeDetailModal()" class="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+            <div class="border-t border-slate-200 bg-slate-50 px-3 sm:px-6 py-4 flex flex-col-reverse sm:flex-row justify-end gap-3">
+                <button type="button" onclick="closeDetailModal()" class="w-full sm:w-auto rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
                     Tutup
                 </button>
-                <button type="button" onclick="printReceipt()" class="rounded-2xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 inline-flex items-center gap-1.5">
+                <button type="button" onclick="printReceipt()" class="w-full sm:w-auto rounded-2xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 inline-flex items-center justify-center gap-1.5">
                     <span class="material-symbols-outlined text-[18px]">print</span> Cetak Struk
                 </button>
             </div>

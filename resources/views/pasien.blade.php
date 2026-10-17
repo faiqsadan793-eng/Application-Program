@@ -23,9 +23,9 @@
     <div class="flex min-h-screen">
         @include('layouts.sidebar')
 
-        <div class="flex-1 flex flex-col">
+        <div class="flex min-w-0 flex-1 flex-col">
             {{-- HEADER --}}
-            <header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
+            <header class="min-h-20 bg-white border-b border-slate-200 px-3 py-3 sm:px-6 flex items-center justify-between gap-3">
                 @include('layouts.header-page-info', ['breadcrumb' => 'Klinik Lala Medicare / Pasien', 'title' => 'Pengelolaan & Registrasi Pasien'])
                 <div class="flex items-center gap-4">
                     @include('layouts.header-date')
@@ -41,7 +41,7 @@
                 </div>
             </header>
 
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-3 sm:p-6">
                 <div class="max-w-[1200px] mx-auto">
 
                     {{-- Flash Messages --}}
@@ -61,16 +61,16 @@
                     {{-- Page Header --}}
                     <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
                         <div>
-                            <h2 class="text-2xl font-bold">Pengelolaan & Registrasi Pasien</h2>
+                            <h2 class="text-xl sm:text-2xl font-bold">Pengelolaan & Registrasi Pasien</h2>
                             <p class="text-sm text-slate-500 mt-1">Cari pasien lama atau daftarkan pasien baru untuk membuat antrean poli hari ini.</p>
                         </div>
-                        <div class="flex items-center gap-2 bg-slate-50 p-1 rounded-full border border-slate-200">
+                        <div class="flex w-full sm:w-auto items-center gap-1 sm:gap-2 bg-slate-50 p-1 rounded-full border border-slate-200">
                             <a href="{{ route('pasien.index') }}"
-                                class="px-5 py-2 rounded-full bg-emerald-600 text-white font-semibold shadow-sm transition hover:bg-emerald-700">
+                                class="flex-1 sm:flex-none whitespace-nowrap px-3 sm:px-5 py-2 text-center text-sm rounded-full bg-emerald-600 text-white font-semibold shadow-sm transition hover:bg-emerald-700">
                                 Cari Pasien Lama
                             </a>
                             <a href="{{ route('pasien.create') }}"
-                                class="px-5 py-2 rounded-full text-slate-600 font-medium transition hover:bg-white/50">
+                                class="flex-1 sm:flex-none whitespace-nowrap px-3 sm:px-5 py-2 text-center text-sm rounded-full text-slate-600 font-medium transition hover:bg-white/50">
                                 Input Pasien Baru
                             </a>
                         </div>
@@ -80,7 +80,7 @@
 
                         {{-- Search Form --}}
                         <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm">
-                            <form method="GET" action="{{ route('pasien.index') }}" class="flex gap-3">
+                            <form method="GET" action="{{ route('pasien.index') }}" class="flex flex-col gap-3 sm:flex-row">
                                 <div class="flex-1 relative">
                                     <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">person_search</span>
                                     <input name="search" value="{{ request('search') }}"
@@ -89,7 +89,7 @@
                                         type="text" autocomplete="off">
                                 </div>
                                 <button type="submit"
-                                    class="bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition hover:bg-emerald-700">
+                                    class="w-full sm:w-auto justify-center bg-emerald-600 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition hover:bg-emerald-700">
                                     <span class="material-symbols-outlined">search</span>
                                     Cari
                                 </button>
@@ -98,7 +98,7 @@
 
                         {{-- Tabel pasien terintegrasi: pasien terbaru atau hasil pencarian --}}
                         <div class="bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
-                            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                            <div class="px-3 sm:px-6 py-4 border-b border-slate-100 bg-slate-50 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
                                 <h3 class="text-sm font-semibold text-slate-500 uppercase tracking-wider">
                                     {{ $hasSearch ? 'Hasil Pencarian Pasien' : 'Data Pasien Terbaru' }}
                                 </h3>
@@ -131,22 +131,22 @@
                                 </div>
                             @else
                                 <div class="overflow-x-auto">
-                                    <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                                    <table class="min-w-[760px] divide-y divide-slate-200 text-left text-sm">
                                         <thead class="bg-slate-50 text-slate-500">
                                             <tr>
-                                                <th class="px-6 py-3 font-semibold uppercase tracking-wide">No. RM</th>
-                                                <th class="px-6 py-3 font-semibold uppercase tracking-wide">Nama Pasien</th>
-                                                <th class="px-6 py-3 font-semibold uppercase tracking-wide">NIK</th>
-                                                <th class="px-6 py-3 font-semibold uppercase tracking-wide">No. HP</th>
-                                                <th class="px-6 py-3 font-semibold uppercase tracking-wide">Terdaftar</th>
-                                                <th class="px-6 py-3 font-semibold uppercase tracking-wide text-right">Aksi</th>
+                                                <th class="whitespace-nowrap px-3 sm:px-6 py-3 font-semibold uppercase tracking-wide">No. RM</th>
+                                                <th class="whitespace-nowrap px-3 sm:px-6 py-3 font-semibold uppercase tracking-wide">Nama Pasien</th>
+                                                <th class="whitespace-nowrap px-3 sm:px-6 py-3 font-semibold uppercase tracking-wide">NIK</th>
+                                                <th class="whitespace-nowrap px-3 sm:px-6 py-3 font-semibold uppercase tracking-wide">No. HP</th>
+                                                <th class="whitespace-nowrap px-3 sm:px-6 py-3 font-semibold uppercase tracking-wide">Terdaftar</th>
+                                                <th class="whitespace-nowrap px-3 sm:px-6 py-3 font-semibold uppercase tracking-wide text-right">Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y divide-slate-200 bg-white">
                                             @foreach($pasiens as $p)
                                                 <tr class="hover:bg-slate-50">
-                                                    <td class="px-6 py-4 font-semibold text-emerald-700">{{ $p->no_rm ?: 'RM-' . str_pad($p->id_pasien, 6, '0', STR_PAD_LEFT) }}</td>
-                                                    <td class="px-6 py-4">
+                                                    <td class="whitespace-nowrap px-3 sm:px-6 py-4 font-semibold text-emerald-700">{{ $p->no_rm ?: 'RM-' . str_pad($p->id_pasien, 6, '0', STR_PAD_LEFT) }}</td>
+                                                    <td class="px-3 sm:px-6 py-4">
                                                         <div class="font-semibold text-slate-900">{{ $p->nama }}</div>
                                                         @if($p->has_active_kunjungan_today)
                                                             <span class="mt-1 inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-700">
@@ -155,10 +155,10 @@
                                                             </span>
                                                         @endif
                                                     </td>
-                                                    <td class="px-6 py-4 text-slate-600">{{ $p->nik ?? '-' }}</td>
-                                                    <td class="px-6 py-4 text-slate-600">{{ $p->no_hp ?? '-' }}</td>
-                                                    <td class="px-6 py-4 text-slate-500">{{ $p->created_at?->timezone('Asia/Jakarta')->locale('id')->translatedFormat('d M Y') ?? '-' }}</td>
-                                                    <td class="px-6 py-4 text-right">
+                                                    <td class="whitespace-nowrap px-3 sm:px-6 py-4 text-slate-600">{{ $p->nik ?? '-' }}</td>
+                                                    <td class="whitespace-nowrap px-3 sm:px-6 py-4 text-slate-600">{{ $p->no_hp ?? '-' }}</td>
+                                                    <td class="whitespace-nowrap px-3 sm:px-6 py-4 text-slate-500">{{ $p->created_at?->timezone('Asia/Jakarta')->locale('id')->translatedFormat('d M Y') ?? '-' }}</td>
+                                                    <td class="whitespace-nowrap px-3 sm:px-6 py-4 text-right">
                                                         @if($p->has_active_kunjungan_today)
                                                             <span class="inline-flex items-center gap-1 rounded-lg bg-emerald-100 px-3 py-2 text-xs font-semibold text-emerald-700">
                                                                 <span class="material-symbols-outlined text-[16px]">event_available</span>
@@ -188,7 +188,7 @@
                                     </table>
                                 </div>
                                 @if($pasiens->hasPages())
-                                    <div class="border-t border-slate-100 px-6 py-4">
+                                    <div class="border-t border-slate-100 px-3 sm:px-6 py-4">
                                         {{ $pasiens->links() }}
                                     </div>
                                 @endif

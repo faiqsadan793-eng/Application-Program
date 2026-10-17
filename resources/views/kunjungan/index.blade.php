@@ -23,8 +23,8 @@
     <div class="flex min-h-screen">
         @include('layouts.sidebar')
 
-        <div class="flex-1 flex flex-col">
-            <header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
+        <div class="flex min-w-0 flex-1 flex-col">
+            <header class="min-h-20 bg-white border-b border-slate-200 px-3 py-3 sm:px-6 flex items-center justify-between gap-3">
                 @include('layouts.header-page-info', ['breadcrumb' => 'Klinik Lala Medicare / Kunjungan', 'title' => 'Riwayat Kunjungan Pasien'])
                 <div class="flex items-center gap-4">
                     @include('layouts.header-date')
@@ -40,21 +40,21 @@
                 </div>
             </header>
 
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-3 sm:p-6">
                 <div class="max-w-[1200px] mx-auto">
 
                     <div class="mb-6">
-                        <h2 class="text-2xl font-bold">Riwayat Kunjungan Pasien</h2>
+                        <h2 class="text-xl sm:text-2xl font-bold">Riwayat Kunjungan Pasien</h2>
                         <p class="text-sm text-slate-500 mt-1">Daftar histori rekam kunjungan pasien di Klinik Lala Medicare.</p>
                     </div>
 
                     {{-- Filter Panel — semua input terhubung ke controller --}}
                     <form method="GET" action="{{ route('kunjungan.index') }}" id="filter-form">
                         <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 mb-6">
-                            <div class="flex flex-wrap gap-4 items-end">
+                            <div class="flex flex-col gap-4 items-stretch sm:flex-row sm:flex-wrap sm:items-end">
 
                                 {{-- Search --}}
-                                <div class="flex-1 min-w-[220px]">
+                                <div class="w-full sm:flex-1 sm:min-w-[220px]">
                                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Cari Pasien</label>
                                     <div class="relative">
                                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
@@ -65,7 +65,7 @@
                                 </div>
 
                                 {{-- Rentang Waktu --}}
-                                <div class="min-w-[170px]">
+                                <div class="w-full sm:min-w-[170px]">
                                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Rentang Waktu</label>
                                     <div class="relative">
                                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">calendar_month</span>
@@ -80,7 +80,7 @@
                                 </div>
 
                                 {{-- Poli --}}
-                                <div class="min-w-[160px]">
+                                <div class="w-full sm:min-w-[160px]">
                                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Poli</label>
                                     <select name="poli"
                                         class="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 px-4 text-sm outline-none transition focus:border-emerald-500 appearance-none">
@@ -92,7 +92,7 @@
                                 </div>
 
                                 {{-- Status --}}
-                                <div class="min-w-[160px]">
+                                <div class="w-full sm:min-w-[160px]">
                                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Status</label>
                                     <select name="status"
                                         class="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 px-4 text-sm outline-none transition focus:border-emerald-500 appearance-none">
@@ -105,14 +105,14 @@
                                 </div>
 
                                 {{-- Tombol --}}
-                                <div class="flex gap-2">
+                                <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
                                     <button type="submit"
-                                        class="rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">
+                                        class="w-full sm:w-auto rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">
                                         Terapkan Filter
                                     </button>
                                     @if(request()->hasAny(['search','rentang','poli','status']))
                                         <a href="{{ route('kunjungan.index') }}"
-                                            class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+                                            class="w-full sm:w-auto rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
                                             Reset
                                         </a>
                                     @endif
@@ -123,7 +123,7 @@
                     </form>
 
                     {{-- Info jumlah hasil --}}
-                    <div class="flex items-center justify-between mb-3 px-1">
+                    <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between mb-3 px-1">
                         <p class="text-sm text-slate-500">
                             Menampilkan <span class="font-semibold text-slate-700">{{ $kunjungans->total() }}</span> kunjungan
                             @if(request('search'))
@@ -135,7 +135,7 @@
                     {{-- Tabel --}}
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                            <table class="min-w-[760px] divide-y divide-slate-200 text-left text-sm">
                                 <thead class="bg-slate-50 text-slate-500">
                                     <tr>
                                         <th class="px-6 py-4 font-semibold uppercase tracking-wide">No. RM</th>
@@ -198,7 +198,7 @@
                         </div>
 
                         @if($kunjungans->hasPages())
-                            <div class="px-6 py-4 border-t border-slate-200">
+                            <div class="px-3 sm:px-6 py-4 border-t border-slate-200">
                                 {{ $kunjungans->links() }}
                             </div>
                         @endif

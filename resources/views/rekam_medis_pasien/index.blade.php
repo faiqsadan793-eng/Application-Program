@@ -22,7 +22,7 @@
         @include('layouts.sidebar')
 
         <div class="flex min-w-0 flex-1 flex-col">
-            <header class="h-16 border-b border-slate-200 bg-white px-6 flex items-center justify-between shadow-sm">
+            <header class="min-h-16 border-b border-slate-200 bg-white px-3 py-3 sm:px-6 flex items-center justify-between gap-3 shadow-sm">
                 @include('layouts.header-page-info', ['breadcrumb' => 'Klinik Lala Medicare / Rekam Medis', 'title' => 'Rekam Medis Pasien'])
                 <div class="flex items-center gap-3">
                     @include('layouts.header-date')
@@ -36,10 +36,10 @@
                 </div>
             </header>
 
-            <main class="flex-1 p-6 md:p-10">
+            <main class="flex-1 p-3 sm:p-6 md:p-10">
                 <div class="mx-auto max-w-6xl">
                     <section class="mb-7">
-                        <h1 class="text-3xl font-bold tracking-tight text-emerald-800">Rekam Medis Pasien</h1>
+                        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-emerald-800">Rekam Medis Pasien</h1>
                         <p class="mt-2 text-sm text-slate-500">Pencarian dan histori rekam medis pasien Klinik Lala Medicare.</p>
                     </section>
 

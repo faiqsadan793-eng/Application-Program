@@ -22,8 +22,8 @@
     <div class="flex min-h-screen">
         @include('layouts.sidebar')
 
-        <div class="flex-1 flex flex-col">
-            <header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
+        <div class="flex min-w-0 flex-1 flex-col">
+            <header class="min-h-20 bg-white border-b border-slate-200 px-3 py-3 sm:px-6 flex items-center justify-between gap-3">
                 @include('layouts.header-page-info', ['breadcrumb' => 'Klinik Lala Medicare / Pasien', 'title' => 'Input Pasien Baru'])
                 <div class="flex items-center gap-4">
                     @include('layouts.header-date')
@@ -39,22 +39,22 @@
                 </div>
             </header>
 
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-3 sm:p-6">
                 <div class="max-w-[1200px] mx-auto">
                     <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
                         <div>
-                            <h2 class="text-2xl font-bold">Pengelolaan & Registrasi Pasien</h2>
+                            <h2 class="text-xl sm:text-2xl font-bold">Pengelolaan & Registrasi Pasien</h2>
                             <p class="text-sm text-slate-500 mt-1">Cari pasien lama atau daftarkan pasien baru untuk membuat antrean poli hari ini.</p>
                         </div>
 
-                        <div class="flex items-center gap-2 bg-slate-50 p-1 rounded-full border border-slate-200">
-                            <a href="{{ route('pasien.index') }}" class="px-5 py-2 rounded-full text-slate-600 font-medium transition hover:bg-white">Cari Pasien Lama</a>
-                            <a href="{{ route('pasien.create') }}" class="px-5 py-2 rounded-full bg-emerald-600 text-white font-semibold shadow-sm transition hover:bg-emerald-700">Input Pasien Baru</a>
+                        <div class="flex w-full sm:w-auto items-center gap-1 sm:gap-2 bg-slate-50 p-1 rounded-full border border-slate-200">
+                            <a href="{{ route('pasien.index') }}" class="flex-1 sm:flex-none whitespace-nowrap px-3 sm:px-5 py-2 text-center text-sm rounded-full text-slate-600 font-medium transition hover:bg-white">Cari Pasien Lama</a>
+                            <a href="{{ route('pasien.create') }}" class="flex-1 sm:flex-none whitespace-nowrap px-3 sm:px-5 py-2 text-center text-sm rounded-full bg-emerald-600 text-white font-semibold shadow-sm transition hover:bg-emerald-700">Input Pasien Baru</a>
                         </div>
                     </div>
 
-                    <section class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
-                        <h3 class="text-lg font-semibold mb-3">Form Pendaftaran Pasien Baru & Antrean</h3>
+                    <section class="bg-white rounded-2xl p-4 sm:p-6 border border-slate-200 shadow-sm">
+                        <h3 class="text-base sm:text-lg font-semibold mb-3">Form Pendaftaran Pasien Baru & Antrean</h3>
                         <p class="text-sm text-slate-500 mb-6">Lengkapi data identitas pasien baru untuk membuat Rekam Medis (RM) dan antrean poli secara otomatis.</p>
 
                         <form method="POST" action="{{ route('pasien.store') }}">
@@ -128,9 +128,9 @@
                                 </div>
                             </div>
 
-                            <div class="mt-6 flex justify-end items-center gap-3">
-                                <a href="{{ route('pasien.index') }}" class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700">Batal</a>
-                                <button type="submit" class="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Simpan Pasien & Buat Antrean</button>
+                            <div class="mt-6 flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-end">
+                                <a href="{{ route('pasien.index') }}" class="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700">Batal</a>
+                                <button type="submit" class="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Simpan Pasien & Buat Antrean</button>
                             </div>
                         </form>
                     </section>

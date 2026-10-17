@@ -22,8 +22,8 @@
     <div class="flex min-h-screen">
         @include('layouts.sidebar')
 
-        <div class="flex-1 flex flex-col">
-            <header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
+        <div class="flex min-w-0 flex-1 flex-col">
+            <header class="min-h-20 bg-white border-b border-slate-200 px-3 py-3 sm:px-6 flex items-center justify-between gap-3">
                 @include('layouts.header-page-info', ['breadcrumb' => 'Panel Dokter / Dashboard', 'title' => 'Dashboard Utama'])
 
                 <div class="flex items-center gap-4">
@@ -40,10 +40,10 @@
                 </div>
             </header>
 
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-3 sm:p-6">
                 <!-- Welcome Banner -->
                 <section class="mb-6">
-                    <div class="overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-6 text-white shadow-lg shadow-emerald-200/50">
+                    <div class="overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-4 sm:p-6 text-white shadow-lg shadow-emerald-200/50">
                         <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                             <div>
                                 <p class="text-sm uppercase tracking-[0.24em] text-emerald-200">Selamat Datang</p>
@@ -55,7 +55,7 @@
                             </div>
                             <form action="{{ route('rekam-medis.panggil-selanjutnya') }}" method="POST" class="inline">
                                 @csrf
-                                <button type="submit" class="inline-flex h-12 items-center gap-2 rounded-2xl bg-white px-5 text-sm font-semibold text-emerald-700 shadow-sm transition hover:bg-emerald-50">
+                                <button type="submit" class="inline-flex h-12 w-full md:w-auto items-center justify-center gap-2 rounded-2xl bg-white px-5 text-sm font-semibold text-emerald-700 shadow-sm transition hover:bg-emerald-50">
                                     <span class="material-symbols-outlined">stethoscope</span>
                                     Panggil Pasien Selanjutnya
                                 </button>
@@ -67,7 +67,7 @@
                 <!-- Stat Cards Grid -->
                 <section class="grid gap-5 md:grid-cols-3 mb-6">
                     <!-- Total Pasien Hari Ini -->
-                    <div class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                    <div class="rounded-3xl bg-white p-4 sm:p-6 shadow-sm border border-slate-200">
                         <div class="flex items-center justify-between gap-4">
                             <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
                                 <span class="material-symbols-outlined text-2xl">groups</span>
@@ -78,7 +78,7 @@
                     </div>
 
                     <!-- Menunggu Diperiksa -->
-                    <div class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                    <div class="rounded-3xl bg-white p-4 sm:p-6 shadow-sm border border-slate-200">
                         <div class="flex items-center justify-between gap-4">
                             <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-amber-700">
                                 <span class="material-symbols-outlined text-2xl">hourglass_empty</span>
@@ -89,7 +89,7 @@
                     </div>
 
                     <!-- Selesai Diperiksa -->
-                    <div class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                    <div class="rounded-3xl bg-white p-4 sm:p-6 shadow-sm border border-slate-200">
                         <div class="flex items-center justify-between gap-4">
                             <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-100 text-sky-700">
                                 <span class="material-symbols-outlined text-2xl">check_circle</span>
@@ -102,7 +102,7 @@
 
                 <!-- Patient Queue Table Card -->
                 <section class="rounded-3xl bg-white shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="border-b border-slate-200 bg-slate-50 px-6 py-5 flex justify-between items-center">
+                    <div class="border-b border-slate-200 bg-slate-50 px-3 sm:px-6 py-5 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <div class="flex items-center gap-3 text-slate-900">
                             <span class="material-symbols-outlined text-2xl text-emerald-600">list_alt</span>
                             <h2 class="text-lg font-semibold">Daftar Antrean Pasien Poli Hari Ini</h2>
@@ -112,7 +112,7 @@
                         </a>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                        <table class="min-w-[760px] divide-y divide-slate-200 text-left text-sm">
                             <thead class="bg-slate-50 text-slate-500">
                                 <tr>
                                     <th class="px-6 py-4 font-semibold uppercase tracking-wide">No. Antrean</th>

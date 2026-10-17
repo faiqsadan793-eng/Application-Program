@@ -22,8 +22,8 @@
     <div class="flex min-h-screen">
         @include('layouts.sidebar')
 
-        <div class="flex-1 flex flex-col">
-            <header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
+        <div class="flex min-w-0 flex-1 flex-col">
+            <header class="min-h-20 bg-white border-b border-slate-200 px-3 py-3 sm:px-6 flex items-center justify-between gap-3">
                 @include('layouts.header-page-info', ['breadcrumb' => 'Panel Dokter / Rekam Medis', 'title' => 'Daftar Antrean Pemeriksaan'])
                 <div class="flex items-center gap-4">
                     @include('layouts.header-date')
@@ -39,7 +39,7 @@
                 </div>
             </header>
 
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-3 sm:p-6">
                 <div class="max-w-[1000px] mx-auto">
                     @if(session('success'))
                         <div class="mb-6 rounded-2xl bg-emerald-50 border border-emerald-200 p-4 text-sm font-semibold text-emerald-800 flex items-center gap-2">
@@ -61,14 +61,14 @@
                     @endif
 
                     <div class="mb-6">
-                        <h2 class="text-2xl font-bold">Antrean Pemeriksaan</h2>
+                        <h2 class="text-xl sm:text-2xl font-bold">Antrean Pemeriksaan</h2>
                         <p class="text-sm text-slate-500 mt-1">Pasien yang menunggu pemeriksaan dokter hari ini.</p>
                     </div>
 
                     @forelse($antrean as $k)
                         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm mb-4 overflow-hidden">
-                            <div class="px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                                <div class="flex items-center gap-4">
+                            <div class="px-4 sm:px-6 py-4 border-b border-slate-100 bg-slate-50 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                <div class="flex min-w-0 flex-wrap items-center gap-3 sm:gap-4">
                                     <span class="font-semibold text-emerald-700">{{ $k->labelAntrean() }}</span>
                                     <div>
                                         <p class="font-semibold text-slate-900">{{ $k->pasien->nama ?? '-' }}</p>
@@ -82,12 +82,12 @@
                                 @endif
                             </div>
 
-                            <div class="p-6">
+                            <div class="p-4 sm:p-6">
                                 @if($k->status === 'antre')
                                     <p class="mb-4 text-sm text-slate-500">Mulai pemeriksaan terlebih dahulu sebelum mengisi rekam medis.</p>
                                     <form method="POST" action="{{ route('rekam-medis.mulai', $k->id_kunjungan) }}" class="flex justify-end">
                                         @csrf
-                                        <button type="submit" class="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700">
+                                        <button type="submit" class="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700">
                                             <span class="material-symbols-outlined text-[18px]">stethoscope</span>
                                             Mulai Periksa
                                         </button>
@@ -170,7 +170,7 @@
                                         @endif
                                     </div>
                                     <div class="mt-4 flex justify-end">
-                                        <button type="submit" data-submit-button class="inline-flex items-center gap-2 rounded-2xl bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60">
+                                        <button type="submit" data-submit-button class="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-sky-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60">
                                             <span class="material-symbols-outlined text-[18px]">save</span>
                                             Simpan & Selesai Periksa
                                         </button>

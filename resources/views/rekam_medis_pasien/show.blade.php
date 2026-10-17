@@ -13,7 +13,7 @@
 <div class="flex min-h-screen">
     @include('layouts.sidebar')
     <div class="min-w-0 flex-1">
-        <header class="flex min-h-16 items-center justify-between gap-4 border-b border-slate-200 bg-white px-6 py-3">
+        <header class="flex min-h-16 items-center justify-between gap-3 border-b border-slate-200 bg-white px-3 py-3 sm:px-6">
             @include('layouts.header-page-info', ['breadcrumb' => 'Klinik Lala Medicare / Rekam Medis / Detail Pasien', 'title' => 'Riwayat Rekam Medis'])
             <div class="flex shrink-0 items-center gap-3">
                 @include('layouts.header-date')
@@ -40,7 +40,7 @@
                         <button class="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white">Unduh PDF Bagian</button>
                     </form>
                 @endif
-                <section aria-label="Identitas pasien" class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <section aria-label="Identitas pasien" class="rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-sm">
                     <div class="flex items-center gap-4 border-b border-slate-100 pb-5"><span class="material-symbols-outlined rounded-xl bg-emerald-50 p-3 text-emerald-700">person</span><div class="min-w-0"><h2 class="break-words text-xl font-bold">{{ $pasien->nama }}</h2><p class="mt-1 text-sm font-semibold text-emerald-700">{{ $pasien->no_rm }}</p></div></div>
                     <dl class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                         <div><dt class="text-xs text-slate-500">Tanggal lahir</dt><dd class="mt-1 text-sm font-medium">{{ $pasien->tanggal_lahir?->translatedFormat('d F Y') ?? '-' }}</dd></div>
@@ -54,11 +54,11 @@
                     @foreach($kunjungans as $kunjungan)
                         @php $rm = $kunjungan->rekamMedis; @endphp
                         <article class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50 px-6 py-4">
+                            <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 bg-slate-50 px-4 sm:px-6 py-4">
                                 <div><h3 class="font-semibold">{{ $kunjungan->tgl_kunjungan->translatedFormat('d F Y') }}</h3><p class="mt-1 text-sm text-slate-500">{{ $kunjungan->poli_tujuan }} · {{ $rm->nama_dokter ?? $rm->dokter?->user?->name ?? '-' }}</p></div>
                                 <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">Selesai diperiksa</span>
                             </div>
-                            <dl class="grid gap-6 p-6 md:grid-cols-2">
+                            <dl class="grid gap-4 sm:gap-6 p-4 sm:p-6 md:grid-cols-2">
                                 <div class="rounded-lg border border-orange-100 bg-orange-50 p-4"><dt class="text-xs font-semibold uppercase tracking-wide text-orange-800">Tanda Vital</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">Suhu: {{ $rm->suhu_tubuh !== null ? number_format((float) $rm->suhu_tubuh, 1, ',', '.') . ' °C' : '-' }}<br>Tinggi: {{ $rm->tinggi_badan !== null ? $rm->tinggi_badan . ' cm' : '-' }} · Berat: {{ $rm->berat_badan !== null ? $rm->berat_badan . ' kg' : '-' }}<br>Tekanan darah: {{ $rm->tekanan_darah ?: '-' }} mmHg</dd></div>
                                 <div class="rounded-lg border border-slate-100 bg-slate-50 p-4"><dt class="text-xs font-semibold uppercase tracking-wide text-slate-500">Keluhan</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->keluhan ?: '-' }}</dd></div>
                                 <div class="rounded-lg border border-sky-100 bg-sky-50 p-4"><dt class="text-xs font-semibold uppercase tracking-wide text-sky-800">Diagnosis</dt><dd class="medical-note mt-2 text-sm leading-7 text-slate-700">{{ $rm->diagnosa ?: '-' }}</dd></div>
