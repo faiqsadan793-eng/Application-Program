@@ -61,6 +61,13 @@ class RekamMedisController extends Controller
         }
         $validated = $request->validate($rules);
 
+        // Field khusus kandungan tidak boleh masuk ke rekam medis poli lain,
+        // meskipun ada request manual yang mengirimkan nama field tersebut.
+        if ($dokter->poli !== 'Poli Spesialis Kandungan') {
+            $validated['hasil_pemeriksaan'] = null;
+            $validated['catatan_tambahan'] = null;
+        }
+
         try {
             $kunjungan = DB::transaction(function () use ($validated, $dokter): Kunjungan {
                 $kunjungan = $this->kunjunganUntukDokter($validated['id_kunjungan'], $dokter->poli, true);

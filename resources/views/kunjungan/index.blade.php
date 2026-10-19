@@ -135,7 +135,7 @@
                     {{-- Tabel --}}
                     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                         <div class="overflow-x-auto">
-                            <table class="min-w-[760px] divide-y divide-slate-200 text-left text-sm">
+                            <table class="w-full min-w-[760px] divide-y divide-slate-200 text-left text-sm">
                                 <thead class="bg-slate-50 text-slate-500">
                                     <tr>
                                         <th class="px-6 py-4 font-semibold uppercase tracking-wide">No. RM</th>

@@ -133,7 +133,7 @@
                         </div>
 
                         <div class="overflow-x-auto">
-                            <table class="min-w-[900px] divide-y divide-slate-200 text-left text-sm">
+                            <table class="w-full min-w-[900px] divide-y divide-slate-200 text-left text-sm">
                                 <thead class="bg-slate-50 text-slate-500">
                                     <tr>
                                         <th class="px-6 py-4 font-semibold uppercase tracking-wide">No. Transaksi</th>

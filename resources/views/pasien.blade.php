@@ -131,7 +131,7 @@
                                 </div>
                             @else
                                 <div class="overflow-x-auto">
-                                    <table class="min-w-[760px] divide-y divide-slate-200 text-left text-sm">
+                                    <table class="w-full min-w-[760px] divide-y divide-slate-200 text-left text-sm">
                                         <thead class="bg-slate-50 text-slate-500">
                                             <tr>
                                                 <th class="whitespace-nowrap px-3 sm:px-6 py-3 font-semibold uppercase tracking-wide">No. RM</th>

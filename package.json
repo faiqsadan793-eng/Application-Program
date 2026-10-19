@@ -5,7 +5,10 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "test:browser": "node tests/Browser/input-protection.mjs"
+        "test:browser": "node tests/Browser/input-protection.mjs",
+        "test:blackbox": "node tests/Browser/black-box.mjs",
+        "test:blackbox:report": "node tests/Browser/black-box.mjs && node tests/BlackBox/generate-report.mjs",
+        "test:whitebox:report": "php artisan test --log-junit tests/reports/results/whitebox.xml --testdox-text tests/reports/results/whitebox-testdox.txt && node tests/WhiteBox/generate-report.mjs"
     },
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",
@@ -13,6 +16,7 @@
         "alpinejs": "^3.4.2",
         "autoprefixer": "^10.4.2",
         "concurrently": "^9.0.1",
+        "docx": "^9.12.0",
         "laravel-vite-plugin": "^3.1",
         "playwright-core": "^1.63.0",
         "postcss": "^8.4.31",

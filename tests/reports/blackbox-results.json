@@ -1,0 +1,151 @@
+{
+  "generatedAt": "2026-10-19T13:58:13.299Z",
+  "total": 16,
+  "passed": 16,
+  "cases": [
+    {
+      "number": "01",
+      "role": "Guest",
+      "title": "Form Login",
+      "route": "/login",
+      "explanation": "Halaman login menampilkan input email, password, tombol Login, dan validasi kredensial sebelum pengguna masuk ke dashboard.",
+      "screenshot": "blackbox-01-guest-form-login.png",
+      "status": "Berhasil"
+    },
+    {
+      "number": "02",
+      "role": "Staff",
+      "title": "Dashboard Staff",
+      "route": "/dashboard",
+      "explanation": "Dashboard menampilkan ringkasan pasien, antrean, dan aktivitas klinik.",
+      "screenshot": "blackbox-02-staff-dashboard-staff.png",
+      "status": "Berhasil"
+    },
+    {
+      "number": "03",
+      "role": "Staff",
+      "title": "Master Data Dokter",
+      "route": "/dokter",
+      "explanation": "Staff dapat melihat daftar dan pengelolaan akun dokter.",
+      "screenshot": "blackbox-03-staff-master-data-dokter.png",
+      "status": "Berhasil"
+    },
+    {
+      "number": "04",
+      "role": "Staff",
+      "title": "Pengelolaan Pasien",
+      "route": "/pasien",
+      "explanation": "Daftar pasien dan aksi pendaftaran antrean ditampilkan.",
+      "screenshot": "blackbox-04-staff-pengelolaan-pasien.png",
+      "status": "Berhasil"
+    },
+    {
+      "number": "05",
+      "role": "Staff",
+      "title": "Input Pasien Baru",
+      "route": "/pasien/create",
+      "explanation": "Form pendaftaran pasien baru tersedia dengan validasi input.",
+      "screenshot": "blackbox-05-staff-input-pasien-baru.png",
+      "status": "Berhasil"
+    },
+    {
+      "number": "06",
+      "role": "Staff",
+      "title": "Riwayat Kunjungan",
+      "route": "/kunjungan",
+      "explanation": "Riwayat kunjungan dapat difilter dan ditampilkan per halaman.",
+      "screenshot": "blackbox-06-staff-riwayat-kunjungan.png",
+      "status": "Berhasil"
+    },
+    {
+      "number": "07",
+      "role": "Staff",
+      "title": "Detail Kunjungan",
+      "route": "/kunjungan/1",
+      "explanation": "Detail pasien, pemeriksaan, dan pembayaran ditampilkan bila data tersedia.",
+      "screenshot": "blackbox-07-staff-detail-kunjungan.png",
+      "status": "Berhasil"
+    },
+    {
+      "number": "08",
+      "role": "Staff",
+      "title": "Proses Transaksi",
+      "route": "/transaksi",
+      "explanation": "Tagihan kunjungan dan proses pembayaran tersedia untuk staff.",
+      "screenshot": "blackbox-08-staff-proses-transaksi.png",
+      "status": "Berhasil"
+    },
+    {
+      "number": "09",
+      "role": "Staff",
+      "title": "Riwayat Transaksi",
+      "route": "/riwayat-transaksi",
+      "explanation": "Transaksi yang telah selesai ditampilkan sebagai histori.",
+      "screenshot": "blackbox-09-staff-riwayat-transaksi.png",
+      "status": "Berhasil"
+    },
+    {
+      "number": "10",
+      "role": "Staff",
+      "title": "Riwayat Rekam Medis",
+      "route": "/rekam-medis-pasien",
+      "explanation": "Daftar rekam medis pasien dapat dibuka oleh staff.",
+      "screenshot": "blackbox-10-staff-riwayat-rekam-medis.png",
+      "status": "Berhasil"
+    },
+    {
+      "number": "11",
+      "role": "Dokter",
+      "title": "Dashboard Dokter",
+      "route": "/dashboard",
+      "explanation": "Dashboard dokter menampilkan antrean sesuai poli dokter.",
+      "screenshot": "blackbox-11-dokter-dashboard-dokter.png",
+      "status": "Berhasil"
+    },
+    {
+      "number": "12",
+      "role": "Dokter",
+      "title": "Pemeriksaan Poli Umum",
+      "route": "/rekam-medis",
+      "explanation": "Form pemeriksaan dokter menampilkan keluhan, tanda vital, hasil, diagnosis, resep, dan catatan.",
+      "screenshot": "blackbox-12-dokter-pemeriksaan-poli-umum.png",
+      "status": "Berhasil"
+    },
+    {
+      "number": "13",
+      "role": "Dokter",
+      "title": "Pemeriksaan Poli Anak",
+      "route": "/rekam-medis",
+      "explanation": "Alur pemeriksaan umum dapat digunakan untuk Poli Anak.",
+      "screenshot": "blackbox-13-dokter-pemeriksaan-poli-anak.png",
+      "status": "Berhasil"
+    },
+    {
+      "number": "14",
+      "role": "Dokter",
+      "title": "Pemeriksaan Poli Gigi",
+      "route": "/rekam-medis",
+      "explanation": "Alur pemeriksaan umum dapat digunakan untuk Poli Gigi.",
+      "screenshot": "blackbox-14-dokter-pemeriksaan-poli-gigi.png",
+      "status": "Berhasil"
+    },
+    {
+      "number": "15",
+      "role": "Dokter",
+      "title": "Pemeriksaan Poli Spesialis Kandungan",
+      "route": "/rekam-medis",
+      "explanation": "Pemeriksaan kandungan mendukung hasil pemeriksaan dan catatan tambahan.",
+      "screenshot": "blackbox-15-dokter-pemeriksaan-poli-spesialis-kandungan.png",
+      "status": "Berhasil"
+    },
+    {
+      "number": "16",
+      "role": "Dokter",
+      "title": "Riwayat Rekam Medis Dokter",
+      "route": "/rekam-medis-pasien",
+      "explanation": "Dokter hanya melihat rekam medis sesuai poli yang dimiliki.",
+      "screenshot": "blackbox-16-dokter-riwayat-rekam-medis-dokter.png",
+      "status": "Berhasil"
+    }
+  ]
+}

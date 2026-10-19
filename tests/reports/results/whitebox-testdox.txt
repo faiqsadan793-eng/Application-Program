@@ -1,0 +1,95 @@
+Authentication (Tests\Feature\Auth\Authentication)
+ [x] Login screen can be rendered
+ [x] Users can authenticate using the login screen
+ [x] Users can not authenticate with invalid password
+ [x] Users can logout
+
+Dokter Management (Tests\Feature\DokterManagement)
+ [x] Staff can view the doctor management page
+ [x] Staff can create a doctor account and profile
+ [x] Staff can update doctor login and profile data
+ [x] Staff can delete doctor profile and login account
+ [x] Doctor cannot manage doctor data
+
+Email Verification (Tests\Feature\Auth\EmailVerification)
+ [x] Email verification screen can be rendered
+ [x] Email can be verified
+ [x] Email is not verified with invalid hash
+
+Example (Tests\Feature\Example)
+ [x] Root redirects guests to login
+
+Example (Tests\Unit\Example)
+ [x] That true is true
+
+Kunjungan Cancellation Flow (Tests\Feature\KunjunganCancellationFlow)
+ [x] Staff can cancel active visit without deleting history and register again
+ [x] Doctor can return own patient to today queue and cancel no show
+ [x] Doctor cannot change another poli and terminal visits cannot be cancelled
+ [x] Doctor cannot cancel patient who has not been called
+ [x] Previous day examination cannot be returned to new day queue
+ [x] Cancellation reason is required
+ [x] Returned patient moves to the back of same poli queue
+
+Kunjungan Flow (Tests\Feature\KunjunganFlow)
+ [x] Patient cannot create a second visit while the first visit is active
+ [x] Patient can create a new visit after a same day visit is completed
+ [x] Daily queue numbers restart per poli and date
+
+Medical Record Export (Tests\Feature\MedicalRecordExport)
+ [x] Staff gets real private pdf and detail is paginated
+ [x] Doctor export uses same poli scope as detail
+ [x] Guest and doctor without profile cannot export
+ [x] Index loads only latest record for each patient
+ [x] Large history can export every part without silent truncation
+
+Password Confirmation (Tests\Feature\Auth\PasswordConfirmation)
+ [x] Confirm password screen can be rendered
+ [x] Password can be confirmed
+ [x] Password is not confirmed with invalid password
+
+Password Update (Tests\Feature\Auth\PasswordUpdate)
+ [x] Password can be updated
+ [x] Correct password must be provided to update password
+
+Poli Specific Flow (Tests\Feature\PoliSpecificFlow)
+ [x] Poli kandungan saves obstetric notes and vital signs
+ [x] Poli kandungan requires hasil pemeriksaan
+ [x] Poli anak saves general record without obstetric fields
+ [x] Poli gigi saves general record and does not store obstetric fields
+
+Profile (Tests\Feature\Profile)
+ [x] Profile page is displayed
+ [x] Profile information can be updated
+ [x] Email verification status is unchanged when the email address is unchanged
+ [x] User can delete their account
+ [x] Correct password must be provided to delete account
+
+Rekam Medis Flow (Tests\Feature\RekamMedisFlow)
+ [x] New patient receives a permanent medical record number
+ [x] Doctor can save record only for own poli and active visit
+ [x] Invalid medical record keeps doctor input and does not finish visit
+ [x] Doctor cannot start or save another poli visit
+ [x] Doctor must start a visit before saving the medical record
+ [x] Doctor cannot call a second patient while another visit is being examined
+ [x] Started examination can be completed after wib midnight without carrying old queue
+ [x] Staff can view patient medical record index and detail
+
+Scalability Guard (Tests\Feature\ScalabilityGuard)
+ [x] Busy pages remain bounded with one thousand daily visits
+
+Staff Feature Audit (Tests\Feature\StaffFeatureAudit)
+ [x] Staff can open all staff pages
+ [x] Doctor cannot open staff only pages
+ [x] Staff can update patient but cannot delete patient with history
+
+Transaksi Flow (Tests\Feature\TransaksiFlow)
+ [x] Payment totals are calculated on the server
+ [x] Payment is rejected when cash is less than server calculated total
+ [x] Payment rejects amounts beyond database capacity and keeps input
+ [x] Payment rejects combined total beyond database capacity
+
+Wib Timezone (Tests\Feature\WibTimezone)
+ [x] Registration examination and payment use the same wib day
+ [x] Daily queue changes at wib midnight instead of utc midnight
+
