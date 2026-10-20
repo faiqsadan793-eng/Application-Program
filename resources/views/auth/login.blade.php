@@ -9,8 +9,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Google Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 
     <style>
         body {
@@ -20,8 +18,11 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
         .login-field-icon {
-            font-size: 14px;
-            line-height: 1;
+            font-size: 16px !important;
+            line-height: 1 !important;
+            width: 18px;
+            height: 18px;
+            text-align: center;
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
         }
     </style>
@@ -104,7 +105,7 @@
                                placeholder="Enter your password"/>
                         <button type="button" 
                                 onclick="togglePasswordVisibility()" 
-                                class="absolute right-3 text-slate-400 hover:text-emerald-600 focus:outline-none">
+                                class="absolute right-2.5 flex h-6 w-6 items-center justify-center text-slate-400 hover:text-emerald-600 focus:outline-none">
                             <span class="material-symbols-outlined login-field-icon" id="eyeIcon">visibility</span>
                         </button>
                     </div>

@@ -1,18 +1,14 @@
-﻿@php $user = Auth::user(); @endphp
+@php $user = Auth::user(); @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pemeriksaan Dokter - Klinik Lala Medicare</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined { font-size: 20px !important; line-height: 1.1; font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20; }
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
@@ -72,7 +68,7 @@
                                     <span class="font-semibold text-emerald-700">{{ $k->labelAntrean() }}</span>
                                     <div>
                                         <p class="font-semibold text-slate-900">{{ $k->pasien->nama ?? '-' }}</p>
-                                        <p class="text-xs text-slate-500">{{ $k->poli_tujuan }} â€¢ Antrean {{ ($k->masuk_antrean_pada ?? $k->created_at)->timezone('Asia/Jakarta')->format('H:i') }} WIB</p>
+                                        <p class="text-xs text-slate-500">{{ $k->poli_tujuan }} • Antrean {{ ($k->masuk_antrean_pada ?? $k->created_at)->timezone('Asia/Jakarta')->format('H:i') }} WIB</p>
                                     </div>
                                 </div>
                                 @if($k->status == 'antre')
@@ -126,7 +122,7 @@
                                         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
                                             <p class="mb-3 text-sm font-semibold text-slate-700">Tanda Vital <span class="text-xs font-normal text-slate-400">(opsional, disarankan diisi)</span></p>
                                             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                                                <div><label class="block text-xs font-medium text-slate-500">Suhu (Â°C)</label><input type="number" step="0.1" min="20" max="45" name="suhu_tubuh" value="{{ $pulihkanInput ? old('suhu_tubuh') : '' }}" class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" placeholder="36.5">@if($pulihkanInput) @error('suhu_tubuh')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror @endif</div>
+                                                <div><label class="block text-xs font-medium text-slate-500">Suhu (°C)</label><input type="number" step="0.1" min="20" max="45" name="suhu_tubuh" value="{{ $pulihkanInput ? old('suhu_tubuh') : '' }}" class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" placeholder="36.5">@if($pulihkanInput) @error('suhu_tubuh')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror @endif</div>
                                                 <div><label class="block text-xs font-medium text-slate-500">Tinggi (cm)</label><input type="number" step="0.01" min="30" max="250" name="tinggi_badan" value="{{ $pulihkanInput ? old('tinggi_badan') : '' }}" class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" placeholder="165">@if($pulihkanInput) @error('tinggi_badan')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror @endif</div>
                                                 <div><label class="block text-xs font-medium text-slate-500">Berat (kg)</label><input type="number" step="0.01" min="1" max="500" name="berat_badan" value="{{ $pulihkanInput ? old('berat_badan') : '' }}" class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" placeholder="60">@if($pulihkanInput) @error('berat_badan')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror @endif</div>
                                                 <div><label class="block text-xs font-medium text-slate-500">Tekanan darah (mmHg)</label><input type="text" maxlength="7" name="tekanan_darah" value="{{ $pulihkanInput ? old('tekanan_darah') : '' }}" class="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" placeholder="120/80">@if($pulihkanInput) @error('tekanan_darah')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror @endif</div>
