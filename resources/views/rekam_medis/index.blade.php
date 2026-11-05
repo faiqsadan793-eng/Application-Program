@@ -142,19 +142,32 @@
                                                 <textarea name="hasil_pemeriksaan" rows="3" maxlength="4000" data-draft-field="hasil_pemeriksaan" class="w-full rounded-xl border {{ $pulihkanInput && $errors->has('hasil_pemeriksaan') ? 'border-red-400' : 'border-slate-200' }} bg-slate-50 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-sky-100" placeholder="Tuliskan kondisi pasien dan hasil pemeriksaan terbaru..." required>{{ $pulihkanInput ? old('hasil_pemeriksaan') : '' }}</textarea>
                                                 @if($pulihkanInput) @error('hasil_pemeriksaan') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror @endif
                                             </div>
+                                        @elseif($k->poli_tujuan === 'Poli Gigi')
+                                            <div>
+                                                <label class="block text-sm font-medium text-slate-600 mb-2">Lokasi / Elemen Gigi & Kondisi Klinis <span class="text-xs font-normal text-slate-400">(opsional)</span></label>
+                                                <textarea name="hasil_pemeriksaan" rows="2" maxlength="4000" data-draft-field="hasil_pemeriksaan" class="w-full rounded-xl border {{ $pulihkanInput && $errors->has('hasil_pemeriksaan') ? 'border-red-400' : 'border-slate-200' }} bg-slate-50 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-sky-100" placeholder="Contoh: Gigi Geraham Kanan Bawah (Elemen 46) - Karies profunda, ada karang gigi...">{{ $pulihkanInput ? old('hasil_pemeriksaan') : '' }}</textarea>
+                                                @if($pulihkanInput) @error('hasil_pemeriksaan') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror @endif
+                                            </div>
                                         @endif
                                         <div>
                                             <label class="block text-sm font-medium text-slate-600 mb-2">Diagnosa *</label>
                                             <textarea name="diagnosa" rows="2" maxlength="2000" data-draft-field="diagnosa"
                                                 class="w-full rounded-xl border {{ $pulihkanInput && $errors->has('diagnosa') ? 'border-red-400' : 'border-slate-200' }} bg-slate-50 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-sky-100"
-                                                placeholder="Tuliskan diagnosa medis..." required>{{ $pulihkanInput ? old('diagnosa') : '' }}</textarea>
+                                                placeholder="{{ $k->poli_tujuan === 'Poli Gigi' ? 'Contoh: Pulpitis Reversibel, Karies Dentis, Gangren Pulpa...' : 'Tuliskan diagnosa medis...' }}" required>{{ $pulihkanInput ? old('diagnosa') : '' }}</textarea>
                                             @if($pulihkanInput) @error('diagnosa') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror @endif
                                         </div>
+                                        @if($k->poli_tujuan === 'Poli Gigi')
+                                            <div>
+                                                <label class="block text-sm font-medium text-slate-600 mb-2">Tindakan Dental <span class="text-xs font-normal text-slate-400">(opsional, jika dilakukan tindakan)</span></label>
+                                                <textarea name="catatan_tambahan" rows="2" maxlength="4000" data-draft-field="catatan_tambahan" class="w-full rounded-xl border {{ $pulihkanInput && $errors->has('catatan_tambahan') ? 'border-red-400' : 'border-slate-200' }} bg-slate-50 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-sky-100" placeholder="Contoh: Tambal Gigi Komposit / Pencabutan Gigi / Scaling Pembersihan Karang Gigi...">{{ $pulihkanInput ? old('catatan_tambahan') : '' }}</textarea>
+                                                @if($pulihkanInput) @error('catatan_tambahan') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror @endif
+                                            </div>
+                                        @endif
                                         <div>
-                                            <label class="block text-sm font-medium text-slate-600 mb-2">Resep Obat *</label>
+                                            <label class="block text-sm font-medium text-slate-600 mb-2">Resep Obat <span class="text-xs font-normal text-slate-400">(opsional jika tidak ada resep)</span></label>
                                             <textarea name="resep_obat" rows="2" maxlength="2000" data-draft-field="resep_obat"
                                                 class="w-full rounded-xl border {{ $pulihkanInput && $errors->has('resep_obat') ? 'border-red-400' : 'border-slate-200' }} bg-slate-50 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-sky-100"
-                                                placeholder="Tuliskan resep obat yang diberikan..." required>{{ $pulihkanInput ? old('resep_obat') : '' }}</textarea>
+                                                placeholder="Tuliskan resep obat yang diberikan (kosongkan jika tanpa obat)...">{{ $pulihkanInput ? old('resep_obat') : '' }}</textarea>
                                             @if($pulihkanInput) @error('resep_obat') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror @endif
                                         </div>
                                         @if($k->poli_tujuan === 'Poli Spesialis Kandungan')
@@ -187,9 +200,11 @@
         </div>
     </div>
 
+    <div id="sessionCompletedVisit" data-visit-id="{{ session('completed_visit_id') }}" class="hidden"></div>
+
     <script>
         (() => {
-            const completedVisitId = @json(session('completed_visit_id'));
+            const completedVisitId = document.getElementById('sessionCompletedVisit')?.dataset.visitId;
             if (completedVisitId) {
                 try {
                     sessionStorage.removeItem(`rekam-medis-draft-${completedVisitId}`);

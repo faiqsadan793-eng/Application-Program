@@ -13,12 +13,12 @@ class RekamMedisPasienController extends Controller
     public function index(Request $request)
     {
         $user = Auth::user();
-        $poliDokter = $user?->role === 'dokter' ? $user->dokter?->poli : null;
+        abort_unless($user?->role === 'dokter', 403, 'Akses rekam medis hanya untuk dokter.');
 
-        abort_if($user?->role === 'dokter' && ! $poliDokter, 403, 'Profil dokter belum memiliki poli yang valid.');
+        $poliDokter = $user->dokter?->poli;
+        abort_unless($poliDokter, 403, 'Profil dokter belum memiliki poli yang valid.');
 
-        // Staff mencari seluruh data; dokter tetap dibatasi otomatis ke polinya sendiri.
-        $poli = $poliDokter ?: 'semua';
+        $poli = $poliDokter;
         $query = Pasien::query()->whereHas('kunjungans.rekamMedis');
 
         if ($request->filled('search')) {
@@ -30,14 +30,12 @@ class RekamMedisPasienController extends Controller
             });
         }
 
-        if ($poli !== 'semua') {
-            $query->whereHas('kunjungans', fn ($q) => $q->where('poli_tujuan', $poli)->whereHas('rekamMedis'));
-        }
+        $query->whereHas('kunjungans', fn ($q) => $q->where('poli_tujuan', $poli)->whereHas('rekamMedis'));
 
         $rekamMedis = $query->with([
             'kunjungans' => function ($q) use ($poli) {
                 $q->whereHas('rekamMedis')
-                    ->when($poli !== 'semua', fn ($q) => $q->where('poli_tujuan', $poli))
+                    ->where('poli_tujuan', $poli)
                     ->with(['rekamMedis.dokter.user'])
                     ->latest('tgl_kunjungan')
                     ->latest('id_kunjungan')->limit(1);
@@ -46,19 +44,21 @@ class RekamMedisPasienController extends Controller
 
         return view('rekam_medis_pasien.index', [
             'rekamMedis' => $rekamMedis,
-            'isDokter' => $user?->role === 'dokter',
+            'isDokter' => true,
         ]);
     }
 
     public function show(Pasien $pasien)
     {
         $user = Auth::user();
-        $poliDokter = $user?->role === 'dokter' ? $user->dokter?->poli : null;
-        abort_if($user?->role === 'dokter' && ! $poliDokter, 403, 'Profil dokter belum memiliki poli yang valid.');
+        abort_unless($user?->role === 'dokter', 403, 'Akses rekam medis hanya untuk dokter.');
+
+        $poliDokter = $user->dokter?->poli;
+        abort_unless($poliDokter, 403, 'Profil dokter belum memiliki poli yang valid.');
 
         $kunjunganQuery = $pasien->kunjungans()
             ->whereHas('rekamMedis')
-            ->when($poliDokter, fn ($q) => $q->where('poli_tujuan', $poliDokter));
+            ->where('poli_tujuan', $poliDokter);
 
         abort_unless($kunjunganQuery->exists(), 404);
 
@@ -71,10 +71,13 @@ class RekamMedisPasienController extends Controller
     public function export(Request $request, Pasien $pasien)
     {
         $user = Auth::user();
-        $poli = $user->role === 'dokter' ? $user->dokter?->poli : null;
-        abort_if($user->role === 'dokter' && ! $poli, 403);
+        abort_unless($user?->role === 'dokter', 403, 'Akses rekam medis hanya untuk dokter.');
+
+        $poli = $user->dokter?->poli;
+        abort_unless($poli, 403, 'Profil dokter belum memiliki poli yang valid.');
+
         $query = $pasien->kunjungans()->whereHas('rekamMedis')
-            ->when($poli, fn ($q) => $q->where('poli_tujuan', $poli));
+            ->where('poli_tujuan', $poli);
         abort_unless($query->exists(), 404);
 
         $total = $query->count();

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dokter;
+use App\Models\Kunjungan;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -91,6 +92,17 @@ class DokterController extends Controller
     {
         $dokter->load('user');
         $namaDokter = $dokter->user->name;
+
+        // Cegah penghapusan dokter jika masih ada kunjungan aktif hari ini pada polinya
+        $adaKunjunganAktif = Kunjungan::padaHariIni()
+            ->where('poli_tujuan', $dokter->poli)
+            ->whereIn('status', Kunjungan::STATUS_AKTIF)
+            ->exists();
+
+        if ($adaKunjunganAktif) {
+            return redirect()->route('dokter.index')
+                ->with('error', 'Dokter ' . $namaDokter . ' tidak dapat dihapus karena masih ada pasien dalam antrean/pemeriksaan aktif hari ini di ' . $dokter->poli . '. Selesaikan atau batalkan kunjungan terlebih dahulu.');
+        }
 
         DB::transaction(function () use ($dokter): void {
             $dokter->user->delete();

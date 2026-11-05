@@ -19,8 +19,8 @@
     <div class="flex min-h-screen">
         @include('layouts.sidebar')
 
-        <div class="flex-1 flex flex-col">
-            <header class="h-20 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
+        <div class="flex min-w-0 flex-1 flex-col">
+            <header class="min-h-20 bg-white border-b border-slate-200 px-3 py-3 sm:px-6 flex items-center justify-between gap-3">
                 @include('layouts.header-page-info', ['breadcrumb' => 'Klinik Lala Medicare / Dashboard', 'title' => 'Dashboard Utama'])
                 <div class="flex items-center gap-4">
                     @include('layouts.header-date')
@@ -36,9 +36,9 @@
                 </div>
             </header>
 
-            <main class="flex-1 overflow-y-auto p-6">
+            <main class="flex-1 overflow-y-auto p-3 sm:p-6">
                 <section class="mb-6">
-                    <div class="overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-6 text-white shadow-lg shadow-emerald-200/50">
+                    <div class="overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-600 to-emerald-500 p-4 sm:p-6 text-white shadow-lg shadow-emerald-200/50">
                         <div class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
                             <div>
                                 <p class="text-sm uppercase tracking-[0.24em] text-emerald-200">Selamat Datang</p>
@@ -54,7 +54,7 @@
                 </section>
 
                 <section class="grid gap-5 md:grid-cols-3 mb-6">
-                    <div class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                    <div class="rounded-3xl bg-white p-4 sm:p-6 shadow-sm border border-slate-200">
                         <div class="flex items-center justify-between gap-4">
                             <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
                                 <span class="material-symbols-outlined text-2xl">groups</span>
@@ -63,7 +63,7 @@
                         </div>
                         <p class="mt-6 text-3xl font-semibold text-slate-900">{{ $totalPasien }}</p>
                     </div>
-                    <div class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                    <div class="rounded-3xl bg-white p-4 sm:p-6 shadow-sm border border-slate-200">
                         <div class="flex items-center justify-between gap-4">
                             <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-100 text-sky-700">
                                 <span class="material-symbols-outlined text-2xl">queue</span>
@@ -72,7 +72,7 @@
                         </div>
                         <p class="mt-6 text-3xl font-semibold text-slate-900">{{ $antreanAktif }}</p>
                     </div>
-                    <div class="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                    <div class="rounded-3xl bg-white p-4 sm:p-6 shadow-sm border border-slate-200">
                         <div class="flex items-center justify-between gap-4">
                             <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-orange-700">
                                 <span class="material-symbols-outlined text-2xl">payments</span>
@@ -84,7 +84,7 @@
                 </section>
 
                 <section class="rounded-3xl bg-white shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="border-b border-slate-200 bg-slate-50 px-6 py-5">
+                    <div class="border-b border-slate-200 bg-slate-50 px-4 sm:px-6 py-4 sm:py-5">
                         <div class="flex items-center gap-3 text-slate-900">
                             <span class="material-symbols-outlined text-2xl text-emerald-600">list_alt</span>
                             <h2 class="text-lg font-semibold">Daftar Antrean Hari Ini</h2>
@@ -107,7 +107,7 @@
                                         <td class="px-6 py-5 font-semibold text-slate-900">{{ $antrean->labelAntrean() }}</td>
                                         <td class="px-6 py-5">
                                             <p class="font-semibold text-slate-900">{{ $antrean->pasien->nama ?? '-' }}</p>
-                                            <p class="text-xs text-slate-500">ID: RM-{{ str_pad($antrean->id_pasien, 4, '0', STR_PAD_LEFT) }}</p>
+                                            <p class="text-xs text-slate-500">{{ $antrean->pasien?->no_rm ?: ($antrean->pasien ? \App\Models\Pasien::nomorRekamMedisUntuk($antrean->id_pasien) : '-') }}</p>
                                         </td>
                                         <td class="px-6 py-5 text-slate-600">{{ $antrean->poli_tujuan }}</td>
                                         <td class="px-6 py-5">

@@ -53,6 +53,16 @@
                             {{ session('error') }}
                         </div>
                     @endif
+                    @if ($errors->any())
+                        <div class="mb-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+                            <p class="font-semibold">Data pasien belum dapat disimpan:</p>
+                            <ul class="mt-1 list-disc list-inside space-y-0.5 text-xs">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
 
                     {{-- Page Header --}}
                     <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
@@ -155,28 +165,45 @@
                                                     <td class="whitespace-nowrap px-3 sm:px-6 py-4 text-slate-600">{{ $p->no_hp ?? '-' }}</td>
                                                     <td class="whitespace-nowrap px-3 sm:px-6 py-4 text-slate-500">{{ $p->created_at?->timezone('Asia/Jakarta')->locale('id')->translatedFormat('d M Y') ?? '-' }}</td>
                                                     <td class="whitespace-nowrap px-3 sm:px-6 py-4 text-right">
-                                                        @if($p->has_active_kunjungan_today)
-                                                            <span class="inline-flex items-center gap-1 rounded-lg bg-emerald-100 px-3 py-2 text-xs font-semibold text-emerald-700">
-                                                                <span class="material-symbols-outlined text-[16px]">event_available</span>
-                                                                Sudah antre
-                                                            </span>
-                                                        @else
-                                                            <form method="POST" action="{{ route('kunjungan.store') }}" class="inline-flex items-center gap-2">
-                                                                @csrf
-                                                                <input type="hidden" name="id_pasien" value="{{ $p->id_pasien }}">
-                                                                <input type="hidden" name="search_query" value="{{ request('search') }}">
-                                                                <select name="poli_tujuan" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" required>
-                                                                    <option disabled selected value="">Pilih Poli</option>
-                                                                    @foreach(config('clinic.poli') as $poli)
-                                                                        <option value="{{ $poli }}">{{ $poli }}</option>
-                                                                    @endforeach
-                                                                </select>
-                                                                <button type="submit" class="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 whitespace-nowrap">
-                                                                    <span class="material-symbols-outlined text-[16px]">add</span>
-                                                                    Buat Antrean
-                                                                </button>
-                                                            </form>
-                                                        @endif
+                                                        <div class="flex items-center justify-end gap-2">
+                                                            <button type="button"
+                                                                onclick="openEditPasienModal(this)"
+                                                                data-action="{{ route('pasien.update', $p->id_pasien) }}"
+                                                                data-nama="{{ $p->nama }}"
+                                                                data-nik="{{ $p->nik }}"
+                                                                data-tanggal-lahir="{{ $p->tanggal_lahir?->format('Y-m-d') }}"
+                                                                data-jenis-kelamin="{{ $p->jenis_kelamin }}"
+                                                                data-no-hp="{{ $p->no_hp }}"
+                                                                data-pekerjaan="{{ $p->pekerjaan }}"
+                                                                data-alamat="{{ $p->alamat }}"
+                                                                class="inline-flex items-center gap-1 rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-semibold text-sky-700 transition hover:bg-sky-100 whitespace-nowrap">
+                                                                <span class="material-symbols-outlined text-[16px]">edit</span>
+                                                                Edit
+                                                            </button>
+
+                                                            @if($p->has_active_kunjungan_today)
+                                                                <span class="inline-flex items-center gap-1 rounded-lg bg-emerald-100 px-3 py-2 text-xs font-semibold text-emerald-700 whitespace-nowrap">
+                                                                    <span class="material-symbols-outlined text-[16px]">event_available</span>
+                                                                    Sudah antre
+                                                                </span>
+                                                            @else
+                                                                <form method="POST" action="{{ route('kunjungan.store') }}" class="inline-flex items-center gap-2">
+                                                                    @csrf
+                                                                    <input type="hidden" name="id_pasien" value="{{ $p->id_pasien }}">
+                                                                    <input type="hidden" name="search_query" value="{{ request('search') }}">
+                                                                    <select name="poli_tujuan" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100" required>
+                                                                        <option disabled selected value="">Pilih Poli</option>
+                                                                        @foreach(config('clinic.poli') as $poli)
+                                                                            <option value="{{ $poli }}">{{ $poli }}</option>
+                                                                        @endforeach
+                                                                    </select>
+                                                                    <button type="submit" class="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-700 whitespace-nowrap">
+                                                                        <span class="material-symbols-outlined text-[16px]">add</span>
+                                                                        Buat Antrean
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             @endforeach
@@ -196,5 +223,91 @@
             </main>
         </div>
     </div>
+    {{-- Modal Edit Pasien --}}
+    <div id="editPasienModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/40 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="editPasienModalTitle">
+        <div class="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-6 shadow-2xl">
+            <div class="mb-5 flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-emerald-700">Manajemen Pasien</p>
+                    <h2 id="editPasienModalTitle" class="mt-1 text-xl font-bold text-slate-900">Edit Data Pasien</h2>
+                </div>
+                <button type="button" onclick="closeEditPasienModal()" class="rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600" aria-label="Tutup">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form id="editPasienForm" method="POST" class="space-y-4">
+                @csrf
+                @method('PUT')
+                <div>
+                    <label for="editNama" class="mb-1 block text-xs font-semibold text-slate-600">Nama Lengkap Pasien *</label>
+                    <input id="editNama" name="nama" type="text" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label for="editNik" class="mb-1 block text-xs font-semibold text-slate-600">NIK (16 Digit)</label>
+                        <input id="editNik" name="nik" type="text" maxlength="16" placeholder="320xxxxxxxxxxxxx" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100">
+                    </div>
+                    <div>
+                        <label for="editNoHp" class="mb-1 block text-xs font-semibold text-slate-600">Nomor HP / WA *</label>
+                        <input id="editNoHp" name="no_hp" type="text" required maxlength="15" placeholder="08xxxxxxxxxx" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label for="editTanggalLahir" class="mb-1 block text-xs font-semibold text-slate-600">Tanggal Lahir *</label>
+                        <input id="editTanggalLahir" name="tanggal_lahir" type="date" required max="{{ now()->setTimezone('Asia/Jakarta')->subDay()->toDateString() }}" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100">
+                    </div>
+                    <div>
+                        <label for="editJenisKelamin" class="mb-1 block text-xs font-semibold text-slate-600">Jenis Kelamin *</label>
+                        <select id="editJenisKelamin" name="jenis_kelamin" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100">
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label for="editPekerjaan" class="mb-1 block text-xs font-semibold text-slate-600">Pekerjaan</label>
+                    <input id="editPekerjaan" name="pekerjaan" type="text" placeholder="Contoh: Karyawan Swasta" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100">
+                </div>
+                <div>
+                    <label for="editAlamat" class="mb-1 block text-xs font-semibold text-slate-600">Alamat Lengkap</label>
+                    <textarea id="editAlamat" name="alamat" rows="3" maxlength="500" placeholder="Alamat lengkap pasien..." class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"></textarea>
+                </div>
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeEditPasienModal()" class="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">Batal</button>
+                    <button type="submit" class="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700">Simpan Perubahan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openEditPasienModal(button) {
+            document.getElementById('editPasienForm').action = button.dataset.action;
+            document.getElementById('editNama').value = button.dataset.nama || '';
+            document.getElementById('editNik').value = button.dataset.nik || '';
+            document.getElementById('editNoHp').value = button.dataset.noHp || '';
+            document.getElementById('editTanggalLahir').value = button.dataset.tanggalLahir || '';
+            document.getElementById('editJenisKelamin').value = button.dataset.jenisKelamin || 'Laki-laki';
+            document.getElementById('editPekerjaan').value = button.dataset.pekerjaan || '';
+            document.getElementById('editAlamat').value = button.dataset.alamat || '';
+            
+            const modal = document.getElementById('editPasienModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeEditPasienModal() {
+            const modal = document.getElementById('editPasienModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.getElementById('editPasienModal')?.addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeEditPasienModal();
+            }
+        });
+    </script>
 </body>
 </html>

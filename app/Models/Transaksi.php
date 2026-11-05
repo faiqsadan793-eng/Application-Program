@@ -14,6 +14,7 @@ class Transaksi extends Model
 
     protected $fillable = [
         'id_kunjungan',
+        'biaya_jasa_dokter',
         'biaya_tindakan',
         'biaya_obat',
         'total_biaya',
@@ -26,6 +27,7 @@ class Transaksi extends Model
     protected function casts(): array
     {
         return [
+            'biaya_jasa_dokter' => 'decimal:2',
             'biaya_tindakan' => 'decimal:2',
             'biaya_obat' => 'decimal:2',
             'total_biaya' => 'decimal:2',

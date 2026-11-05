@@ -36,28 +36,26 @@ Route::middleware(['auth', 'role:staff'])->group(function () {
     Route::resource('transaksi', TransaksiController::class)
         ->only(['index', 'update']);
 
-    // Riwayat Transaksi: histori transaksi yang sudah lunas
+    // Riwayat Transaksi: histori transaksi yang sudah lunas & ekspor laporan
     Route::get('riwayat-transaksi', [TransaksiController::class, 'riwayat'])
         ->name('riwayat-transaksi.index');
+    Route::get('riwayat-transaksi/export', [TransaksiController::class, 'exportCsv'])
+        ->name('riwayat-transaksi.export');
 });
 
-// Riwayat rekam medis dapat dibaca oleh staff dan dokter sesuai hak akses polinya.
+// Pembatalan & pengembalian antrean dapat dilakukan oleh staff dan dokter
 Route::middleware(['auth', 'role:staff,dokter'])->group(function () {
     Route::patch('kunjungan/{kunjungan}/batalkan', [KunjunganController::class, 'batalkan'])
         ->name('kunjungan.batalkan');
     Route::patch('kunjungan/{kunjungan}/kembalikan-antrean', [KunjunganController::class, 'kembalikanKeAntrean'])
         ->name('kunjungan.kembalikan-antrean');
-
-    Route::get('rekam-medis-pasien', [RekamMedisPasienController::class, 'index'])
-        ->name('rekam-medis-pasien.index');
-    Route::get('rekam-medis-pasien/{pasien}', [RekamMedisPasienController::class, 'show'])
-        ->name('rekam-medis-pasien.show');
-    Route::get('rekam-medis-pasien/{pasien}/pdf', [RekamMedisPasienController::class, 'export'])
-        ->middleware('throttle:6,1')->name('rekam-medis-pasien.pdf');
 });
 
 // ROUTE KHUSUS DOKTER
 Route::middleware(['auth', 'role:dokter'])->group(function () {
+    Route::get('dashboard/antrean-check', [DashboardController::class, 'checkAntreanDokter'])
+        ->name('dashboard.dokter.antrean-check');
+
     Route::post('rekam-medis/panggil-selanjutnya', [RekamMedisController::class, 'panggilSelanjutnya'])
         ->name('rekam-medis.panggil-selanjutnya');
     Route::post('rekam-medis/{id}/mulai', [RekamMedisController::class, 'mulaiPeriksa'])
@@ -66,6 +64,14 @@ Route::middleware(['auth', 'role:dokter'])->group(function () {
     // Rekam Medis: hanya lihat antrian dan simpan hasil periksa
     Route::resource('rekam-medis', RekamMedisController::class)
         ->only(['index', 'store']);
+
+    // Riwayat Rekam Medis Pasien: hanya dapat diakses oleh dokter
+    Route::get('rekam-medis-pasien', [RekamMedisPasienController::class, 'index'])
+        ->name('rekam-medis-pasien.index');
+    Route::get('rekam-medis-pasien/{pasien}', [RekamMedisPasienController::class, 'show'])
+        ->name('rekam-medis-pasien.show');
+    Route::get('rekam-medis-pasien/{pasien}/pdf', [RekamMedisPasienController::class, 'export'])
+        ->middleware('throttle:6,1')->name('rekam-medis-pasien.pdf');
 });
 
 // Profile: semua user yang sudah login

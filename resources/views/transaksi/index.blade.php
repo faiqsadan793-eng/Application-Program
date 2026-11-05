@@ -66,43 +66,47 @@
                             </span>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="min-w-[680px] divide-y divide-slate-200 text-left text-sm">
+                            <table class="w-full min-w-[700px] divide-y divide-slate-200 text-left text-sm">
                                 <thead class="bg-slate-50 text-slate-500">
                                     <tr>
-                                        <th class="px-6 py-4 font-semibold uppercase tracking-wide">No. Antrean</th>
+                                        <th class="whitespace-nowrap px-6 py-4 font-semibold uppercase tracking-wide">No. Antrean</th>
                                         <th class="px-6 py-4 font-semibold uppercase tracking-wide">Nama Pasien</th>
                                         <th class="px-6 py-4 font-semibold uppercase tracking-wide">Diagnosa</th>
-                                        <th class="px-6 py-4 font-semibold uppercase tracking-wide">Total Biaya</th>
-                                        <th class="px-6 py-4 font-semibold uppercase tracking-wide text-center">Aksi</th>
+                                        <th class="whitespace-nowrap px-6 py-4 font-semibold uppercase tracking-wide">Total Biaya</th>
+                                        <th class="whitespace-nowrap px-6 py-4 font-semibold uppercase tracking-wide text-center">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-200 bg-white">
                                     @forelse($transaksis as $t)
-                                        <tr class="hover:bg-slate-50">
-                                            <td class="px-6 py-5 font-semibold text-orange-700">{{ $t->kunjungan?->labelAntrean() ?? 'Nomor belum tersedia' }}</td>
+                                        <tr class="hover:bg-slate-50 transition-colors">
+                                            <td class="whitespace-nowrap px-6 py-5 font-bold text-orange-700">{{ $t->kunjungan?->labelAntrean() ?? 'Nomor belum tersedia' }}</td>
                                             <td class="px-6 py-5">
                                                 <p class="font-semibold text-slate-900">{{ $t->kunjungan->pasien->nama ?? '-' }}</p>
                                                 <p class="text-xs text-slate-500">{{ $t->kunjungan->poli_tujuan ?? '-' }}</p>
                                             </td>
-                                            <td class="px-6 py-5 text-slate-600 max-w-[200px] truncate">
+                                            <td class="px-6 py-5 text-slate-600 max-w-[240px] truncate" title="{{ $t->kunjungan->rekamMedis->diagnosa ?? '-' }}">
                                                 {{ $t->kunjungan->rekamMedis->diagnosa ?? '-' }}
                                             </td>
-                                             <td class="px-6 py-5 font-semibold text-slate-800">
+                                             <td class="whitespace-nowrap px-6 py-5 font-semibold text-slate-800">
                                                  Rp {{ number_format($t->total_biaya, 0, ',', '.') }}
                                              </td>
-                                             <td class="px-6 py-5 text-center">
+                                             <td class="whitespace-nowrap px-6 py-5 text-center">
                                                  <button type="button"
                                                          data-transaction-id="{{ $t->id_transaksi }}"
-                                                         onclick="openPaymentModal({{ json_encode([
+                                                         data-payment-info="{{ json_encode([
                                                              'id_transaksi' => $t->id_transaksi,
                                                              'no_antrean' => $t->kunjungan?->labelAntrean() ?? 'Nomor belum tersedia',
                                                              'nama_pasien' => $t->kunjungan->pasien->nama ?? '-',
                                                              'poli' => $t->kunjungan->poli_tujuan ?? '-',
                                                              'diagnosa' => $t->kunjungan->rekamMedis->diagnosa ?? '-',
                                                              'resep_obat' => $t->kunjungan->rekamMedis->resep_obat ?? '-',
+                                                             'catatan_tindakan' => $t->kunjungan->rekamMedis->catatan_tambahan ?? '-',
                                                              'jasa_dokter' => 50000,
+                                                             'biaya_tindakan' => (int) $t->biaya_tindakan,
+                                                             'biaya_obat' => (int) $t->biaya_obat,
                                                              'update_url' => route('transaksi.update', $t),
-                                                         ]) }})"
+                                                         ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) }}"
+                                                         onclick="openPaymentModalFromButton(this)"
                                                          class="inline-flex items-center gap-1.5 rounded-2xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700">
                                                      <span class="material-symbols-outlined text-[16px]">payments</span> Proses Bayar
                                                  </button>
@@ -110,9 +114,10 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="px-6 py-12 text-center">
+                                            <td colspan="5" class="px-6 py-16 text-center">
                                                 <span class="material-symbols-outlined text-4xl text-slate-300 block mb-2">payments</span>
-                                                <p class="text-slate-500">Tidak ada transaksi yang menunggu pembayaran.</p>
+                                                <p class="text-slate-500 font-medium">Tidak ada transaksi yang menunggu pembayaran.</p>
+                                                <p class="text-slate-400 text-xs mt-1">Semua pasien yang telah diperiksa sudah menyelesaikan pembayaran.</p>
                                             </td>
                                         </tr>
                                     @endforelse
@@ -174,6 +179,10 @@
                         <p class="text-xs text-sky-700 font-semibold uppercase tracking-wider">Diagnosa Dokter</p>
                         <p id="modalDiagnosa" class="text-slate-800 mt-0.5 font-medium">-</p>
                     </div>
+                    <div id="wrapperCatatanTindakan" class="border-t border-sky-100 pt-2 hidden">
+                        <p class="text-xs text-sky-700 font-semibold uppercase tracking-wider">Tindakan Khusus / Prosedur</p>
+                        <p id="modalCatatanTindakan" class="text-slate-800 mt-0.5 font-medium whitespace-pre-line">-</p>
+                    </div>
                     <div class="border-t border-sky-100 pt-2">
                         <p class="text-xs text-sky-700 font-semibold uppercase tracking-wider">Resep Obat</p>
                         <p id="modalResepObat" class="text-slate-800 mt-0.5 font-medium whitespace-pre-line">-</p>
@@ -183,24 +192,48 @@
 
                 <!-- Form Rincian Transaksi -->
                 <div class="space-y-3">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 gap-3">
+                        {{-- 1. Jasa Konsultasi Dokter --}}
                         <div>
-                            <label class="mb-1 flex min-h-8 items-end text-xs font-semibold uppercase tracking-wider text-slate-600">Jasa Dokter / Tindakan</label>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="text-xs font-semibold uppercase tracking-wider text-slate-700">1. Jasa Konsultasi Dokter</label>
+                                <span class="text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Tarif Dasar</span>
+                            </div>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">Rp</span>
-                                <input type="text" id="displayBiayaTindakan" value="50.000" inputmode="numeric" autocomplete="off" oninput="formatPaymentInput(this); calculateTotal()" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-50 text-sm font-semibold outline-none focus:ring-2 focus:ring-emerald-100" required />
-                                 <input type="hidden" id="inputJasaDokter" name="biaya_tindakan" value="50000" />
-                             </div>
-                             @error('biaya_tindakan') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror
+                                <input type="text" id="displayBiayaJasaDokter" value="50.000" inputmode="numeric" autocomplete="off" oninput="formatPaymentInput(this); calculateTotal()" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-50 text-sm font-semibold outline-none focus:ring-2 focus:ring-emerald-100" required />
+                                <input type="hidden" id="inputBiayaJasaDokter" name="biaya_jasa_dokter" value="50000" />
+                            </div>
+                            @error('biaya_jasa_dokter') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror
                         </div>
-                        <div>
-                            <label class="mb-1 flex min-h-8 items-end text-xs font-semibold uppercase tracking-wider text-slate-600">Biaya Obat</label>
+
+                        {{-- 2. Biaya Tindakan Medis (Opsional) --}}
+                        <div id="wrapperBiayaTindakan" class="p-3 rounded-2xl bg-slate-50 border border-slate-200 transition">
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="text-xs font-semibold uppercase tracking-wider text-slate-700">2. Biaya Tindakan Medis</label>
+                                <span id="badgeTindakanPoli" class="text-[11px] font-medium text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200">Opsional</span>
+                            </div>
                             <div class="relative">
                                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">Rp</span>
-                                <input type="text" id="displayBiayaObat" value="0" inputmode="numeric" autocomplete="off" oninput="formatPaymentInput(this); calculateTotal()" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-50 text-sm font-semibold outline-none focus:ring-2 focus:ring-emerald-100" required />
-                                 <input type="hidden" id="inputBiayaObat" name="biaya_obat" value="0" />
-                             </div>
-                             @error('biaya_obat') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror
+                                <input type="text" id="displayBiayaTindakan" value="0" inputmode="numeric" autocomplete="off" oninput="formatPaymentInput(this); calculateTotal()" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-white text-sm font-semibold outline-none focus:ring-2 focus:ring-emerald-100" />
+                                <input type="hidden" id="inputBiayaTindakan" name="biaya_tindakan" value="0" />
+                            </div>
+                            <p class="mt-1 text-[11px] text-slate-500" id="hintTindakan">Isi jika pasien menjalani tindakan khusus (Tambal/Cabut Gigi, USG, dsb). Biarkan 0 jika tidak ada.</p>
+                            @error('biaya_tindakan') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror
+                        </div>
+
+                        {{-- 3. Biaya Obat (Opsional) --}}
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="text-xs font-semibold uppercase tracking-wider text-slate-700">3. Biaya Resep Obat</label>
+                                <span class="text-[11px] font-medium text-slate-500 bg-slate-50 px-2 py-0.5 rounded-full border border-slate-200">Opsional</span>
+                            </div>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">Rp</span>
+                                <input type="text" id="displayBiayaObat" value="0" inputmode="numeric" autocomplete="off" oninput="formatPaymentInput(this); calculateTotal()" class="pl-9 pr-3 py-2.5 w-full rounded-xl border border-slate-200 bg-slate-50 text-sm font-semibold outline-none focus:ring-2 focus:ring-emerald-100" />
+                                <input type="hidden" id="inputBiayaObat" name="biaya_obat" value="0" />
+                            </div>
+                            @error('biaya_obat') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror
                         </div>
                     </div>
 
@@ -267,6 +300,18 @@
         </div>
     </div>
 
+    {{-- Elemen penampung sesi & old input agar linter JS di VS Code tidak mengira @json adalah TypeScript Decorator --}}
+    <div id="paymentSessionMeta" class="hidden"
+        data-completed-id="{{ session('completed_payment_id') }}"
+        data-failed-id="{{ old('payment_transaction_id') }}"
+        data-old-jasa="{{ old('biaya_jasa_dokter', 50000) }}"
+        data-old-tindakan="{{ old('biaya_tindakan', 0) }}"
+        data-old-obat="{{ old('biaya_obat', 0) }}"
+        data-old-uang="{{ old('uang_dibayar', 0) }}"
+        data-old-metode="{{ old('metode_pembayaran', 'cash') }}"
+        data-errors="{{ json_encode($errors->all()) }}">
+    </div>
+
     <script>
         const maxPaymentAmount = 9999999999;
         let currentPaymentId = null;
@@ -298,6 +343,7 @@
             if (!currentPaymentId || restoringPayment) return;
 
             const draft = {
+                biaya_jasa_dokter: paymentValue(document.getElementById('displayBiayaJasaDokter').value),
                 biaya_tindakan: paymentValue(document.getElementById('displayBiayaTindakan').value),
                 biaya_obat: paymentValue(document.getElementById('displayBiayaObat').value),
                 uang_dibayar: paymentValue(document.getElementById('displayUangDibayar').value),
@@ -320,6 +366,15 @@
             }
         }
 
+        function openPaymentModalFromButton(btn) {
+            try {
+                const data = JSON.parse(btn.getAttribute('data-payment-info'));
+                openPaymentModal(data);
+            } catch (e) {
+                console.error('Gagal membuka modal pembayaran:', e);
+            }
+        }
+
         function openPaymentModal(data) {
             currentPaymentId = Number(data.id_transaksi);
             restoringPayment = true;
@@ -327,10 +382,43 @@
             document.getElementById('modalPoli').innerText = data.poli;
             document.getElementById('modalNamaPasien').innerText = data.nama_pasien;
             document.getElementById('modalDiagnosa').innerText = data.diagnosa;
-            document.getElementById('modalResepObat').innerText = data.resep_obat;
+            document.getElementById('modalResepObat').innerText = data.resep_obat || 'Tidak ada resep obat';
 
-            document.getElementById('displayBiayaTindakan').value = formatRupiahNumber(data.jasa_dokter || 50000);
-            document.getElementById('displayBiayaObat').value = '0';
+            // Catatan Tindakan (khusus poli gigi / kandungan / tindakan dokter)
+            const wrapperCatatan = document.getElementById('wrapperCatatanTindakan');
+            const modalCatatan = document.getElementById('modalCatatanTindakan');
+            if (data.catatan_tindakan && data.catatan_tindakan !== '-') {
+                modalCatatan.innerText = data.catatan_tindakan;
+                wrapperCatatan.classList.remove('hidden');
+            } else {
+                wrapperCatatan.classList.add('hidden');
+            }
+
+            // Penyesuaian UI berdasarkan Poli
+            const badgeTindakan = document.getElementById('badgeTindakanPoli');
+            const hintTindakan = document.getElementById('hintTindakan');
+            const wrapperTindakan = document.getElementById('wrapperBiayaTindakan');
+
+            if (data.poli === 'Poli Gigi') {
+                badgeTindakan.innerText = 'Poli Gigi';
+                badgeTindakan.className = 'text-[11px] font-semibold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300';
+                hintTindakan.innerText = 'Pasien Poli Gigi: masukkan biaya tindakan (tambal, cabut, scaling) jika ada.';
+                wrapperTindakan.className = 'p-3 rounded-2xl bg-emerald-50/50 border border-emerald-200 transition';
+            } else if (data.poli === 'Poli Spesialis Kandungan') {
+                badgeTindakan.innerText = 'Poli Kandungan';
+                badgeTindakan.className = 'text-[11px] font-semibold text-sky-700 bg-sky-100 px-2 py-0.5 rounded-full border border-sky-300';
+                hintTindakan.innerText = 'Pasien Poli Kandungan: masukkan biaya tindakan/USG jika ada.';
+                wrapperTindakan.className = 'p-3 rounded-2xl bg-sky-50/50 border border-sky-200 transition';
+            } else {
+                badgeTindakan.innerText = 'Opsional';
+                badgeTindakan.className = 'text-[11px] font-medium text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200';
+                hintTindakan.innerText = 'Isi jika ada tindakan medis tambahan. Biarkan 0 jika hanya periksa biasa.';
+                wrapperTindakan.className = 'p-3 rounded-2xl bg-slate-50 border border-slate-200 transition';
+            }
+
+            document.getElementById('displayBiayaJasaDokter').value = formatRupiahNumber(data.jasa_dokter || 50000);
+            document.getElementById('displayBiayaTindakan').value = formatRupiahNumber(data.biaya_tindakan || 0);
+            document.getElementById('displayBiayaObat').value = formatRupiahNumber(data.biaya_obat || 0);
             document.getElementById('displayUangDibayar').value = '0';
             selectPaymentMethod('cash');
 
@@ -344,6 +432,7 @@
 
             const draft = loadPaymentDraft(currentPaymentId);
             if (draft) {
+                document.getElementById('displayBiayaJasaDokter').value = formatRupiahNumber(draft.biaya_jasa_dokter || 50000);
                 document.getElementById('displayBiayaTindakan').value = formatRupiahNumber(draft.biaya_tindakan || 0);
                 document.getElementById('displayBiayaObat').value = formatRupiahNumber(draft.biaya_obat || 0);
                 document.getElementById('displayUangDibayar').value = formatRupiahNumber(draft.uang_dibayar || 0);
@@ -367,10 +456,13 @@
         }
 
         function calculateTotal() {
-            const jasaDokter = paymentValue(document.getElementById('displayBiayaTindakan').value);
+            const jasaDokter = paymentValue(document.getElementById('displayBiayaJasaDokter').value);
+            const biayaTindakan = paymentValue(document.getElementById('displayBiayaTindakan').value);
             const biayaObat = paymentValue(document.getElementById('displayBiayaObat').value);
-            const total = jasaDokter + biayaObat;
-            document.getElementById('inputJasaDokter').value = jasaDokter;
+            const total = jasaDokter + biayaTindakan + biayaObat;
+
+            document.getElementById('inputBiayaJasaDokter').value = jasaDokter;
+            document.getElementById('inputBiayaTindakan').value = biayaTindakan;
             document.getElementById('inputBiayaObat').value = biayaObat;
             document.getElementById('inputTotalBiaya').value = formatRupiahNumber(total);
 
@@ -425,12 +517,13 @@
 
             calculateTotal();
 
+            const biayaJasaDokter = paymentValue(document.getElementById('displayBiayaJasaDokter').value);
             const biayaTindakan = paymentValue(document.getElementById('displayBiayaTindakan').value);
             const biayaObat = paymentValue(document.getElementById('displayBiayaObat').value);
             const total = paymentValue(document.getElementById('inputTotalBiaya').value);
             const uangDibayar = paymentValue(document.getElementById('displayUangDibayar').value);
 
-            if ([biayaTindakan, biayaObat, uangDibayar, total].some((value) => value > maxPaymentAmount)) {
+            if ([biayaJasaDokter, biayaTindakan, biayaObat, uangDibayar, total].some((value) => value > maxPaymentAmount)) {
                 event.preventDefault();
                 setPaymentAlert('Nominal maksimal yang dapat disimpan adalah Rp 9.999.999.999. Periksa kembali rincian pembayaran.');
                 return;
@@ -450,27 +543,32 @@
             submitButton.textContent = 'Memproses...';
         });
 
-        const completedPaymentId = @json(session('completed_payment_id'));
+        const paymentMeta = document.getElementById('paymentSessionMeta');
+        const completedPaymentId = paymentMeta ? paymentMeta.dataset.completedId : null;
         if (completedPaymentId) {
             try {
                 sessionStorage.removeItem(paymentStorageKey(completedPaymentId));
             } catch (error) {}
         }
 
-        const failedPaymentId = @json(old('payment_transaction_id'));
+        const failedPaymentId = paymentMeta ? paymentMeta.dataset.failedId : null;
         if (failedPaymentId) {
             const trigger = document.querySelector(`[data-transaction-id="${failedPaymentId}"]`);
             if (trigger) {
                 trigger.click();
                 restoringPayment = true;
-                document.getElementById('displayBiayaTindakan').value = formatRupiahNumber(@json(old('biaya_tindakan', 0)));
-                document.getElementById('displayBiayaObat').value = formatRupiahNumber(@json(old('biaya_obat', 0)));
-                document.getElementById('displayUangDibayar').value = formatRupiahNumber(@json(old('uang_dibayar', 0)));
-                const oldMethod = @json(old('metode_pembayaran', 'cash'));
+                document.getElementById('displayBiayaJasaDokter').value = formatRupiahNumber(paymentMeta.dataset.oldJasa || 50000);
+                document.getElementById('displayBiayaTindakan').value = formatRupiahNumber(paymentMeta.dataset.oldTindakan || 0);
+                document.getElementById('displayBiayaObat').value = formatRupiahNumber(paymentMeta.dataset.oldObat || 0);
+                document.getElementById('displayUangDibayar').value = formatRupiahNumber(paymentMeta.dataset.oldUang || 0);
+                const oldMethod = paymentMeta.dataset.oldMetode || 'cash';
                 selectPaymentMethod(['cash', 'qr', 'debit'].includes(oldMethod) ? oldMethod : 'cash');
                 restoringPayment = false;
                 calculateTotal();
-                setPaymentAlert(@json($errors->all()).join(' '));
+                try {
+                    const errList = JSON.parse(paymentMeta.dataset.errors || '[]');
+                    if (errList.length > 0) setPaymentAlert(errList.join(' '));
+                } catch (e) {}
             }
         }
     </script>

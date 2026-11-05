@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Detail Kunjungan RM-{{ str_pad($kunjungan->id_kunjungan, 3, '0', STR_PAD_LEFT) }} - Klinik Lala Medicare</title>
+    <title>Detail Kunjungan {{ $kunjungan->labelAntrean() }} - {{ $kunjungan->pasien?->nama ?? 'Pasien' }} - Klinik Lala Medicare</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body { font-family: 'Inter', sans-serif; }
@@ -29,7 +29,7 @@
                     <div>
                         <p class="text-xs text-slate-400">Riwayat Kunjungan</p>
                         <p class="text-sm font-semibold text-slate-900">
-                            Detail Kunjungan — RM-{{ str_pad($kunjungan->id_kunjungan, 3, '0', STR_PAD_LEFT) }}
+                            Detail Kunjungan — {{ $kunjungan->labelAntrean() }} ({{ $kunjungan->pasien?->no_rm ?: ($kunjungan->pasien ? \App\Models\Pasien::nomorRekamMedisUntuk($kunjungan->pasien->id_pasien) : '-') }})
                         </p>
                     </div>
                 </div>
@@ -103,9 +103,15 @@
                                 {{-- Kolom kiri --}}
                                 <div class="space-y-5">
                                     <div>
+                                        <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Nomor Antrean</p>
+                                        <p class="mt-1 font-bold text-emerald-700 text-lg">
+                                            {{ $kunjungan->labelAntrean() }}
+                                        </p>
+                                    </div>
+                                    <div>
                                         <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">No. Rekam Medis</p>
                                         <p class="mt-1 font-semibold text-sky-700 text-lg">
-                                            RM-{{ str_pad($kunjungan->id_kunjungan, 3, '0', STR_PAD_LEFT) }}
+                                            {{ $kunjungan->pasien?->no_rm ?: ($kunjungan->pasien ? \App\Models\Pasien::nomorRekamMedisUntuk($kunjungan->pasien->id_pasien) : '-') }}
                                         </p>
                                     </div>
                                     <div>

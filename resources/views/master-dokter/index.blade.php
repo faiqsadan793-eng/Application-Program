@@ -48,6 +48,13 @@
                     </div>
                 @endif
 
+                @if (session('error'))
+                    <div class="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                        <span class="material-symbols-outlined text-lg">error</span>
+                        <span>{{ session('error') }}</span>
+                    </div>
+                @endif
+
                 @if ($errors->any())
                     <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
                         <p class="font-semibold">Data belum dapat disimpan.</p>

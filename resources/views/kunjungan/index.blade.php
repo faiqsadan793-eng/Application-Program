@@ -44,72 +44,79 @@
                         <p class="text-sm text-slate-500 mt-1">Daftar histori rekam kunjungan pasien di Klinik Lala Medicare.</p>
                     </div>
 
-                    {{-- Filter Panel — semua input terhubung ke controller --}}
+                    {{-- Filter Panel --}}
                     <form method="GET" action="{{ route('kunjungan.index') }}" id="filter-form">
                         <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 mb-6">
-                            <div class="flex flex-col gap-4 items-stretch sm:flex-row sm:flex-wrap sm:items-end">
+                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12 lg:items-end">
 
                                 {{-- Search --}}
-                                <div class="w-full sm:flex-1 sm:min-w-[220px]">
-                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Cari Pasien</label>
+                                <div class="sm:col-span-2 lg:col-span-4">
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Cari Pasien</label>
                                     <div class="relative">
-                                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+                                        <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
                                         <input type="text" name="search" value="{{ request('search') }}"
                                             placeholder="Nama pasien atau No. RM..."
-                                            class="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-12 pr-4 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
+                                            class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-3 text-sm outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
                                     </div>
                                 </div>
 
                                 {{-- Rentang Waktu --}}
-                                <div class="w-full sm:min-w-[170px]">
-                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Rentang Waktu</label>
+                                <div class="lg:col-span-2">
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Rentang Waktu</label>
                                     <div class="relative">
-                                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">calendar_month</span>
                                         <select name="rentang"
-                                            class="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-12 pr-4 text-sm outline-none transition focus:border-emerald-500 appearance-none">
+                                            class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-3 pr-8 text-sm outline-none transition focus:border-emerald-500 appearance-none">
                                             <option value="7"     {{ request('rentang','semua') === '7'     ? 'selected' : '' }}>7 Hari Terakhir</option>
                                             <option value="30"    {{ request('rentang','semua') === '30'    ? 'selected' : '' }}>30 Hari Terakhir</option>
                                             <option value="bulan" {{ request('rentang','semua') === 'bulan' ? 'selected' : '' }}>Bulan Ini</option>
                                             <option value="semua" {{ request('rentang','semua') === 'semua' ? 'selected' : '' }}>Semua Waktu</option>
                                         </select>
+                                        <span class="material-symbols-outlined pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">expand_more</span>
                                     </div>
                                 </div>
 
                                 {{-- Poli --}}
-                                <div class="w-full sm:min-w-[160px]">
-                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Poli</label>
-                                    <select name="poli"
-                                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 px-4 text-sm outline-none transition focus:border-emerald-500 appearance-none">
-                                        <option value="semua"     {{ request('poli','semua') === 'semua'     ? 'selected' : '' }}>Semua Poli</option>
-                                        @foreach(config('clinic.poli') as $poli)
-                                            <option value="{{ $poli }}" {{ request('poli') === $poli ? 'selected' : '' }}>{{ $poli }}</option>
-                                        @endforeach
-                                    </select>
+                                <div class="lg:col-span-2">
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Poli</label>
+                                    <div class="relative">
+                                        <select name="poli"
+                                            class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-3 pr-8 text-sm outline-none transition focus:border-emerald-500 appearance-none">
+                                            <option value="semua"     {{ request('poli','semua') === 'semua'     ? 'selected' : '' }}>Semua Poli</option>
+                                            @foreach(config('clinic.poli') as $poli)
+                                                <option value="{{ $poli }}" {{ request('poli') === $poli ? 'selected' : '' }}>{{ $poli }}</option>
+                                            @endforeach
+                                        </select>
+                                        <span class="material-symbols-outlined pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">expand_more</span>
+                                    </div>
                                 </div>
 
                                 {{-- Status --}}
-                                <div class="w-full sm:min-w-[160px]">
-                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Status</label>
-                                    <select name="status"
-                                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 px-4 text-sm outline-none transition focus:border-emerald-500 appearance-none">
-                                        <option value="semua"     {{ request('status','semua') === 'semua'      ? 'selected' : '' }}>Semua Status</option>
-                                        <option value="menunggu"  {{ request('status') === 'menunggu'  ? 'selected' : '' }}>Menunggu</option>
-                                        <option value="siap_bayar"{{ request('status') === 'siap_bayar'? 'selected' : '' }}>Siap Bayar</option>
-                                        <option value="selesai"   {{ request('status') === 'selesai'   ? 'selected' : '' }}>Selesai</option>
-                                        <option value="dibatalkan"{{ request('status') === 'dibatalkan'? 'selected' : '' }}>Dibatalkan</option>
-                                    </select>
+                                <div class="lg:col-span-2">
+                                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Status</label>
+                                    <div class="relative">
+                                        <select name="status"
+                                            class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-3 pr-8 text-sm outline-none transition focus:border-emerald-500 appearance-none">
+                                            <option value="semua"     {{ request('status','semua') === 'semua'      ? 'selected' : '' }}>Semua Status</option>
+                                            <option value="menunggu"  {{ request('status') === 'menunggu'  ? 'selected' : '' }}>Menunggu</option>
+                                            <option value="siap_bayar"{{ request('status') === 'siap_bayar'? 'selected' : '' }}>Siap Bayar</option>
+                                            <option value="selesai"   {{ request('status') === 'selesai'   ? 'selected' : '' }}>Selesai</option>
+                                            <option value="dibatalkan"{{ request('status') === 'dibatalkan'? 'selected' : '' }}>Dibatalkan</option>
+                                        </select>
+                                        <span class="material-symbols-outlined pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">expand_more</span>
+                                    </div>
                                 </div>
 
                                 {{-- Tombol --}}
-                                <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+                                <div class="flex gap-2 sm:col-span-2 lg:col-span-2">
                                     <button type="submit"
-                                        class="w-full sm:w-auto rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700">
-                                        Terapkan Filter
+                                        class="flex-1 inline-flex items-center justify-center gap-1 rounded-xl bg-emerald-600 px-3 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 whitespace-nowrap">
+                                        <span class="material-symbols-outlined text-[18px]">filter_alt</span> Filter
                                     </button>
                                     @if(request()->hasAny(['search','rentang','poli','status']))
                                         <a href="{{ route('kunjungan.index') }}"
-                                            class="w-full sm:w-auto rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
-                                            Reset
+                                            class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                                            title="Reset Filter">
+                                            <span class="material-symbols-outlined text-[18px]">refresh</span>
                                         </a>
                                     @endif
                                 </div>
@@ -134,6 +141,7 @@
                             <table class="w-full min-w-[760px] divide-y divide-slate-200 text-left text-sm">
                                 <thead class="bg-slate-50 text-slate-500">
                                     <tr>
+                                        <th class="px-6 py-4 font-semibold uppercase tracking-wide">No. Antrean</th>
                                         <th class="px-6 py-4 font-semibold uppercase tracking-wide">No. RM</th>
                                         <th class="px-6 py-4 font-semibold uppercase tracking-wide">Nama Pasien</th>
                                         <th class="px-6 py-4 font-semibold uppercase tracking-wide">Tanggal &amp; Jam</th>
@@ -145,13 +153,16 @@
                                 <tbody class="divide-y divide-slate-200 bg-white">
                                     @forelse($kunjungans as $kunjungan)
                                         <tr class="hover:bg-slate-50">
-                                            <td class="px-6 py-5 font-semibold text-sky-700">
-                                                RM-{{ str_pad($kunjungan->id_kunjungan, 3, '0', STR_PAD_LEFT) }}
+                                            <td class="px-6 py-5 font-bold text-emerald-700 whitespace-nowrap">
+                                                {{ $kunjungan->labelAntrean() }}
+                                            </td>
+                                            <td class="px-6 py-5 font-semibold text-sky-700 whitespace-nowrap">
+                                                {{ $kunjungan->pasien?->no_rm ?: ($kunjungan->pasien ? \App\Models\Pasien::nomorRekamMedisUntuk($kunjungan->pasien->id_pasien) : '-') }}
                                             </td>
                                             <td class="px-6 py-5">
                                                 <p class="font-semibold text-slate-900">{{ $kunjungan->pasien->nama ?? '-' }}</p>
                                                 <p class="text-xs text-slate-400 mt-0.5">
-                                                    ID: RM-{{ str_pad($kunjungan->pasien->id_pasien ?? 0, 4, '0', STR_PAD_LEFT) }}
+                                                    NIK: {{ $kunjungan->pasien->nik ?? '-' }}
                                                 </p>
                                             </td>
                                             <td class="px-6 py-5 text-slate-500">
@@ -182,7 +193,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="6" class="px-6 py-16 text-center">
+                                            <td colspan="7" class="px-6 py-16 text-center">
                                                 <span class="material-symbols-outlined text-5xl text-slate-300 block mb-3">manage_search</span>
                                                 <p class="text-slate-500 font-medium">Tidak ada data kunjungan</p>
                                                 <p class="text-slate-400 text-sm mt-1">Coba ubah filter atau kata kunci pencarian.</p>

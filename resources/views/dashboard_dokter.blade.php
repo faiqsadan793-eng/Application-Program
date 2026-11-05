@@ -70,7 +70,7 @@
                             </div>
                             <p class="text-sm text-slate-500">Total Pasien Hari Ini</p>
                         </div>
-                        <p class="mt-6 text-3xl font-semibold text-slate-900">{{ $totalPasien }}</p>
+                        <p id="statTotalPasien" class="mt-6 text-3xl font-semibold text-slate-900">{{ $totalPasien }}</p>
                     </div>
 
                     <!-- Menunggu Diperiksa -->
@@ -81,7 +81,7 @@
                             </div>
                             <p class="text-sm text-slate-500">Menunggu Diperiksa</p>
                         </div>
-                        <p class="mt-6 text-3xl font-semibold text-slate-900">{{ $antreanAktif }}</p>
+                        <p id="statAntreanAktif" class="mt-6 text-3xl font-semibold text-slate-900">{{ $antreanAktif }}</p>
                     </div>
 
                     <!-- Selesai Diperiksa -->
@@ -92,7 +92,7 @@
                             </div>
                             <p class="text-sm text-slate-500">Selesai Diperiksa</p>
                         </div>
-                        <p class="mt-6 text-3xl font-semibold text-slate-900">{{ $selesaiDiperiksa }}</p>
+                        <p id="statSelesaiDiperiksa" class="mt-6 text-3xl font-semibold text-slate-900">{{ $selesaiDiperiksa }}</p>
                     </div>
                 </section>
 
@@ -102,10 +102,15 @@
                         <div class="flex items-center gap-3 text-slate-900">
                             <span class="material-symbols-outlined text-2xl text-emerald-600">list_alt</span>
                             <h2 class="text-lg font-semibold">Daftar Antrean Pasien Poli Hari Ini</h2>
+                            <span id="liveStatusBadge" class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
+                                <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Update
+                            </span>
                         </div>
-                        <a href="{{ route('dashboard') }}" class="text-slate-500 hover:text-emerald-600 transition flex items-center">
-                            <span class="material-symbols-outlined">refresh</span>
-                        </a>
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="fetchLiveAntrean(true)" title="Perbarui Sekarang" class="text-slate-500 hover:text-emerald-600 transition flex items-center p-1 rounded-lg hover:bg-slate-100">
+                                <span class="material-symbols-outlined" id="refreshIcon">refresh</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full min-w-[760px] divide-y divide-slate-200 text-left text-sm">
@@ -119,7 +124,7 @@
                                     <th class="px-6 py-4 font-semibold uppercase tracking-wide text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-200 bg-white">
+                            <tbody id="antreanTableBody" class="divide-y divide-slate-200 bg-white">
                                 @forelse($antreanHariIni as $antrean)
                                     <tr class="hover:bg-slate-50">
                                         <td class="px-6 py-5 font-semibold text-slate-900">{{ $antrean->labelAntrean() }}</td>
@@ -177,5 +182,173 @@
             </main>
         </div>
     </div>
+
+    {{-- Elemen data penampung agar linter JS di VS Code tidak mengira sintaks Blade @ adalah decorator TS --}}
+    <div id="dashboardDoctorMeta" class="hidden"
+        data-check-url="{{ route('dashboard.dokter.antrean-check') }}"
+        data-csrf-token="{{ csrf_token() }}"
+        data-queue-count="{{ (int) $antreanAktif }}">
+    </div>
+
+    <script>
+        const metaEl = document.getElementById('dashboardDoctorMeta');
+        const checkUrl = metaEl.dataset.checkUrl;
+        const csrfToken = metaEl.dataset.csrfToken;
+        let previousQueueCount = parseInt(metaEl.dataset.queueCount || '0', 10);
+        let isFetching = false;
+
+        function renderStatusBadge(status) {
+            if (status === 'antre') {
+                return '<span class="inline-flex rounded-full bg-yellow-100 px-3 py-1 text-[11px] font-semibold text-yellow-800">Antre</span>';
+            } else if (status === 'menunggu_dokter') {
+                return '<span class="inline-flex rounded-full bg-sky-100 px-3 py-1 text-[11px] font-semibold text-sky-800">Sedang Diperiksa</span>';
+            } else if (status === 'siap_bayar') {
+                return '<span class="inline-flex rounded-full bg-orange-100 px-3 py-1 text-[11px] font-semibold text-orange-800">Siap Bayar</span>';
+            } else if (status === 'dibatalkan') {
+                return '<span class="inline-flex rounded-full bg-red-100 px-3 py-1 text-[11px] font-semibold text-red-800">Dibatalkan</span>';
+            }
+            return '<span class="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-semibold text-emerald-800">Selesai</span>';
+        }
+
+        function renderActionButton(item) {
+            if (item.status === 'antre') {
+                return `
+                    <form action="${item.route_mulai}" method="POST" class="inline">
+                        <input type="hidden" name="_token" value="${csrfToken}">
+                        <button type="submit" class="inline-flex items-center gap-1 rounded-2xl bg-emerald-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700">
+                            <span class="material-symbols-outlined text-[16px]">stethoscope</span> Periksa Pasien
+                        </button>
+                    </form>
+                `;
+            } else if (item.status === 'menunggu_dokter') {
+                return `
+                    <a href="${item.route_lanjut}" class="inline-flex items-center gap-1 rounded-2xl bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-sky-700">
+                        <span class="material-symbols-outlined text-[16px]">stethoscope</span> Lanjutkan Periksa
+                    </a>
+                `;
+            } else if (item.status === 'dibatalkan') {
+                return `
+                    <span class="inline-flex items-center gap-1 rounded-2xl border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700">
+                        <span class="material-symbols-outlined text-[16px]">cancel</span> Dibatalkan
+                    </span>
+                `;
+            }
+            return `
+                <span class="inline-flex items-center gap-1 rounded-2xl bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-500 border border-slate-200">
+                    <span class="material-symbols-outlined text-[16px]">check_circle</span> Selesai
+                </span>
+            `;
+        }
+
+        async function fetchLiveAntrean(isManual = false) {
+            if (isFetching) return;
+            isFetching = true;
+
+            const refreshIcon = document.getElementById('refreshIcon');
+            if (refreshIcon && isManual) {
+                refreshIcon.classList.add('animate-spin');
+            }
+
+            try {
+                const response = await fetch(checkUrl, {
+                    headers: { 'Accept': 'application/json' }
+                });
+
+                if (!response.ok) throw new Error('Gagal memuat status antrean');
+
+                const data = await response.json();
+
+                // Update stat angka
+                const statTotal = document.getElementById('statTotalPasien');
+                const statAktif = document.getElementById('statAntreanAktif');
+                const statSelesai = document.getElementById('statSelesaiDiperiksa');
+
+                if (statTotal) statTotal.innerText = data.totalPasien;
+                if (statAktif) statAktif.innerText = data.antreanAktif;
+                if (statSelesai) statSelesai.innerText = data.selesaiDiperiksa;
+
+                // Cek jika ada antrean bertambah untuk notifikasi visual
+                if (data.antreanAktif > previousQueueCount) {
+                    const badge = document.getElementById('liveStatusBadge');
+                    if (badge) {
+                        badge.classList.remove('bg-emerald-100', 'text-emerald-700');
+                        badge.classList.add('bg-amber-100', 'text-amber-800');
+                        badge.innerHTML = '<span class="h-2 w-2 rounded-full bg-amber-500 animate-ping"></span> Pasien Baru Masuk!';
+                        setTimeout(() => {
+                            badge.classList.remove('bg-amber-100', 'text-amber-800');
+                            badge.classList.add('bg-emerald-100', 'text-emerald-700');
+                            badge.innerHTML = '<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Update';
+                        }, 5000);
+                    }
+                }
+                previousQueueCount = data.antreanAktif;
+
+                // Render tabel antrean
+                const tbody = document.getElementById('antreanTableBody');
+                if (tbody) {
+                    if (!data.antrean || data.antrean.length === 0) {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="px-6 py-8 text-center text-slate-500">Belum ada antrean untuk poli Anda hari ini.</td>
+                            </tr>
+                        `;
+                    } else {
+                        tbody.innerHTML = data.antrean.map(item => `
+                            <tr class="hover:bg-slate-50 transition">
+                                <td class="px-6 py-5 font-semibold text-slate-900">${item.no_antrean}</td>
+                                <td class="px-6 py-5">
+                                    <p class="font-semibold text-slate-900">${item.nama_pasien}</p>
+                                    <p class="text-xs text-slate-500">ID: ${item.no_rm}</p>
+                                </td>
+                                <td class="px-6 py-5 text-slate-500">${item.jam_daftar}</td>
+                                <td class="px-6 py-5 text-slate-600 font-medium">${item.poli || '-'}</td>
+                                <td class="px-6 py-5">${renderStatusBadge(item.status)}</td>
+                                <td class="px-6 py-5 text-center">${renderActionButton(item)}</td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+            } catch (err) {
+                console.warn('Auto polling antrean error:', err);
+            } finally {
+                isFetching = false;
+                if (refreshIcon) {
+                    refreshIcon.classList.remove('animate-spin');
+                }
+            }
+        }
+
+        // Smart polling: setiap 10 detik, hanya jika tab aktif (Page Visibility API)
+        let pollingTimer = null;
+
+        function startPolling() {
+            if (!pollingTimer) {
+                pollingTimer = setInterval(() => {
+                    if (!document.hidden) {
+                        fetchLiveAntrean(false);
+                    }
+                }, 10000); // 10 detik
+            }
+        }
+
+        function stopPolling() {
+            if (pollingTimer) {
+                clearInterval(pollingTimer);
+                pollingTimer = null;
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopPolling();
+            } else {
+                fetchLiveAntrean(false);
+                startPolling();
+            }
+        });
+
+        // Jalankan polling
+        startPolling();
+    </script>
 </body>
 </html>

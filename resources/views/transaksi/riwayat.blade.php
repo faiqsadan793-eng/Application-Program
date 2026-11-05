@@ -43,9 +43,15 @@
             <main class="flex-1 overflow-y-auto p-3 sm:p-6">
                 <div class="max-w-[1200px] mx-auto">
 
-                    <div class="mb-6">
-                        <h2 class="text-xl sm:text-2xl font-bold">Riwayat Transaksi</h2>
-                        <p class="text-sm text-slate-500 mt-1">Histori transaksi pembayaran pasien dan rekapitulasi kasir.</p>
+                    <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-bold">Riwayat Transaksi</h2>
+                            <p class="text-sm text-slate-500 mt-1">Histori transaksi pembayaran pasien dan rekapitulasi kasir.</p>
+                        </div>
+                        <a href="{{ route('riwayat-transaksi.export', request()->query()) }}" class="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 whitespace-nowrap self-start sm:self-auto">
+                            <span class="material-symbols-outlined text-[20px]">download</span>
+                            Ekspor Laporan Excel / CSV
+                        </a>
                     </div>
 
                     {{-- Summary Cards --}}
@@ -77,9 +83,9 @@
                     {{-- Filter Bar --}}
                     <form method="GET" action="{{ route('riwayat-transaksi.index') }}" id="filter-form" class="no-print">
                         <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 mb-6">
-                            <div class="flex flex-col gap-4 items-stretch sm:flex-row sm:flex-wrap sm:items-end">
+                            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-12 lg:items-end">
                                 {{-- Search --}}
-                                <div class="w-full sm:flex-1 sm:min-w-[200px]">
+                                <div class="sm:col-span-2 lg:col-span-5">
                                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Cari</label>
                                     <div class="relative">
                                         <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]">search</span>
@@ -90,25 +96,25 @@
                                 </div>
 
                                 {{-- Date from --}}
-                                <div class="w-full sm:min-w-[160px]">
+                                <div class="lg:col-span-2">
                                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Dari Tanggal</label>
                                     <input type="date" name="tanggal_dari" value="{{ request('tanggal_dari') }}"
                                         class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
                                 </div>
 
                                 {{-- Date to --}}
-                                <div class="w-full sm:min-w-[160px]">
+                                <div class="lg:col-span-2">
                                     <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Sampai Tanggal</label>
                                     <input type="date" name="tanggal_sampai" value="{{ request('tanggal_sampai') }}"
                                         class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 px-3 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100" />
                                 </div>
 
                                 {{-- Buttons --}}
-                                <div class="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-                                    <button type="submit" class="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
+                                <div class="flex gap-2 sm:col-span-2 lg:col-span-3">
+                                    <button type="submit" class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 whitespace-nowrap">
                                         <span class="material-symbols-outlined text-[18px]">filter_alt</span> Filter
                                     </button>
-                                    <a href="{{ route('riwayat-transaksi.index') }}" class="inline-flex w-full sm:w-auto items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+                                    <a href="{{ route('riwayat-transaksi.index') }}" class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 whitespace-nowrap">
                                         <span class="material-symbols-outlined text-[18px]">refresh</span> Reset
                                     </a>
                                 </div>
@@ -157,20 +163,22 @@
                                             </td>
                                             <td class="px-6 py-5 text-center no-print">
                                                 <button type="button"
-                                                    onclick='openDetailModal({{ json_encode([
+                                                    data-transaction='{{ json_encode([
                                                         'no_transaksi' => 'TRX-' . str_pad($t->id_transaksi, 5, '0', STR_PAD_LEFT),
                                                         'tanggal' => $t->updated_at->timezone('Asia/Jakarta')->locale('id')->translatedFormat('d M Y, H:i') . ' WIB',
                                                         'nama_pasien' => $t->kunjungan->pasien->nama ?? '-',
                                                         'poli' => $t->kunjungan->poli_tujuan ?? '-',
                                                         'diagnosa' => $t->kunjungan->rekamMedis->diagnosa ?? '-',
                                                         'resep_obat' => $t->kunjungan->rekamMedis->resep_obat ?? '-',
+                                                        'biaya_jasa_dokter' => $t->biaya_jasa_dokter ?? 50000,
                                                         'biaya_tindakan' => $t->biaya_tindakan,
                                                         'biaya_obat' => $t->biaya_obat,
                                                         'total_biaya' => $t->total_biaya,
                                                         'uang_dibayar' => $t->uang_dibayar,
                                                         'kembalian' => $t->kembalian,
                                                         'metode_pembayaran' => \App\Models\Transaksi::labelMetodePembayaran($t->metode_pembayaran),
-                                                    ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) }})'
+                                                    ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) }}'
+                                                    onclick="openDetailModalFromButton(this)"
                                                     class="inline-flex items-center gap-1.5 rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700 transition hover:bg-emerald-600 hover:text-white hover:border-emerald-600">
                                                     <span class="material-symbols-outlined text-[16px]">receipt_long</span> Detail
                                                 </button>
@@ -252,7 +260,11 @@
                 <div class="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100 text-sm space-y-2">
                     <p class="text-xs text-emerald-700 font-bold uppercase tracking-wider mb-2">Rincian Pembayaran</p>
                     <div class="flex justify-between">
-                        <span class="text-slate-600">Jasa Dokter / Tindakan</span>
+                        <span class="text-slate-600">Jasa Dokter</span>
+                        <span id="detailBiayaJasaDokter" class="font-semibold text-slate-800">Rp 50.000</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-600">Biaya Tindakan Medis</span>
                         <span id="detailBiayaTindakan" class="font-semibold text-slate-800">Rp 0</span>
                     </div>
                     <div class="flex justify-between">
@@ -302,16 +314,26 @@
             return 'Rp ' + num.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
         }
 
+        function openDetailModalFromButton(btn) {
+            try {
+                const data = JSON.parse(btn.getAttribute('data-transaction'));
+                openDetailModal(data);
+            } catch (err) {
+                console.error('Gagal membaca data transaksi:', err);
+            }
+        }
+
         function openDetailModal(data) {
             document.getElementById('detailNoTransaksi').innerText = data.no_transaksi;
             document.getElementById('detailTanggal').innerText = data.tanggal;
             document.getElementById('detailNamaPasien').innerText = data.nama_pasien;
             document.getElementById('detailPoli').innerText = data.poli;
             document.getElementById('detailDiagnosa').innerText = data.diagnosa;
-            document.getElementById('detailResepObat').innerText = data.resep_obat;
+            document.getElementById('detailResepObat').innerText = data.resep_obat || 'Tidak ada resep obat';
 
-            document.getElementById('detailBiayaTindakan').innerText = formatRupiah(data.biaya_tindakan);
-            document.getElementById('detailBiayaObat').innerText = formatRupiah(data.biaya_obat);
+            document.getElementById('detailBiayaJasaDokter').innerText = formatRupiah(data.biaya_jasa_dokter || 50000);
+            document.getElementById('detailBiayaTindakan').innerText = formatRupiah(data.biaya_tindakan || 0);
+            document.getElementById('detailBiayaObat').innerText = formatRupiah(data.biaya_obat || 0);
             document.getElementById('detailTotalBiaya').innerText = formatRupiah(data.total_biaya);
             document.getElementById('detailMetodePembayaran').innerText = data.metode_pembayaran;
             document.getElementById('detailUangDibayar').innerText = formatRupiah(data.uang_dibayar);

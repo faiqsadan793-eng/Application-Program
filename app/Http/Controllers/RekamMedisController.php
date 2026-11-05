@@ -53,7 +53,7 @@ class RekamMedisController extends Controller
             'tekanan_darah'=> ['nullable', 'regex:/^\d{2,3}\/\d{2,3}$/'],
             'hasil_pemeriksaan' => 'nullable|string|max:4000',
             'diagnosa'     => 'required|string|max:2000',
-            'resep_obat'   => 'required|string|max:2000',
+            'resep_obat'   => 'nullable|string|max:2000',
             'catatan_tambahan' => 'nullable|string|max:4000',
         ];
         if ($dokter->poli === 'Poli Spesialis Kandungan') {
@@ -85,7 +85,7 @@ class RekamMedisController extends Controller
                     'tekanan_darah'=> $validated['tekanan_darah'] ?? null,
                     'hasil_pemeriksaan' => $validated['hasil_pemeriksaan'] ?? null,
                     'diagnosa'     => $validated['diagnosa'],
-                    'resep_obat'   => $validated['resep_obat'],
+                    'resep_obat'   => $validated['resep_obat'] ?? null,
                     'catatan_tambahan' => $validated['catatan_tambahan'] ?? null,
                 ]);
 

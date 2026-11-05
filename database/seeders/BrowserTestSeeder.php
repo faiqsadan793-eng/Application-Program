@@ -22,24 +22,21 @@ class BrowserTestSeeder extends Seeder
 
         $password = Hash::make('browser-test-password');
         $staff = User::create(['name' => 'Staff Browser', 'email' => 'staff.browser@test.local', 'password' => $password, 'role' => 'staff']);
-        $doctor = User::create(['name' => 'Dokter Browser', 'email' => 'dokter.browser@test.local', 'password' => $password, 'role' => 'dokter']);
-        Dokter::create(['user_id' => $doctor->id, 'nip_sip' => 'SIP-BROWSER', 'poli' => 'Poli Umum']);
+        foreach (config('clinic.poli') as $index => $poli) {
+            $doctor = User::create([
+                'name' => 'Dokter ' . $poli,
+                'email' => 'dokter.' . ($index === 'Poli Spesialis Kandungan' ? 'kandungan' : strtolower(str_replace('Poli ', '', $index))) . '.browser@test.local',
+                'password' => $password,
+                'role' => 'dokter',
+            ]);
+            Dokter::create(['user_id' => $doctor->id, 'nip_sip' => 'SIP-BROWSER-' . $index, 'poli' => $poli]);
+        }
 
         $medicalPatient = Pasien::create($this->patient('Pasien Rekam Medis', '081200000001'));
-        Kunjungan::create([
-            'id_pasien' => $medicalPatient->id_pasien,
-            'tgl_kunjungan' => now()->toDateString(),
-            'poli_tujuan' => 'Poli Umum',
-            'status' => Kunjungan::STATUS_MENUNGGU_DOKTER,
-        ]);
+        $this->visit($medicalPatient, 'Poli Umum', Kunjungan::STATUS_MENUNGGU_DOKTER);
 
         $paymentPatient = Pasien::create($this->patient('Pasien Pembayaran', '081200000002'));
-        $paymentVisit = Kunjungan::create([
-            'id_pasien' => $paymentPatient->id_pasien,
-            'tgl_kunjungan' => now()->toDateString(),
-            'poli_tujuan' => 'Poli Gigi',
-            'status' => Kunjungan::STATUS_SIAP_BAYAR,
-        ]);
+        $paymentVisit = $this->visit($paymentPatient, 'Poli Gigi', Kunjungan::STATUS_SIAP_BAYAR);
         RekamMedis::create([
             'id_kunjungan' => $paymentVisit->id_kunjungan,
             'nama_dokter' => 'Dokter Browser',
@@ -52,10 +49,30 @@ class BrowserTestSeeder extends Seeder
             'total_biaya' => 0,
             'status_pembayaran' => Transaksi::STATUS_BELUM,
         ]);
+
+        $childPatient = Pasien::create($this->patient('Pasien Anak', '081200000003'));
+        $this->visit($childPatient, 'Poli Anak', Kunjungan::STATUS_ANTRE);
+
+        $obstetricPatient = Pasien::create($this->patient('Pasien Kandungan', '081200000004'));
+        $this->visit($obstetricPatient, 'Poli Spesialis Kandungan', Kunjungan::STATUS_MENUNGGU_DOKTER);
     }
 
     private function patient(string $name, string $phone): array
     {
         return ['nama' => $name, 'tanggal_lahir' => '1990-01-01', 'jenis_kelamin' => 'Perempuan', 'no_hp' => $phone];
+    }
+
+    private function visit(Pasien $patient, string $poli, string $status): Kunjungan
+    {
+        $date = Kunjungan::tanggalHariIni();
+
+        return Kunjungan::create([
+            'id_pasien' => $patient->id_pasien,
+            'tgl_kunjungan' => $date,
+            'poli_tujuan' => $poli,
+            'kode_antrean' => Kunjungan::kodeAntreanUntuk($poli),
+            'nomor_antrean' => Kunjungan::nomorAntreanBerikutnya($date, $poli),
+            'status' => $status,
+        ]);
     }
 }
