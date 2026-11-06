@@ -29,6 +29,7 @@
         $riwayatTransaksiActive = request()->routeIs('riwayat-transaksi.*') ? $active : $inactive;
         $periksaActive = request()->routeIs('rekam-medis.*') ? $active : $inactive;
         $rekamMedisPasienActive = request()->routeIs('rekam-medis-pasien.*') ? $active : $inactive;
+        $profileActive = request()->routeIs('profile.*') ? $active : $inactive;
     @endphp
 
     <nav class="custom-scrollbar flex-1 space-y-1.5 overflow-y-auto px-3 py-5">
@@ -68,6 +69,13 @@
                 <span>Rekam Medis Pasien</span>
             </a>
         @endif
+
+        <div class="pt-2 mt-2 border-t border-slate-100">
+            <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors {{ $profileActive }}">
+                <span class="material-symbols-outlined text-[21px]">manage_accounts</span>
+                <span class="font-medium">Profil & Akun</span>
+            </a>
+        </div>
     </nav>
 
     <div class="px-4 py-5 border-t border-slate-200">

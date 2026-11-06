@@ -150,7 +150,51 @@
                                             </div>
                                         @endif
                                         <div>
-                                            <label class="block text-sm font-medium text-slate-600 mb-2">Diagnosa *</label>
+                                            <div class="flex flex-wrap items-center justify-between gap-1 mb-1.5">
+                                                <label class="block text-sm font-medium text-slate-600">Diagnosa *</label>
+                                                <span class="text-[11px] font-semibold text-slate-400">⚡ Template Diagnosa Cepat:</span>
+                                            </div>
+                                            @php
+                                                $quickDiagnoses = match($k->poli_tujuan) {
+                                                    'Poli Gigi' => [
+                                                        'Karies Dentis (Gigi Berlubang)',
+                                                        'Pulpitis Akut',
+                                                        'Gingivitis (Radang Gusi)',
+                                                        'Periodontitis',
+                                                        'Gangren Radiks (Sisa Akar Gigi)',
+                                                    ],
+                                                    'Poli Anak' => [
+                                                        'ISPA Pediatrik (Batuk Pilek)',
+                                                        'Diare Akut Dehidrasi Ringan',
+                                                        'Faringitis Akut (Radang Tenggorokan)',
+                                                        'Alergi / Dermatitis Atopik',
+                                                        'Febris Observasi Infeksi Virus',
+                                                    ],
+                                                    'Poli Spesialis Kandungan' => [
+                                                        'Pemeriksaan ANC Kehamilan Rutin',
+                                                        'Disminore Primer (Nyeri Haid)',
+                                                        'Fluor Albus (Keputihan)',
+                                                        'Emesis Gravidarum (Mual Hamil)',
+                                                        'Pemeriksaan USG Ginekologi',
+                                                    ],
+                                                    default => [
+                                                        'ISPA / Batuk Pilek Akut',
+                                                        'Dispepsia / Sakit Maag',
+                                                        'Febris / Demam Akut',
+                                                        'Hipertensi Primer',
+                                                        'Cephalgia (Sakit Kepala)',
+                                                    ],
+                                                };
+                                            @endphp
+                                            <div class="mb-2.5 flex flex-wrap gap-1.5">
+                                                @foreach($quickDiagnoses as $qd)
+                                                    <button type="button"
+                                                        onclick="applyQuickDiagnosis(this, '{{ addslashes($qd) }}')"
+                                                        class="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-600 shadow-2xs transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-700 active:scale-95">
+                                                        <span class="font-bold text-sky-500">+</span> {{ $qd }}
+                                                    </button>
+                                                @endforeach
+                                            </div>
                                             <textarea name="diagnosa" rows="2" maxlength="2000" data-draft-field="diagnosa"
                                                 class="w-full rounded-xl border {{ $pulihkanInput && $errors->has('diagnosa') ? 'border-red-400' : 'border-slate-200' }} bg-slate-50 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-sky-100"
                                                 placeholder="{{ $k->poli_tujuan === 'Poli Gigi' ? 'Contoh: Pulpitis Reversibel, Karies Dentis, Gangren Pulpa...' : 'Tuliskan diagnosa medis...' }}" required>{{ $pulihkanInput ? old('diagnosa') : '' }}</textarea>
@@ -158,7 +202,25 @@
                                         </div>
                                         @if($k->poli_tujuan === 'Poli Gigi')
                                             <div>
-                                                <label class="block text-sm font-medium text-slate-600 mb-2">Tindakan Dental <span class="text-xs font-normal text-slate-400">(opsional, jika dilakukan tindakan)</span></label>
+                                                <div class="flex flex-wrap items-center justify-between gap-1 mb-1.5">
+                                                    <label class="block text-sm font-medium text-slate-600">Tindakan Dental <span class="text-xs font-normal text-slate-400">(opsional, jika dilakukan tindakan)</span></label>
+                                                    <span class="text-[11px] font-semibold text-emerald-600">⚡ Tindakan Umum:</span>
+                                                </div>
+                                                <div class="mb-2.5 flex flex-wrap gap-1.5">
+                                                    @foreach([
+                                                        'Tambal Gigi Komposit',
+                                                        'Pembersihan Karang Gigi (Scaling)',
+                                                        'Ekstraksi Gigi (Pencabutan)',
+                                                        'Perawatan Saluran Akar (PSA)',
+                                                        'Topical Fluoride Treatment',
+                                                    ] as $td)
+                                                        <button type="button"
+                                                            onclick="applyQuickProcedure(this, '{{ addslashes($td) }}')"
+                                                            class="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-white px-2.5 py-1 text-[11px] font-medium text-emerald-700 shadow-2xs transition hover:border-emerald-300 hover:bg-emerald-50 active:scale-95">
+                                                            <span class="font-bold text-emerald-600">+</span> {{ $td }}
+                                                        </button>
+                                                    @endforeach
+                                                </div>
                                                 <textarea name="catatan_tambahan" rows="2" maxlength="4000" data-draft-field="catatan_tambahan" class="w-full rounded-xl border {{ $pulihkanInput && $errors->has('catatan_tambahan') ? 'border-red-400' : 'border-slate-200' }} bg-slate-50 px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-sky-100" placeholder="Contoh: Tambal Gigi Komposit / Pencabutan Gigi / Scaling Pembersihan Karang Gigi...">{{ $pulihkanInput ? old('catatan_tambahan') : '' }}</textarea>
                                                 @if($pulihkanInput) @error('catatan_tambahan') <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p> @enderror @endif
                                             </div>
@@ -203,6 +265,36 @@
     <div id="sessionCompletedVisit" data-visit-id="{{ session('completed_visit_id') }}" class="hidden"></div>
 
     <script>
+        function applyQuickDiagnosis(button, text) {
+            const form = button.closest('form');
+            if (!form) return;
+            const textarea = form.querySelector('textarea[name="diagnosa"]');
+            if (!textarea) return;
+
+            if (!textarea.value || textarea.value.trim() === '') {
+                textarea.value = text;
+            } else if (!textarea.value.includes(text)) {
+                textarea.value = textarea.value.trim() + ', ' + text;
+            }
+            textarea.focus();
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        function applyQuickProcedure(button, text) {
+            const form = button.closest('form');
+            if (!form) return;
+            const textarea = form.querySelector('textarea[name="catatan_tambahan"]');
+            if (!textarea) return;
+
+            if (!textarea.value || textarea.value.trim() === '') {
+                textarea.value = text;
+            } else if (!textarea.value.includes(text)) {
+                textarea.value = textarea.value.trim() + ', ' + text;
+            }
+            textarea.focus();
+            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
         (() => {
             const completedVisitId = document.getElementById('sessionCompletedVisit')?.dataset.visitId;
             if (completedVisitId) {

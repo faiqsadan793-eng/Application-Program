@@ -21,7 +21,7 @@ class TransaksiController extends Controller
         return view('transaksi.index', compact('transaksis'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, int|string $id)
     {
         // Dipakai untuk membuka kembali transaksi yang sama jika validasi gagal.
         $request->merge(['payment_transaction_id' => (int) $id]);
@@ -177,6 +177,15 @@ class TransaksiController extends Controller
         return response()->stream(function () use ($transaksis) {
             $handle = fopen('php://output', 'w');
 
+            // Mitigasi CSV Formula Injection (Cegah eksekusi formula di Microsoft Excel)
+            $sanitizeCell = function ($val): string {
+                $str = (string) ($val ?? '-');
+                if (isset($str[0]) && in_array($str[0], ['=', '+', '-', '@', "\t", "\r"], true)) {
+                    return "'" . $str;
+                }
+                return $str;
+            };
+
             // UTF-8 BOM agar terbaca rapi saat dibuka di Microsoft Excel
             fputs($handle, "\xEF\xBB\xBF");
 
@@ -208,10 +217,10 @@ class TransaksiController extends Controller
                 fputcsv($handle, [
                     'TRX-' . str_pad($t->id_transaksi, 5, '0', STR_PAD_LEFT),
                     $waktu,
-                    $noRm,
-                    $t->kunjungan->pasien->nama ?? '-',
-                    $t->kunjungan->poli_tujuan ?? '-',
-                    $t->kunjungan->rekamMedis->diagnosa ?? '-',
+                    $sanitizeCell($noRm),
+                    $sanitizeCell($t->kunjungan->pasien->nama),
+                    $sanitizeCell($t->kunjungan->poli_tujuan),
+                    $sanitizeCell($t->kunjungan->rekamMedis->diagnosa),
                     (int) ($t->biaya_jasa_dokter ?? 50000),
                     (int) $t->biaya_tindakan,
                     (int) $t->biaya_obat,

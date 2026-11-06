@@ -24,15 +24,15 @@
 
                 <div class="flex items-center gap-4">
                     @include('layouts.header-date')
-                    <div class="flex items-center gap-3">
+                    <a href="{{ route('profile.edit') }}" title="Pengaturan Akun & Profil" class="flex items-center gap-3 group transition">
                         <div class="hidden sm:block text-right">
-                            <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>
+                            <p class="text-sm font-semibold text-slate-900 group-hover:text-emerald-700 transition">{{ $user->name }}</p>
                             <p class="text-xs text-slate-500">Dokter ({{ $dokter->poli ?? '-' }})</p>
                         </div>
-                        <div class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-sky-100 text-sky-700 font-semibold">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-sky-100 text-sky-700 font-semibold group-hover:border-sky-400 group-hover:shadow-sm transition">
                             {{ strtoupper(substr($user->name, 0, 1)) }}
                         </div>
-                    </div>
+                    </a>
                 </div>
             </header>
 
@@ -197,6 +197,45 @@
         let previousQueueCount = parseInt(metaEl.dataset.queueCount || '0', 10);
         let isFetching = false;
 
+        // Web Audio API Chime (Suara notifikasi bel lembut tanpa butuh file MP3 eksternal)
+        function playQueueChime() {
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                if (ctx.state === 'suspended') {
+                    ctx.resume();
+                }
+                const now = ctx.currentTime;
+
+                // Nada 1: Bell lembut 880 Hz (A5)
+                const osc1 = ctx.createOscillator();
+                const gain1 = ctx.createGain();
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(880, now);
+                gain1.gain.setValueAtTime(0.12, now);
+                gain1.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+                osc1.connect(gain1);
+                gain1.connect(ctx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.35);
+
+                // Nada 2: Nada harmonik lebih tinggi 1174.66 Hz (D6)
+                const osc2 = ctx.createOscillator();
+                const gain2 = ctx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(1174.66, now + 0.12);
+                gain2.gain.setValueAtTime(0.14, now + 0.12);
+                gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.55);
+                osc2.connect(gain2);
+                gain2.connect(ctx.destination);
+                osc2.start(now + 0.12);
+                osc2.stop(now + 0.55);
+            } catch (e) {
+                // Browser policy / audio disabled: fallback hening tanpa error
+            }
+        }
+
         function renderStatusBadge(status) {
             if (status === 'antre') {
                 return '<span class="inline-flex rounded-full bg-yellow-100 px-3 py-1 text-[11px] font-semibold text-yellow-800">Antre</span>';
@@ -267,8 +306,9 @@
                 if (statAktif) statAktif.innerText = data.antreanAktif;
                 if (statSelesai) statSelesai.innerText = data.selesaiDiperiksa;
 
-                // Cek jika ada antrean bertambah untuk notifikasi visual
+                // Cek jika ada antrean bertambah untuk notifikasi suara & visual
                 if (data.antreanAktif > previousQueueCount) {
+                    playQueueChime();
                     const badge = document.getElementById('liveStatusBadge');
                     if (badge) {
                         badge.classList.remove('bg-emerald-100', 'text-emerald-700');

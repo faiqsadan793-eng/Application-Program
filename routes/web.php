@@ -54,6 +54,7 @@ Route::middleware(['auth', 'role:staff,dokter'])->group(function () {
 // ROUTE KHUSUS DOKTER
 Route::middleware(['auth', 'role:dokter'])->group(function () {
     Route::get('dashboard/antrean-check', [DashboardController::class, 'checkAntreanDokter'])
+        ->middleware('throttle:60,1')
         ->name('dashboard.dokter.antrean-check');
 
     Route::post('rekam-medis/panggil-selanjutnya', [RekamMedisController::class, 'panggilSelanjutnya'])

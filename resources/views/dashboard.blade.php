@@ -24,15 +24,15 @@
                 @include('layouts.header-page-info', ['breadcrumb' => 'Klinik Lala Medicare / Dashboard', 'title' => 'Dashboard Utama'])
                 <div class="flex items-center gap-4">
                     @include('layouts.header-date')
-                    <div class="flex items-center gap-3">
+                    <a href="{{ route('profile.edit') }}" title="Pengaturan Akun & Profil" class="flex items-center gap-3 group transition">
                         <div class="hidden sm:block text-right">
-                            <p class="text-sm font-semibold text-slate-900">{{ $user->name }}</p>
+                            <p class="text-sm font-semibold text-slate-900 group-hover:text-emerald-700 transition">{{ $user->name }}</p>
                             <p class="text-xs text-slate-500">{{ ucfirst($user->role ?? 'Staff') }}</p>
                         </div>
-                        <div class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-emerald-100 text-emerald-700 font-semibold">
+                        <div class="flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-emerald-100 text-emerald-700 font-semibold group-hover:border-emerald-400 group-hover:shadow-sm transition">
                             {{ strtoupper(substr($user->name, 0, 1)) }}
                         </div>
-                    </div>
+                    </a>
                 </div>
             </header>
 

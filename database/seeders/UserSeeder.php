@@ -13,12 +13,17 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // Password dapat dikonfigurasi melalui .env (SEEDER_DOKTER_PASSWORD / SEEDER_STAFF_PASSWORD)
+        // Jika tidak diset, gunakan default untuk kemudahan development lokal.
+        $dokterPassword = env('SEEDER_DOKTER_PASSWORD', 'password123');
+        $staffPassword  = env('SEEDER_STAFF_PASSWORD', 'password123');
+
         // Akun Dokter
         User::firstOrCreate(
             ['email' => 'dokter@klinik.com'],
             [
                 'name'               => 'dr. Budi Santoso',
-                'password'           => Hash::make('password123'),
+                'password'           => Hash::make($dokterPassword),
                 'role'               => 'dokter',
                 'email_verified_at'  => now(),
             ]
@@ -29,7 +34,7 @@ class UserSeeder extends Seeder
             ['email' => 'staff@klinik.com'],
             [
                 'name'               => 'Siti Rahma (Staff)',
-                'password'           => Hash::make('password123'),
+                'password'           => Hash::make($staffPassword),
                 'role'               => 'staff',
                 'email_verified_at'  => now(),
             ]
