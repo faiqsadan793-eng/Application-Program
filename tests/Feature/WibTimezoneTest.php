@@ -60,6 +60,7 @@ class WibTimezoneTest extends TestCase
         $this->assertSame('2026-09-10 00:30:00', $visit->fresh()->rekamMedis->created_at->format('Y-m-d H:i:s'));
         $payment = Transaksi::sole();
         $this->actingAs($staff)->put(route('transaksi.update', $payment), [
+            'biaya_jasa_dokter' => 20000,
             'biaya_tindakan' => 50000,
             'biaya_obat' => 10000,
             'uang_dibayar' => 100000,
@@ -72,7 +73,7 @@ class WibTimezoneTest extends TestCase
             'tanggal_dari' => '2026-09-10',
             'tanggal_sampai' => '2026-09-10',
         ]))->assertOk()->assertViewHas('jumlahTransaksi', 1)
-            ->assertViewHas('totalPendapatan', fn ($total) => (float) $total === 60000.0);
+            ->assertViewHas('totalPendapatan', fn ($total) => (float) $total === 80000.0);
         $this->get(route('riwayat-transaksi.index', [
             'tanggal_dari' => '2026-09-09',
             'tanggal_sampai' => '2026-09-09',

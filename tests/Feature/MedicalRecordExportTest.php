@@ -27,7 +27,10 @@ class MedicalRecordExportTest extends TestCase
         for ($i = 0; $i < 12; $i++) {
             $this->record($patient, 'Poli Umum', 'Diagnosis '.$i);
         }
-        $this->actingAs(User::factory()->create(['role' => 'staff']));
+        $doctor = User::factory()->create(['role' => 'dokter']);
+        Dokter::create(['user_id' => $doctor->id, 'nip_sip' => 'SIP-EXP-001', 'poli' => 'Poli Umum']);
+
+        $this->actingAs($doctor);
         $this->get(route('rekam-medis-pasien.show', $patient))->assertOk()
             ->assertSee('Detail Pasien')->assertSee('Ekspor Seluruh Riwayat PDF')
             ->assertViewHas('kunjungans', fn ($rows) => $rows->count() === 10 && $rows->total() === 12);
@@ -65,12 +68,15 @@ class MedicalRecordExportTest extends TestCase
 
     public function test_index_loads_only_latest_record_for_each_patient(): void
     {
+        $doctor = User::factory()->create(['role' => 'dokter']);
+        Dokter::create(['user_id' => $doctor->id, 'nip_sip' => 'SIP-EXP-002', 'poli' => 'Poli Umum']);
+
         foreach (range(1, 2) as $i) {
             $patient = $this->patient();
             $this->record($patient, 'Poli Umum', 'Lama');
             $this->record($patient, 'Poli Umum', 'Terbaru');
         }
-        $this->actingAs(User::factory()->create(['role' => 'staff']))
+        $this->actingAs($doctor)
             ->get(route('rekam-medis-pasien.index'))->assertOk()->assertViewHas('rekamMedis', function ($rows) {
                 return $rows->count() === 2 && $rows->every(fn ($p) => $p->kunjungans->count() === 1 && $p->kunjungans->first()->rekamMedis->diagnosa === 'Terbaru');
             });
@@ -82,7 +88,10 @@ class MedicalRecordExportTest extends TestCase
         foreach (range(1, 51) as $i) {
             $this->record($patient, 'Poli Umum', 'Diagnosis '.$i);
         }
-        $this->actingAs(User::factory()->create(['role' => 'staff']));
+        $doctor = User::factory()->create(['role' => 'dokter']);
+        Dokter::create(['user_id' => $doctor->id, 'nip_sip' => 'SIP-EXP-003', 'poli' => 'Poli Umum']);
+
+        $this->actingAs($doctor);
         $this->get(route('rekam-medis-pasien.pdf', $patient))->assertRedirect(route('rekam-medis-pasien.show', $patient))->assertSessionHas('error');
         view()->composer('rekam_medis_pasien.pdf', function ($view) {
             $data = $view->getData();

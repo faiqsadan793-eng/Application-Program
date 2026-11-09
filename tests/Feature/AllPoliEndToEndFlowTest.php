@@ -71,6 +71,7 @@ class AllPoliEndToEndFlowTest extends TestCase
             $this->assertSame(Kunjungan::STATUS_SIAP_BAYAR, $kunjungan->fresh()->status);
 
             $this->actingAs($staff)->put(route('transaksi.update', $transaksi), [
+                'biaya_jasa_dokter' => 25000,
                 'biaya_tindakan' => 50000,
                 'biaya_obat' => 10000,
                 'uang_dibayar' => 100000,
@@ -80,8 +81,11 @@ class AllPoliEndToEndFlowTest extends TestCase
             $this->assertDatabaseHas('transaksis', [
                 'id_transaksi' => $transaksi->id_transaksi,
                 'id_kunjungan' => $kunjungan->id_kunjungan,
-                'total_biaya' => 60000,
-                'kembalian' => 40000,
+                'biaya_jasa_dokter' => 25000,
+                'biaya_tindakan' => 50000,
+                'biaya_obat' => 10000,
+                'total_biaya' => 85000,
+                'kembalian' => 15000,
                 'status_pembayaran' => Transaksi::STATUS_LUNAS,
             ]);
             $this->assertSame(Kunjungan::STATUS_SELESAI, $kunjungan->fresh()->status);

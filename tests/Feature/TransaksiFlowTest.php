@@ -19,6 +19,7 @@ class TransaksiFlowTest extends TestCase
         $transaksi = $this->transaksiSiapBayar();
 
         $this->actingAs($staff)->put(route('transaksi.update', $transaksi), [
+            'biaya_jasa_dokter' => 20000,
             'biaya_tindakan' => 50000,
             'biaya_obat' => 12500,
             'uang_dibayar' => 100000,
@@ -30,11 +31,12 @@ class TransaksiFlowTest extends TestCase
 
         $this->assertDatabaseHas('transaksis', [
             'id_transaksi' => $transaksi->id_transaksi,
+            'biaya_jasa_dokter' => 20000,
             'biaya_tindakan' => 50000,
             'biaya_obat' => 12500,
-            'total_biaya' => 62500,
+            'total_biaya' => 82500,
             'uang_dibayar' => 100000,
-            'kembalian' => 37500,
+            'kembalian' => 17500,
             'metode_pembayaran' => 'cash',
             'status_pembayaran' => Transaksi::STATUS_LUNAS,
         ]);
@@ -50,6 +52,7 @@ class TransaksiFlowTest extends TestCase
         $transaksi = $this->transaksiSiapBayar();
 
         $this->actingAs($staff)->put(route('transaksi.update', $transaksi), [
+            'biaya_jasa_dokter' => 20000,
             'biaya_tindakan' => 50000,
             'biaya_obat' => 12500,
             'uang_dibayar' => 60000,
@@ -74,6 +77,7 @@ class TransaksiFlowTest extends TestCase
         $transaksi = $this->transaksiSiapBayar();
 
         $this->actingAs($staff)->put(route('transaksi.update', $transaksi), [
+            'biaya_jasa_dokter' => 0,
             'biaya_tindakan' => 10000000000,
             'biaya_obat' => 0,
             'uang_dibayar' => 10000000000,
@@ -92,7 +96,8 @@ class TransaksiFlowTest extends TestCase
         $transaksi = $this->transaksiSiapBayar();
 
         $this->actingAs($staff)->put(route('transaksi.update', $transaksi), [
-            'biaya_tindakan' => 6000000000,
+            'biaya_jasa_dokter' => 1000000000,
+            'biaya_tindakan' => 5000000000,
             'biaya_obat' => 4000000000,
             'uang_dibayar' => 9999999999,
             'metode_pembayaran' => 'debit',

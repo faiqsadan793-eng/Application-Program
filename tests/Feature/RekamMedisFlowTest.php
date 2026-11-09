@@ -257,7 +257,9 @@ class RekamMedisFlowTest extends TestCase
 
     public function test_staff_can_view_patient_medical_record_index_and_detail(): void
     {
-        $staff = User::factory()->create(['role' => 'staff']);
+        $doctor = User::factory()->create(['role' => 'dokter']);
+        Dokter::create(['user_id' => $doctor->id, 'nip_sip' => 'SIP-RATNA-001', 'poli' => 'Poli Umum']);
+
         $pasien = Pasien::create($this->pasienData());
         $pasien->no_rm = Pasien::nomorRekamMedisUntuk($pasien->id_pasien);
         $pasien->save();
@@ -275,9 +277,9 @@ class RekamMedisFlowTest extends TestCase
             'resep_obat' => 'Obat batuk',
         ]);
 
-        $this->actingAs($staff)->get(route('rekam-medis-pasien.index', ['search' => $pasien->no_rm]))
+        $this->actingAs($doctor)->get(route('rekam-medis-pasien.index', ['search' => $pasien->no_rm]))
             ->assertOk()->assertSee($pasien->no_rm)->assertSee('ISPA');
-        $this->actingAs($staff)->get(route('rekam-medis-pasien.show', $pasien))
+        $this->actingAs($doctor)->get(route('rekam-medis-pasien.show', $pasien))
             ->assertOk()->assertSee('Riwayat Pemeriksaan')->assertSee('Obat batuk');
     }
 
