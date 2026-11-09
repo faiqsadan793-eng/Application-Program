@@ -1,3 +1,5 @@
+providers = ["php", "node"]
+
 [phases.setup]
 nixPkgs = [
     "php84",
@@ -8,13 +10,14 @@ nixPkgs = [
     "php84Extensions.intl",
     "php84Extensions.bcmath",
     "php84Extensions.exif",
+    "php84Extensions.zip",
     "composer",
     "nodejs_20"
 ]
 
 [phases.install]
 cmds = [
-    "composer install --no-dev --optimize-autoloader --no-interaction",
+    "composer install --no-dev --optimize-autoloader --no-interaction --ignore-platform-req=php+",
     "npm ci --prefer-offline --no-audit || npm install"
 ]
 
