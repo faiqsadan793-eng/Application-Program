@@ -9,6 +9,7 @@
     <style>body{font-family:Inter,sans-serif}.medical-note{white-space:pre-wrap;overflow-wrap:anywhere}</style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-900">
+    @include('layouts.skeleton')
 <div class="flex min-h-screen">
     @include('layouts.sidebar')
     <div class="min-w-0 flex-1">

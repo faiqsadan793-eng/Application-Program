@@ -14,6 +14,7 @@
     </style>
 </head>
 <body class="min-h-screen bg-slate-100 text-slate-900">
+    @include('layouts.skeleton')
     @php $user = Auth::user(); @endphp
 
     <div class="flex min-h-screen">
